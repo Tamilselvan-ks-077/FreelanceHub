@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelanceHub - Edit Profile</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <script src="{% static 'core/js/main.js' %}" defer></script>
+    <style>
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-brand {
+            font-family: var(--font-outfit);
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.95rem;
+        }
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .skill-tag {
+            background: rgba(138, 75, 243, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(138, 75, 243, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .skill-tag button {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .flex-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .flex-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Header -->
+        <nav class="nav-header">
+            <a href="{% url 'home' %}" class="nav-brand">FreelanceHub</a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Find Freelancers</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'logout' %}">Log Out</a>
+            </div>
+        </nav>
+
+        <header style="margin-bottom: 30px;">
+            <h1>Edit Profile</h1>
+            <p>Customize your profile details and public contact info</p>
+        </header>
+
+        <!-- Notification Message Alerts -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                <span>{{ message }}</span>
+                <button class="alert-close" aria-label="Close message">&times;</button>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="layout" style="grid-template-columns: {% if profile.role == 'freelancer' %}2fr 1fr{% else %}1fr{% endif %};">
+            
+            <!-- Left Side: Profile Information Form -->
+            <main class="glass-panel">
+                <form method="POST" action="{% url 'profile_edit' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile">
+                    
+                    <h2>Professional Profile</h2>
+                    
+                    {% if profile.role == 'freelancer' %}
+                    <div class="form-group">
+                        <label for="title">Professional Title</label>
+                        <input type="text" id="title" name="title" value="{{ profile.title|default_if_none:'' }}" placeholder="e.g. Senior Frontend Developer" required>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-row" style="{% if profile.role == 'client' %}grid-template-columns: 1fr;{% endif %}">
+                        {% if profile.role == 'freelancer' %}
+                        <div class="form-group">
+                            <label for="hourly_rate">Hourly Rate ($)</label>
+                            <input type="number" id="hourly_rate" name="hourly_rate" step="0.01" value="{{ profile.hourly_rate }}" required>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" value="{{ profile.age }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact_email">Public Contact Email</label>
+                        <input type="email" id="contact_email" name="contact_email" value="{{ profile.contact_email|default_if_none:'' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Profile Bio</label>
+                        <textarea id="bio" name="bio" rows="6" style="width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-family: var(--font-inter); font-size: 1rem; resize: vertical;" placeholder="{% if profile.role == 'freelancer' %}Tell clients about your experience, services, and past work...{% else %}Tell freelancers about yourself, your projects, or your company...{% endif %}" required>{{ profile.bio|default_if_none:'' }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="max-width: 200px;">Save Profile</button>
+                </form>
+            </main>
+
+            <!-- Right Side: Skills Management Panel (Freelancers Only) -->
+            {% if profile.role == 'freelancer' %}
+            <aside class="glass-panel">
+                <h2>Manage Skills</h2>
+                
+                <!-- Current Skills Tag Cloud -->
+                <div class="skills-list">
+                    {% for fs in current_skills %}
+                    <div class="skill-tag">
+                        <span>{{ fs.skill.name }}</span>
+                        <form method="POST" action="{% url 'profile_edit' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_skill">
+                            <input type="hidden" name="skill_id" value="{{ fs.skill.id }}">
+                            <button type="submit" title="Remove skill">&times;</button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p style="color: var(--text-dark); font-size: 0.9rem; margin-bottom: 15px;">No skills added yet.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Add Skill Form -->
+                <form method="POST" action="{% url 'profile_edit' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_skill">
+                    <div class="form-group">
+                        <label for="new_skill">Add a Skill</label>
+                        <input type="text" id="new_skill" name="skill_name" placeholder="e.g. Python, React, UI Design" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Add</button>
+                </form>
+            </aside>
+            {% endif %}
+
+        </div>
+    </div>
+</body>
+</html>

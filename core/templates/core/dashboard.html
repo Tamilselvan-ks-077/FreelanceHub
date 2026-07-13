@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelanceHub - Dashboard</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <script src="{% static 'core/js/main.js' %}" defer></script>
+    <style>
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-brand {
+            font-family: var(--font-outfit);
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.95rem;
+        }
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .badge {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+        .badge-pending { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+        .badge-accepted { background: rgba(23, 162, 184, 0.15); color: #17a2b8; border: 1px solid rgba(23, 162, 184, 0.3); }
+        .badge-rejected { background: rgba(220, 53, 69, 0.15); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+        .badge-completed { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
+        .badge-unpaid { background: rgba(220, 53, 69, 0.15); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+        .badge-paid { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
+        
+        .list-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            margin-right: 5px;
+        }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--error); color: white; }
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-success:hover { filter: brightness(1.1); }
+        .btn-danger:hover { filter: brightness(1.1); }
+        .btn-info:hover { filter: brightness(1.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Header -->
+        <nav class="nav-header">
+            <a href="{% url 'home' %}" class="nav-brand">FreelanceHub</a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Find Freelancers</a>
+                <a href="{% url 'profile_edit' %}">Edit Profile</a>
+                <a href="{% url 'logout' %}">Log Out</a>
+            </div>
+        </nav>
+
+        <header style="margin-bottom: 30px;">
+            <h1>User Dashboard</h1>
+            <p>Manage your bookings, contracts, and financial receipts</p>
+        </header>
+
+        <!-- Notification Message Alerts -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                <span>{{ message }}</span>
+                <button class="alert-close" aria-label="Close message">&times;</button>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            
+            <!-- Left Side: Bookings Panel -->
+            <main class="glass-panel">
+                <h2>
+                    {% if user.profile.role == 'client' %}
+                        My Outgoing Booking Requests
+                    {% else %}
+                        My Incoming Project Requests
+                    {% endif %}
+                </h2>
+                <div style="margin-top: 20px;">
+                    {% for booking in bookings %}
+                    <div class="list-item">
+                        <div class="list-item-header">
+                            <span style="font-weight: 600;">
+                                {% if user.profile.role == 'client' %}
+                                    To: {{ booking.freelancer.username }} ({{ booking.freelancer.profile.title|default:"Freelancer" }})
+                                {% else %}
+                                    From: {{ booking.client.username }}
+                                {% endif %}
+                            </span>
+                            <span class="badge badge-{{ booking.status }}">{{ booking.status }}</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                            <strong>Duration:</strong> {{ booking.start_date }} to {{ booking.end_date }}
+                        </p>
+                        <p style="font-size: 0.95rem; line-height: 1.5; color: var(--text-main); margin-bottom: 15px;">
+                            {{ booking.description }}
+                        </p>
+                        
+                        <!-- Actions based on role and status -->
+                        <div class="list-item-footer">
+                            {% if user.profile.role == 'freelancer' and booking.status == 'pending' %}
+                            <form method="POST" action="{% url 'booking_action' booking.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="accept">
+                                <button type="submit" class="action-btn btn-success">Accept & Generate Invoice</button>
+                            </form>
+                            <form method="POST" action="{% url 'booking_action' booking.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="action-btn btn-danger">Decline Request</button>
+                            </form>
+                            {% elif user.profile.role == 'freelancer' and booking.status == 'accepted' %}
+                            <form method="POST" action="{% url 'booking_action' booking.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="complete">
+                                <button type="submit" class="action-btn btn-info">Mark as Completed</button>
+                            </form>
+                            {% elif user.profile.role == 'client' and booking.status == 'pending' %}
+                            <a href="{% url 'booking_edit' booking.id %}" class="action-btn btn-info" style="text-decoration: none; display: inline-block;">Edit Request</a>
+                            <form method="POST" action="{% url 'booking_cancel' booking.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this booking request?');">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn btn-danger">Cancel Request</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p style="color: var(--text-muted);">No booking requests found.</p>
+                    {% endfor %}
+                </div>
+            </main>
+
+            <!-- Right Side: Invoices Panel -->
+            <aside class="glass-panel">
+                <h2>Receipts & Invoices</h2>
+                <div style="margin-top: 20px;">
+                    {% for invoice in invoices %}
+                    <div class="list-item" style="padding: 15px;">
+                        <div class="list-item-header" style="border-bottom: none; margin-bottom: 5px;">
+                            <span style="font-weight: 600; color: var(--accent);">Invoice #{{ invoice.id }}</span>
+                            <span class="badge badge-{{ invoice.status }}">{{ invoice.status }}</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">
+                            <strong>Amount:</strong> ${{ invoice.amount }}
+                        </p>
+                        <p style="font-size: 0.8rem; color: var(--text-dark); margin-bottom: 12px;">
+                            Booking #{{ invoice.booking.id }} | {{ invoice.issued_at|date:"M d, Y" }}
+                        </p>
+                        
+                        <!-- Client Invoice Pay Button -->
+                        {% if user.profile.role == 'client' and invoice.status == 'unpaid' %}
+                        <form method="POST" action="{% url 'pay_invoice' invoice.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn btn-success" style="width: 100%; margin-right: 0;">Pay Invoice</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p style="color: var(--text-muted);">No invoices found.</p>
+                    {% endfor %}
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</body>
+</html>

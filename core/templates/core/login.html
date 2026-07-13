@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelanceHub - Log In</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <script src="{% static 'core/js/main.js' %}" defer></script>
+    <style>
+        .auth-container {
+            max-width: 450px;
+            margin: 60px auto;
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .auth-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FreelanceHub</h1>
+            <p>Welcome back to the talent community</p>
+        </header>
+
+        <div class="auth-container glass-panel">
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <h2>Log In</h2>
+
+                <!-- Notification Message Alerts -->
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        <span>{{ message }}</span>
+                        <button class="alert-close" type="button" aria-label="Close message">&times;</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Log In</button>
+            </form>
+
+            <div class="auth-links">
+                Don't have an account yet? <a href="{% url 'signup' %}">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
