@@ -1,172 +1,235 @@
+{% extends "core/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreelanceHub - Talent Marketplace</title>
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
-    <script src="{% static 'core/js/main.js' %}" defer></script>
-    <style>
-        .nav-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .nav-brand {
-            font-family: var(--font-outfit);
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 0.95rem;
-        }
-        .nav-links a:hover {
-            color: var(--text-main);
-        }
-        .search-panel {
-            margin-bottom: 40px;
-        }
-        .search-form {
-            display: grid;
-            grid-template-columns: 2fr 1fr 120px;
-            gap: 15px;
-        }
-        @media (max-width: 700px) {
-            .search-form {
-                grid-template-columns: 1fr;
-            }
-        }
-        .user-welcome {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-        .user-welcome span {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        .card-skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-            justify-content: center;
-        }
-        .card-skill-tag {
-            font-size: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            padding: 2px 8px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        
-        <!-- Navigation Header -->
-        <nav class="nav-header">
-            <a href="{% url 'home' %}" class="nav-brand">FreelanceHub</a>
-            <div class="nav-links">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}">Dashboard</a>
-                    <a href="{% url 'profile_edit' %}">Edit Profile</a>
-                    <a href="{% url 'logout' %}">Log Out</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Log In</a>
-                    <a href="{% url 'signup' %}">Sign Up</a>
-                {% endif %}
+
+{% block title %}Explore Expert Freelancers | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="marketplace-hero animate-fade-in">
+    <h1>Find Expert Freelancers Instantly</h1>
+    <p>Connect with top-tier developers, designers, and consultants for your projects.</p>
+</div>
+
+<!-- Advanced Search & Directory Layout -->
+<div class="search-directory-layout">
+    <!-- Filters Sidebar Panel -->
+    <aside class="glass-panel sidebar-filters animate-slide-in">
+        <form method="GET" action="{% url 'home' %}" class="filters-form">
+            <h3><i class="fa-solid fa-filter"></i> Filters</h3>
+            
+            <div class="filter-group">
+                <label for="q">Keyword Search</label>
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Name, title, bio...">
             </div>
-        </nav>
+            
+            <div class="filter-group">
+                <label for="skill">Required Skill</label>
+                <input type="text" name="skill" id="skill" value="{{ skill_query }}" placeholder="Python, Django, UI/UX...">
+            </div>
+            
+            <div class="filter-group">
+                <label>Hourly Rate ($)</label>
+                <div class="range-inputs">
+                    <input type="number" name="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
+                    <input type="number" name="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label for="location">Location</label>
+                <input type="text" name="location" id="location" value="{{ location }}" placeholder="Germany, Remote, India...">
+            </div>
+            
+            <div class="filter-group">
+                <label for="experience">Min Experience (Years)</label>
+                <input type="number" name="experience" id="experience" value="{{ experience }}" placeholder="0" min="0">
+            </div>
+            
+            <div class="filter-group">
+                <label for="rating">Min Rating</label>
+                <select name="rating" id="rating">
+                    <option value="">Any Rating</option>
+                    <option value="4" {% if min_rating == '4' %}selected{% endif %}>4+ Stars</option>
+                    <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>4.5+ Stars</option>
+                    <option value="5" {% if min_rating == '5' %}selected{% endif %}>5 Stars Only</option>
+                </select>
+            </div>
+            
+            <div class="filter-group checkboxes">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="availability" value="true" {% if availability == 'true' %}checked{% endif %}>
+                    Available Now Only
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="verified" value="true" {% if verified == 'true' %}checked{% endif %}>
+                    Verified Freelancers
+                </label>
+            </div>
+            
+            <!-- Hidden sort to maintain sort order when applying filters -->
+            <input type="hidden" name="sort_by" value="{{ sort_by }}">
+            
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Apply Filters</button>
+            <a href="{% url 'home' %}" class="btn-secondary-link text-center">Clear All</a>
+        </form>
+    </aside>
 
-        <header>
-            <h1>FreelanceHub</h1>
-            <p>Find and book professional freelance talent instantly</p>
-        </header>
-
-        {% if user.is_authenticated %}
-        <div class="user-welcome">
-            Logged in as: <span>{{ user.username }}</span> (Role: <span>{{ user.profile.get_role_display }}</span>)
+    <!-- Main Results Column -->
+    <div class="main-directory-content">
+        <div class="directory-control-bar glass-panel animate-fade-in">
+            <span class="results-count">{{ freelancers.count }} Freelancers Available</span>
+            
+            <!-- Sorting Dropdown -->
+            <div class="sort-selector">
+                <label for="sort_by_select">Sort By:</label>
+                <select id="sort_by_select" onchange="applySort(this.value)">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
+                    <option value="lowest_price" {% if sort_by == 'lowest_price' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="highest_price" {% if sort_by == 'highest_price' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="most_completed" {% if sort_by == 'most_completed' %}selected{% endif %}>Projects Completed</option>
+                </select>
+            </div>
         </div>
-        {% endif %}
 
-        <!-- Notification Message Alerts -->
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
-                <span>{{ message }}</span>
-                <button class="alert-close" aria-label="Close message">&times;</button>
-            </li>
+        <!-- Quick Category Suggestion Pills -->
+        <div class="suggestion-pills-bar glass-panel animate-fade-in" style="margin-bottom: 25px; padding: 15px 30px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);"><i class="fa-solid fa-fire text-accent animate-pulse"></i> Popular Skills:</span>
+            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('Django')">Django</button>
+            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('React')">React</button>
+            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('Python')">Python</button>
+            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('UI Design')">UI Design</button>
+            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('DevOps')">DevOps</button>
+        </div>
+
+        <div class="cards-grid">
+            {% for freelancer in freelancers %}
+                <article class="talent-card animate-fade-in">
+                    {% if freelancer.is_verified %}
+                        <div class="verified-tag" title="Verified Professional"><i class="fa-solid fa-circle-check"></i> Verified</div>
+                    {% endif %}
+                    
+                    <div class="card-avatar-wrapper">
+                        {% if freelancer.cover_banner %}
+                            <div class="card-avatar-banner" style="background-image: url('{{ freelancer.cover_banner.url }}')"></div>
+                        {% else %}
+                            <div class="card-avatar-banner default-banner"></div>
+                        {% endif %}
+                        
+                        <div class="avatar">
+                            {% if freelancer.user.first_name %}
+                                {{ freelancer.user.first_name|slice:":1" }}{{ freelancer.user.last_name|slice:":1" }}
+                            {% else %}
+                                {{ freelancer.user.username|slice:":2"|upper }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h3 class="talent-name">
+                            {{ freelancer.user.username }}
+                            {% if freelancer.is_verified %}
+                                <i class="fa-solid fa-circle-check text-accent" title="Verified Account"></i>
+                            {% endif %}
+                        </h3>
+                        <p class="talent-title">{{ freelancer.title|default:"Freelancer Professional" }}</p>
+                        
+                        <div class="talent-rating-wrapper">
+                            <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
+                            <span class="reviews-count">({{ freelancer.get_reviews_count }} reviews)</span>
+                        </div>
+                        
+                        {% if freelancer.location %}
+                            <span class="talent-location"><i class="fa-solid fa-location-dot"></i> {{ freelancer.location }}</span>
+                        {% endif %}
+                        
+                        <p class="talent-bio-snippet">{{ freelancer.bio|default:"No bio available."|truncatewords:15 }}</p>
+                        
+                        <div class="card-skills">
+                            {% for freelancer_skill in freelancer.skills.all|slice:":4" %}
+                                <span class="card-skill-tag">{{ freelancer_skill.skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="talent-meta">
+                            <span class="talent-rate"><strong>${{ freelancer.hourly_rate }}</strong> / hr</span>
+                            <span class="talent-availability {% if freelancer.availability %}status-online{% else %}status-offline{% endif %}">
+                                {% if freelancer.availability %}Available{% else %}Busy{% endif %}
+                            </span>
+                        </div>
+                        
+                        <a href="{% url 'talent_detail' freelancer.id %}" class="btn-primary"><i class="fa-solid fa-arrow-pointer"></i> View Profile</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state glass-panel" style="width: 100%;">
+                    <i class="fa-solid fa-user-slash empty-icon"></i>
+                    <p>No freelancers match your criteria. Try loosening your filter requirements!</p>
+                </div>
             {% endfor %}
-        </ul>
-        {% endif %}
-
-        <!-- Search & Filter Controls -->
-        <section class="glass-panel search-panel">
-            <form method="GET" action="{% url 'home' %}" class="search-form">
-                <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search by name, title, or bio...">
-                <input type="text" name="skill" value="{{ skill_query|default:'' }}" placeholder="Filter by skill (e.g. Python)...">
-                <button type="submit" class="btn-primary">Search</button>
-            </form>
-        </section>
-
-        <!-- Talent Directory -->
-        <main class="glass-panel">
-            <h2 style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Available Freelancers</span>
-                <span class="badge-count">{{ freelancers|length }} found</span>
-            </h2>
-
-            <div class="cards-grid">
-                {% for freelancer in freelancers %}
-                <div class="talent-card">
-                    <div class="avatar">{{ freelancer.user.username|slice:":2"|upper }}</div>
-                    <div class="talent-name">{{ freelancer.user.username }}</div>
-                    <div class="talent-email" style="font-style: italic; color: var(--primary); font-weight: 500; font-size: 0.9rem; margin-bottom: 6px;">
-                        {{ freelancer.title|default:"Freelance Professional" }}
-                    </div>
-                    
-                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                        {{ freelancer.bio|slice:":80" }}{% if freelancer.bio|length > 80 %}...{% endif %}
-                    </div>
-
-                    <!-- Skills List -->
-                    <div class="card-skills">
-                        {% for fs in freelancer.skills.all %}
-                        <span class="card-skill-tag">{{ fs.skill.name }}</span>
-                        {% empty %}
-                        <span style="font-size: 0.75rem; color: var(--text-dark);">No listed skills</span>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="talent-meta">
-                        <span class="talent-age">Rate: ${{ freelancer.hourly_rate }}/hr</span>
-                        <span class="talent-badge">Age: {{ freelancer.age }}</span>
-                    </div>
-
-                    <a href="{% url 'talent_detail' freelancer.id %}" class="btn-primary" style="margin-top: 15px; text-decoration: none; width: 100%; display: block; text-align: center;">View Details</a>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <p>No freelancers match your search criteria. Try adjusting your query!</p>
-                </div>
-                {% endfor %}
-            </div>
-        </main>
-        
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<!-- Recently Viewed Section -->
+{% if recently_viewed %}
+<section class="recently-viewed-section animate-fade-in">
+    <h2><i class="fa-solid fa-clock-rotate-left animate-pulse"></i> Recently Viewed</h2>
+    <div class="cards-grid">
+        {% for profile in recently_viewed %}
+            <a href="{% url 'talent_detail' profile.id %}" class="recent-profile-card glass-panel">
+                <div class="recent-avatar-initials">
+                    {{ profile.user.username|slice:":2"|upper }}
+                </div>
+                <div class="recent-meta">
+                    <h4>{{ profile.user.username }}</h4>
+                    <p>{{ profile.title|default:"Professional" }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form and input references
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = filterForm.querySelector('input[name="search"]');
+    
+    // Auto-apply sort parameter
+    function applySort(value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort_by', value);
+        window.location.href = url.toString();
+    }
+
+    // Set search text and submit
+    function quickSearch(skill) {
+        searchInput.value = skill;
+        filterForm.submit();
+    }
+
+    // Debounce function to delay search submissions
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // Auto-submit form when checkboxes/selects change
+    filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(el => {
+        el.addEventListener('change', () => {
+            filterForm.submit();
+        });
+    });
+
+    // Debounced auto-submit on typing search keyword
+    searchInput.addEventListener('input', debounce(() => {
+        filterForm.submit();
+    }, 600));
+</script>
+{% endblock %}

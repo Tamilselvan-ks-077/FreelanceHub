@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+
+{% block title %}System Alerts & Notifications | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="auth-container animate-fade-in" style="max-width: 700px; width: 100%;">
+    <div class="glass-panel" style="padding: 30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+            <h2 style="margin:0;"><i class="fa-solid fa-bell text-accent animate-pulse"></i> Alerts & Notifications</h2>
+            {% if unread_notifications_count > 0 %}
+                <a href="{% url 'mark_notifications_read' %}" class="btn-secondary-small"><i class="fa-solid fa-check-double"></i> Mark All as Read</a>
+            {% endif %}
+        </div>
+        
+        <div class="notifications-main-list">
+            {% for n in notifs %}
+                <div class="notification-item-card glass-panel {% if not n.is_read %}unread-notif{% endif %} animate-fade-in">
+                    <div class="notif-icon-col">
+                        {% if n.notification_type == 'booking' %}
+                            <i class="fa-solid fa-briefcase text-primary"></i>
+                        {% elif n.notification_type == 'payment' %}
+                            <i class="fa-solid fa-credit-card text-success"></i>
+                        {% elif n.notification_type == 'message' %}
+                            <i class="fa-solid fa-comment-dots text-accent"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-exclamation text-muted"></i>
+                        {% endif %}
+                    </div>
+                    <div class="notif-details-col">
+                        <h4>{{ n.verb }}</h4>
+                        {% if n.description %}
+                            <p>{{ n.description }}</p>
+                        {% endif %}
+                        <span class="notif-date">{{ n.created_at|date:"F d, Y @ H:i" }}</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <i class="fa-regular fa-bell-slash empty-icon"></i>
+                    <p>You have no notifications yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

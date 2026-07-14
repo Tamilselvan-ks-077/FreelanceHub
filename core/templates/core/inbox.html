@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+
+{% block title %}Messages Inbox | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="auth-container animate-fade-in" style="max-width: 700px; width: 100%;">
+    <div class="glass-panel" style="padding: 30px;">
+        <h2><i class="fa-solid fa-comments text-primary"></i> Chat Conversations</h2>
+        <p class="muted-text" style="margin-bottom: 25px;">Select a conversation to resume chat messages</p>
+        
+        <div class="inbox-partners-list">
+            {% for partner in partners %}
+                <a href="{% url 'chat' partner.user.username %}" class="inbox-partner-item glass-panel animate-fade-in">
+                    <div class="partner-avatar">
+                        {{ partner.user.username|slice:":2"|upper }}
+                    </div>
+                    <div class="partner-meta">
+                        <h4>
+                            {{ partner.user.username }}
+                            {% if partner.is_verified %}
+                                <i class="fa-solid fa-circle-check text-accent" title="Verified Account"></i>
+                            {% endif %}
+                        </h4>
+                        <p>{{ partner.title|default:"Professional Consultant" }}</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-muted" style="margin-left:auto;"></i>
+                </a>
+            {% empty %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-message-slash empty-icon"></i>
+                    <p>No active conversations found. Visit a profile to send a direct message!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

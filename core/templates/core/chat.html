@@ -1,0 +1,116 @@
+{% extends "core/base.html" %}
+
+{% block title %}Chat with {{ partner.username }} | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="chat-main-container animate-fade-in">
+    <!-- Left Pane: Conversations List -->
+    <aside class="chat-sidebar glass-panel">
+        <h3>Active Chats</h3>
+        <div class="chat-sidebar-list">
+            {% for p in partners %}
+                <a href="{% url 'chat' p.user.username %}" class="chat-sidebar-item {% if p.user == partner %}active-item{% endif %}">
+                    <div class="small-avatar">
+                        {{ p.user.username|slice:":2"|upper }}
+                    </div>
+                    <div class="small-meta">
+                        <h4>{{ p.user.username }}</h4>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="muted-text text-center" style="font-size:0.8rem; margin-top:20px;">No other chats</p>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <!-- Right Pane: Active Chat Window -->
+    <section class="chat-window-panel glass-panel">
+        <div class="chat-window-header">
+            <div class="partner-header-avatar">
+                {{ partner.username|slice:":2"|upper }}
+            </div>
+            <div class="partner-header-meta">
+                <h3>{{ partner.username }}</h3>
+                <span class="online-status-dot"></span>
+            </div>
+            
+            {% if partner.profile.role == 'freelancer' %}
+                <a href="{% url 'talent_detail' partner.profile.id %}" class="btn-secondary-small" style="margin-left:auto;"><i class="fa-solid fa-user"></i> View Profile</a>
+            {% endif %}
+        </div>
+
+        <!-- Chat logs scroll box -->
+        <div class="chat-logs-wrapper" id="chatLogs">
+            {% for msg in chat_messages %}
+                <div class="chat-message-bubble {% if msg.sender == user %}bubble-sent{% else %}bubble-received{% endif %}">
+                    <div class="bubble-content">
+                        {% if msg.body %}
+                            <p class="msg-text">{{ msg.body }}</p>
+                        {% endif %}
+                        
+                        {% if msg.attachment %}
+                            <div class="msg-attachment-link">
+                                <i class="fa-solid fa-file-arrow-down"></i> 
+                                <a href="{{ msg.attachment.url }}" target="_blank" download>
+                                    {{ msg.attachment.name|default:"Attachment" }}
+                                </a>
+                            </div>
+                        {% endif %}
+                        <span class="msg-time">{{ msg.created_at|date:"H:i" }}</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="chat-empty-log" id="emptyLog">
+                    <i class="fa-regular fa-comment-dots" style="font-size: 3rem; opacity: 0.25; margin-bottom: 10px;"></i>
+                    <p>No messages yet. Send a greeting to start chatting!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Messaging Input Form -->
+        <form method="POST" action="{% url 'chat' partner.username %}" enctype="multipart/form-data" class="chat-input-form">
+            {% csrf_token %}
+            
+            <div class="form-group-chat-input">
+                <!-- Attachment File Input -->
+                <label for="chat_attachment" class="attachment-label-btn" title="Upload File">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <input type="file" name="attachment" id="chat_attachment" style="display:none;" onchange="updateFileName(this)">
+                </label>
+                
+                <textarea name="body" placeholder="Write message..." rows="1" id="chatTextarea" required></textarea>
+                
+                <button type="submit" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <div id="file-selected-indicator" class="file-indicator-text" style="display:none;"></div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll chat window to bottom
+    const chatLogs = document.getElementById('chatLogs');
+    chatLogs.scrollTop = chatLogs.scrollHeight;
+
+    function updateFileName(input) {
+        const indicator = document.getElementById('file-selected-indicator');
+        if (input.files && input.files.length > 0) {
+            indicator.textContent = `Selected attachment: ${input.files[0].name}`;
+            indicator.style.display = 'block';
+            document.getElementById('chatTextarea').removeAttribute('required');
+        } else {
+            indicator.style.display = 'none';
+            document.getElementById('chatTextarea').setAttribute('required', 'true');
+        }
+    }
+
+    // Auto-expand textarea height
+    const tx = document.getElementById('chatTextarea');
+    tx.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+</script>
+{% endblock %}
