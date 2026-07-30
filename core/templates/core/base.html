@@ -13,7 +13,273 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=1.2">
+    
+    <!-- Core UI Overrides & Reset guarantees -->
+    <style>
+        /* Force Link Reset & Prevent Visited Purple Color */
+        a, a:visited, a:active, a:focus {
+            color: inherit;
+            text-decoration: none !important;
+        }
+
+        /* Enhanced Animated Background */
+        body {
+            background-color: #0b0f19 !important;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(147, 51, 234, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 90%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px !important;
+            background-attachment: fixed !important;
+            color: #f1f5f9;
+        }
+
+        [data-theme="light"] body {
+            background-color: #f8fafc !important;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(147, 51, 234, 0.06) 0px, transparent 50%),
+                radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 100% 100%, 32px 32px !important;
+            color: #0f172a;
+        }
+
+        /* App Footer Container */
+        .app-footer {
+            position: relative;
+            margin-top: 70px !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 24px !important;
+            padding: 48px 40px 28px 40px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+            overflow: hidden !important;
+        }
+
+        [data-theme="light"] .app-footer {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .footer-top-glow {
+            position: absolute;
+            top: 0;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #06b6d4, #8b5cf6, transparent);
+            opacity: 0.8;
+        }
+
+        /* Footer Grid Layout */
+        .footer-grid {
+            display: grid !important;
+            grid-template-columns: 2fr 1fr 1fr 1fr !important;
+            gap: 36px !important;
+            margin-bottom: 36px !important;
+            align-items: start !important;
+        }
+
+        .footer-brand {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            align-items: flex-start !important;
+        }
+
+        .footer-brand-logo,
+        .footer-brand-logo:visited,
+        .footer-brand-logo:hover,
+        .footer-brand-logo:active {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-family: 'Outfit', sans-serif !important;
+            font-size: 1.7rem !important;
+            font-weight: 800 !important;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            text-decoration: none !important;
+            letter-spacing: -0.02em !important;
+        }
+
+        .footer-brand-logo i {
+            -webkit-text-fill-color: #3b82f6 !important;
+        }
+
+        .footer-brand p {
+            color: #94a3b8 !important;
+            font-size: 0.92rem !important;
+            line-height: 1.6 !important;
+            margin: 0 !important;
+            max-width: 380px !important;
+        }
+
+        .footer-status-pill {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            margin-top: 6px !important;
+            padding: 6px 14px !important;
+            background: rgba(34, 197, 94, 0.1) !important;
+            border: 1px solid rgba(34, 197, 94, 0.25) !important;
+            border-radius: 20px !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            color: #4ade80 !important;
+        }
+
+        .status-dot-pulse {
+            width: 8px !important;
+            height: 8px !important;
+            background-color: #22c55e !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7) !important;
+            animation: statusPulse 2s infinite !important;
+        }
+
+        @keyframes statusPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* Footer Column Groups - Must flex vertically! */
+        .footer-links-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            align-items: flex-start !important;
+        }
+
+        .footer-links-group h4 {
+            color: #f8fafc !important;
+            font-family: 'Outfit', sans-serif !important;
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 6px !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        [data-theme="light"] .footer-links-group h4 {
+            color: #0f172a !important;
+        }
+
+        .footer-links-group a,
+        .footer-links-group a:visited,
+        .footer-links-group a:link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            color: #94a3b8 !important;
+            text-decoration: none !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            transition: all 0.25s ease !important;
+        }
+
+        .footer-links-group a i {
+            font-size: 0.85rem !important;
+            width: 16px !important;
+            text-align: center !important;
+            color: #64748b !important;
+            transition: color 0.25s ease, transform 0.25s ease !important;
+        }
+
+        .footer-links-group a:hover,
+        .footer-links-group a:focus {
+            color: #60a5fa !important;
+            transform: translateX(4px) !important;
+        }
+
+        .footer-links-group a:hover i {
+            color: #60a5fa !important;
+            transform: scale(1.15) !important;
+        }
+
+        /* Footer Bottom Bar */
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding-top: 24px !important;
+            margin-top: 12px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            color: #64748b !important;
+            font-size: 0.88rem !important;
+        }
+
+        [data-theme="light"] .footer-bottom {
+            border-top-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .footer-socials {
+            display: flex !important;
+            gap: 12px !important;
+            align-items: center !important;
+        }
+
+        .footer-socials a,
+        .footer-socials a:visited,
+        .footer-socials a:link {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 12px !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #94a3b8 !important;
+            font-size: 1.1rem !important;
+            text-decoration: none !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        [data-theme="light"] .footer-socials a {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        .footer-socials a:hover,
+        .footer-socials a:focus {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%) !important;
+            border-color: transparent !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35) !important;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 32px !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .footer-grid {
+                grid-template-columns: 1fr !important;
+                gap: 28px !important;
+            }
+            .footer-bottom {
+                flex-direction: column !important;
+                gap: 16px !important;
+                text-align: center !important;
+            }
+            .app-footer {
+                padding: 36px 20px 20px 20px !important;
+            }
+        }
+    </style>
     
     <!-- Theme Initializer (prevents theme flash) -->
     <script>
@@ -106,34 +372,53 @@
 
         <!-- Premium Footer -->
         <footer class="app-footer">
+            <div class="footer-top-glow"></div>
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <h3>FreelanceHub</h3>
+                    <a href="{% url 'home' %}" class="footer-brand-logo">
+                        <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
+                    </a>
                     <p>The premium, next-generation talent marketplace connecting expert freelancers and forward-thinking clients worldwide.</p>
+                    <div class="footer-status-pill">
+                        <span class="status-dot-pulse"></span>
+                        <span>All Systems Operational</span>
+                    </div>
                 </div>
+                
                 <div class="footer-links-group">
                     <h4>Marketplace</h4>
-                    <a href="{% url 'home' %}">Find Freelancers</a>
-                    <a href="{% url 'home' %}?verified=true">Verified Experts</a>
-                    <a href="{% url 'home' %}?sort_by=highest_rated">Top Rated</a>
+                    <a href="{% url 'home' %}"><i class="fa-solid fa-compass"></i> Find Freelancers</a>
+                    <a href="{% url 'home' %}?verified=true"><i class="fa-solid fa-shield-halved"></i> Verified Experts</a>
+                    <a href="{% url 'home' %}?sort_by=highest_rated"><i class="fa-solid fa-star"></i> Top Rated</a>
                 </div>
+                
                 <div class="footer-links-group">
                     <h4>Account</h4>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}">User Dashboard</a>
-                        <a href="{% url 'profile_edit' %}">Profile Configuration</a>
+                        <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-simple"></i> User Dashboard</a>
+                        <a href="{% url 'messages' %}"><i class="fa-solid fa-envelope"></i> Inbox Messages</a>
+                        <a href="{% url 'profile_edit' %}"><i class="fa-solid fa-sliders"></i> Account Settings</a>
                     {% else %}
-                        <a href="{% url 'login' %}">Sign In</a>
-                        <a href="{% url 'signup' %}">Create Account</a>
+                        <a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
+                        <a href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Create Account</a>
                     {% endif %}
                 </div>
+
+                <div class="footer-links-group">
+                    <h4>Trust & Safety</h4>
+                    <a href="{% url 'home' %}"><i class="fa-solid fa-lock"></i> Escrow Protection</a>
+                    <a href="{% url 'home' %}"><i class="fa-solid fa-headset"></i> Help & Support</a>
+                    <a href="{% url 'home' %}"><i class="fa-solid fa-file-contract"></i> Terms of Service</a>
+                </div>
             </div>
+            
             <div class="footer-bottom">
                 <p>&copy; 2026 FreelanceHub. Created by Google Deepmind Antigravity.</p>
                 <div class="footer-socials">
-                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#"><i class="fa-brands fa-github"></i></a>
-                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
                 </div>
             </div>
         </footer>
