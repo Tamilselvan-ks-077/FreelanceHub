@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Avg
@@ -91,6 +92,29 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking #{self.id}: {self.client.username} -> {self.freelancer.username} ({self.status})"
+# Chat models for booking-specific communication
+
+class ChatRoom(models.Model):
+    booking = models.OneToOneField('Booking', on_delete=models.CASCADE, related_name='chat_room')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"ChatRoom for Booking #{self.booking.id}"
+
+class ChatMessage(models.Model):
+    room = models.ForeignKey('ChatRoom', on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} in Booking #{self.room.booking.id}"
+
+# Signal to automatically create a ChatRoom when a Booking is created
+@receiver(post_save, sender=Booking)
+def create_chat_room(sender, instance, created, **kwargs):
+    if created:
+        ChatRoom.objects.create(booking=instance)
 
 class Invoice(models.Model):
     STATUS_CHOICES = (
