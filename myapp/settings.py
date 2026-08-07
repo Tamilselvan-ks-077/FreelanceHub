@@ -20,13 +20,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / 'db.sqlite3'
 if os.environ.get('VERCEL') or not os.access(BASE_DIR, os.W_OK):
     TMP_DB = Path('/tmp/db.sqlite3')
-    if DB_PATH.exists() and not TMP_DB.exists():
-        try:
-            shutil.copyfile(DB_PATH, TMP_DB)
-        except Exception:
-            pass
-    if TMP_DB.exists():
-        DB_PATH = TMP_DB
+    if not TMP_DB.exists():
+        if DB_PATH.exists():
+            try:
+                shutil.copyfile(DB_PATH, TMP_DB)
+            except Exception:
+                pass
+        else:
+            try:
+                TMP_DB.touch()
+            except Exception:
+                pass
+    DB_PATH = TMP_DB
+
 
 
 
