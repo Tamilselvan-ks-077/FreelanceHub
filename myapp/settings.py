@@ -10,10 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
+import shutil
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+DB_PATH = BASE_DIR / 'db.sqlite3'
+if os.environ.get('VERCEL') or not os.access(BASE_DIR, os.W_OK):
+    TMP_DB = Path('/tmp/db.sqlite3')
+    if DB_PATH.exists() and not TMP_DB.exists():
+        try:
+            shutil.copyfile(DB_PATH, TMP_DB)
+        except Exception:
+            pass
+    if TMP_DB.exists():
+        DB_PATH = TMP_DB
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,6 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'myapp.urls'
 
@@ -77,7 +93,7 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_PATH,
     }
 }
 

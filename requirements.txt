@@ -3,3 +3,4 @@ djangorestframework==3.17.1
 pillow==12.3.0
 sqlparse==0.5.5
 asgiref==3.11.1
+whitenoise==6.9.0
