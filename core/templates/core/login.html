@@ -3,36 +3,134 @@
 {% block title %}Sign In | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-container animate-fade-in">
-    <div class="glass-panel auth-card">
-        <h2><i class="fa-solid fa-lock"></i> Welcome Back</h2>
-        <p class="auth-subtitle">Sign in to your FreelanceHub account</p>
+<div class="auth-split-wrapper animate-fade-in">
+    <!-- Left Showcase Side -->
+    <div class="auth-showcase-panel glass-panel">
+        <div class="showcase-badge">
+            <i class="fa-solid fa-sparkles text-accent"></i>
+            <span>Next-Gen Talent Marketplace</span>
+        </div>
         
-        <form method="POST" action="{% url 'login' %}">
+        <h1 class="showcase-title">
+            Unlock High-Impact Freelancers & Global Opportunities.
+        </h1>
+        
+        <p class="showcase-desc">
+            Connect with verified elite professionals, manage milestones with protected escrow billing, and scale projects faster than ever.
+        </p>
+
+        <div class="showcase-features">
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Vetted & Verified Talent</h4>
+                    <p>Only top-tier developers, designers, and domain specialists.</p>
+                </div>
+            </div>
+
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Escrow Protected Invoicing</h4>
+                    <p>Funds are secured and released upon completed deliverables.</p>
+                </div>
+            </div>
+
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Direct Live Messaging</h4>
+                    <p>Instant collaboration, file sharing, and project alerts.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="showcase-stat-pill">
+            <div class="avatars-cluster">
+                <span class="mini-av av-1">JD</span>
+                <span class="mini-av av-2">AK</span>
+                <span class="mini-av av-3">MS</span>
+            </div>
+            <div class="stat-text">
+                <strong>4.9 / 5 Rating</strong>
+                <span>from over 10,000+ satisfied clients</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Form Card -->
+    <div class="auth-form-panel glass-panel">
+        <div class="auth-card-glow"></div>
+        
+        <div class="auth-card-header">
+            <div class="auth-header-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Enter your credentials to access your FreelanceHub workspace</p>
+        </div>
+
+        <form method="POST" action="{% url 'login' %}" class="auth-modern-form">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-with-icon">
                     <i class="fa-solid fa-user"></i>
-                    <input type="text" name="username" id="username" required placeholder="Enter your username">
+                    <input type="text" name="username" id="username" required placeholder="Enter your username" autocomplete="username">
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
-                <div class="input-with-icon">
+                <div class="input-with-icon password-input-wrapper">
                     <i class="fa-solid fa-key"></i>
-                    <input type="password" name="password" id="password" required placeholder="Enter your password">
+                    <input type="password" name="password" id="password" required placeholder="Enter your password" autocomplete="current-password">
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" aria-label="Toggle password visibility">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
                 </div>
             </div>
-            
-            <button type="submit" class="btn-primary btn-block"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</button>
+
+            <button type="submit" class="btn-auth-submit">
+                <span>Sign In to Workspace</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </form>
-        
-        <div class="auth-links">
-            Don't have an account? <a href="{% url 'signup' %}">Create one here</a>
+
+        <div class="auth-divider">
+            <span>New to FreelanceHub?</span>
+        </div>
+
+        <div class="auth-switch-cta">
+            <a href="{% url 'signup' %}" class="btn-secondary-link btn-block">
+                <i class="fa-solid fa-user-plus"></i> Create Free Account
+            </a>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePasswordVisibility(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        const icon = btn.querySelector('i');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}

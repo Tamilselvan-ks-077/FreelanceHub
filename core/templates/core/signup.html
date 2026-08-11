@@ -3,32 +3,100 @@
 {% block title %}Create Account | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-container animate-fade-in">
-    <div class="glass-panel auth-card">
-        <h2><i class="fa-solid fa-user-plus"></i> Create Account</h2>
-        <p class="auth-subtitle">Join the premium freelancer network</p>
+<div class="auth-split-wrapper animate-fade-in">
+    <!-- Left Showcase Side -->
+    <div class="auth-showcase-panel glass-panel">
+        <div class="showcase-badge">
+            <i class="fa-solid fa-sparkles text-accent"></i>
+            <span>Join 50,000+ Members Worldwide</span>
+        </div>
         
-        <form method="POST" action="{% url 'signup' %}">
+        <h1 class="showcase-title">
+            Start Your Journey with Elite Talent & Top Clients.
+        </h1>
+        
+        <p class="showcase-desc">
+            Whether you are hiring specialized talent or showcasing your freelance expertise, FreelanceHub empowers your growth.
+        </p>
+
+        <div class="showcase-features">
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Tailored Workspaces</h4>
+                    <p>Register as a Client to hire, or Freelancer to work & earn.</p>
+                </div>
+            </div>
+
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Escrow Security</h4>
+                    <p>Protected transactions, milestone tracking, and instant invoicing.</p>
+                </div>
+            </div>
+
+            <div class="showcase-feature-item">
+                <div class="feature-icon-box">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Real-time Analytics</h4>
+                    <p>Live revenue performance tracking and project management.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="showcase-stat-pill">
+            <div class="avatars-cluster">
+                <span class="mini-av av-1">TS</span>
+                <span class="mini-av av-2">DL</span>
+                <span class="mini-av av-3">EM</span>
+            </div>
+            <div class="stat-text">
+                <strong>Instant Setup</strong>
+                <span>Create your profile in less than 2 minutes</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Form Card -->
+    <div class="auth-form-panel glass-panel">
+        <div class="auth-card-glow"></div>
+        
+        <div class="auth-card-header">
+            <div class="auth-header-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join the next-generation premium freelance network</p>
+        </div>
+
+        <form method="POST" action="{% url 'signup' %}" class="auth-modern-form">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-with-icon">
                     <i class="fa-solid fa-user"></i>
-                    <input type="text" name="username" id="username" required placeholder="Choose a username">
+                    <input type="text" name="username" id="username" required placeholder="Choose a username" autocomplete="username">
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <div class="input-with-icon">
                     <i class="fa-solid fa-envelope"></i>
-                    <input type="email" name="email" id="email" required placeholder="name@example.com">
+                    <input type="email" name="email" id="email" required placeholder="name@example.com" autocomplete="email">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="role">I want to register as a:</label>
+                <label for="role">Account Role</label>
                 <div class="input-with-icon">
                     <i class="fa-solid fa-briefcase"></i>
                     <select name="role" id="role" required>
@@ -37,29 +105,64 @@
                     </select>
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-key"></i>
-                    <input type="password" name="password" id="password" required placeholder="Create a strong password">
+
+            <div class="flex-row" style="gap: 14px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon password-input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" name="password" id="password" required placeholder="Password" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="password_confirm">Confirm</label>
+                    <div class="input-with-icon password-input-wrapper">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <input type="password" name="password_confirm" id="password_confirm" required placeholder="Repeat" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password_confirm', this)" aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label for="password_confirm">Confirm Password</label>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <input type="password" name="password_confirm" id="password_confirm" required placeholder="Repeat password">
-                </div>
-            </div>
-            
-            <button type="submit" class="btn-primary btn-block"><i class="fa-solid fa-user-plus"></i> Register</button>
+
+            <button type="submit" class="btn-auth-submit" style="margin-top: 8px;">
+                <span>Create My Workspace</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </form>
-        
-        <div class="auth-links">
-            Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+
+        <div class="auth-divider">
+            <span>Already have an account?</span>
+        </div>
+
+        <div class="auth-switch-cta">
+            <a href="{% url 'login' %}" class="btn-secondary-link btn-block">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Existing Account
+            </a>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePasswordVisibility(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        const icon = btn.querySelector('i');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}
