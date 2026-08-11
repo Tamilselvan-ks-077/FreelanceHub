@@ -158,7 +158,11 @@ def signup_view(request):
     return render(request, "core/signup.html")
 
 def login_view(request):
+    next_url = request.POST.get("next") or request.GET.get("next")
+
     if request.user.is_authenticated:
+        if next_url and next_url.startswith('/'):
+            return redirect(next_url)
         return redirect('home')
 
     if request.method == "POST":
@@ -170,12 +174,14 @@ def login_view(request):
             auth_login(request, user)
             log_activity(user, "Logged in.")
             messages.success(request, f"Welcome back, {username}!")
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
             return redirect('home')
         else:
             messages.error(request, "Invalid username or password.")
-            return redirect('login')
+            return render(request, "core/login.html", {"next": next_url})
 
-    return render(request, "core/login.html")
+    return render(request, "core/login.html", {"next": next_url})
 
 def logout_view(request):
     if request.user.is_authenticated:

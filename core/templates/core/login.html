@@ -76,8 +76,11 @@
             <p>Enter your credentials to access your FreelanceHub workspace</p>
         </div>
 
-        <form method="POST" action="{% url 'login' %}" class="auth-modern-form">
+        <form method="POST" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="auth-modern-form">
             {% csrf_token %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
 
             <div class="form-group">
                 <label for="username">Username</label>

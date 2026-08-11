@@ -8,6 +8,11 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     
+    # Auth Fallback / Aliases
+    path('accounts/login/', views.login_view),
+    path('accounts/signup/', views.signup_view),
+    path('accounts/logout/', views.logout_view),
+    
     # Profile & Portfolio CRUD
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('freelancer/<int:profile_id>/', views.talent_detail_view, name='talent_detail'),
