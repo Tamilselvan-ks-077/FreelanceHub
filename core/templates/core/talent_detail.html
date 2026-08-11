@@ -44,6 +44,17 @@
                     <h3>About Me</h3>
                     <p>{{ freelancer.bio|default:"No bio description available."|linebreaksbr }}</p>
                 </div>
+
+                {% if freelancer.skills.all %}
+                    <div class="profile-section">
+                        <h3><i class="fa-solid fa-tags text-accent"></i> Skills & Expertise</h3>
+                        <div class="card-skills" style="justify-content: flex-start; margin-top: 10px; margin-bottom: 5px;">
+                            {% for freelancer_skill in freelancer.skills.all %}
+                                <span class="card-skill-tag">{{ freelancer_skill.skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
                 
                 {% if freelancer.experience_detail %}
                     <div class="profile-section">
@@ -89,7 +100,7 @@
             </div>
 
             <!-- Reviews Log Section -->
-            <div class="glass-panel profile-reviews-section">
+            <div class="glass-panel profile-reviews-section" id="reviews-section">
                 <h3><i class="fa-solid fa-star text-accent animate-pulse"></i> Reviews & Feedback</h3>
                 
                 <!-- Review Submission (For authenticated clients with completed projects) -->

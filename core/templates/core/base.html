@@ -424,24 +424,19 @@
         </footer>
     </div>
 
+    <!-- Global Scripts -->
+    <script src="{% static 'core/js/main.js' %}"></script>
     <!-- Theme Switcher Logic -->
     <script>
         const toggler = document.getElementById('themeToggler');
-        toggler.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-
-        // Automatically fade out alerts
-        setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-20px)';
-                setTimeout(() => alert.remove(), 400);
+        if (toggler) {
+            toggler.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
             });
-        }, 5000);
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

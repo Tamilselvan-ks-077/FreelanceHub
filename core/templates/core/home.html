@@ -13,7 +13,7 @@
 <div class="search-directory-layout">
     <!-- Filters Sidebar Panel -->
     <aside class="glass-panel sidebar-filters animate-slide-in">
-        <form method="GET" action="{% url 'home' %}" class="filters-form">
+        <form method="GET" action="{% url 'home' %}" class="filters-form" id="filterForm">
             <h3><i class="fa-solid fa-filter"></i> Filters</h3>
             
             <div class="filter-group">
@@ -131,7 +131,7 @@
                                 <i class="fa-solid fa-circle-check text-accent" title="Verified Account"></i>
                             {% endif %}
                         </h3>
-                        <p class="talent-title">{{ freelancer.title|default:"Freelancer Professional" }}</p>
+                        <p class="talent-title">{{ freelancer.title|default:"Freelance Professional" }}</p>
                         
                         <div class="talent-rating-wrapper">
                             <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
@@ -194,9 +194,9 @@
 
 {% block extra_js %}
 <script>
-    // Form and input references
     const filterForm = document.getElementById('filterForm');
-    const searchInput = filterForm.querySelector('input[name="search"]');
+    const searchInput = document.getElementById('q');
+    const skillInput = document.getElementById('skill');
     
     // Auto-apply sort parameter
     function applySort(value) {
@@ -207,11 +207,17 @@
 
     // Set search text and submit
     function quickSearch(skill) {
-        searchInput.value = skill;
-        filterForm.submit();
+        if (skillInput) {
+            skillInput.value = skill;
+        } else if (searchInput) {
+            searchInput.value = skill;
+        }
+        if (filterForm) {
+            filterForm.submit();
+        }
     }
 
-    // Debounce function to delay search submissions
+    // Debounce helper
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -220,16 +226,20 @@
         };
     }
 
-    // Auto-submit form when checkboxes/selects change
-    filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(el => {
-        el.addEventListener('change', () => {
-            filterForm.submit();
+    if (filterForm) {
+        // Auto-submit form when selects or checkboxes change
+        filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(el => {
+            el.addEventListener('change', () => {
+                filterForm.submit();
+            });
         });
-    });
 
-    // Debounced auto-submit on typing search keyword
-    searchInput.addEventListener('input', debounce(() => {
-        filterForm.submit();
-    }, 600));
+        // Debounced auto-submit on typing in search fields
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(() => {
+                filterForm.submit();
+            }, 600));
+        }
+    }
 </script>
 {% endblock %}
