@@ -185,12 +185,33 @@
 {% block extra_js %}
 <script>
     function switchAdminTab(event, tabId) {
-        event.preventDefault();
+        if (event && event.preventDefault) {
+            event.preventDefault();
+        }
         document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
         document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active-tab'));
-        event.currentTarget.classList.add('active');
-        document.getElementById(tabId).classList.add('active-tab');
+        
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.classList.add('active-tab');
+            let targetHash = '#' + tabId.replace('admin-', '');
+            const targetLink = document.querySelector(`.sidebar-link[href="${targetHash}"]`);
+            if (targetLink) {
+                targetLink.classList.add('active');
+            } else if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            history.pushState(null, null, targetHash);
+        }
     }
+
+    // Switch to tab if hash is present in URL
+    window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            switchAdminTab(null, 'admin-' + hash);
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('revenueChart').getContext('2d');

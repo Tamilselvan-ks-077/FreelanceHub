@@ -308,6 +308,13 @@
                 }
             }, 600));
         }
+        if (skillInput) {
+            skillInput.addEventListener('input', debounce(() => {
+                if (validateFilters()) {
+                    filterForm.submit();
+                }
+            }, 600));
+        }
     }
 </script>
 {% endblock %}

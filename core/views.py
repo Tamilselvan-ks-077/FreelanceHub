@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg, Count, Sum
+from django.conf import settings
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.http import Http404
 from django.utils import timezone
 from rest_framework.decorators import api_view
@@ -180,6 +182,10 @@ def signup_view(request):
             messages.error(request, "Passwords do not match.")
             return redirect('signup')
 
+        if role not in ('client', 'freelancer'):
+            messages.error(request, "Invalid account role selected.")
+            return redirect('signup')
+
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username is already taken.")
             return redirect('signup')
@@ -205,8 +211,14 @@ def login_view(request):
     next_url = request.POST.get("next") or request.GET.get("next")
 
     if request.user.is_authenticated:
-        if next_url and next_url.startswith('/'):
-            return redirect(next_url)
+        if next_url:
+            is_safe = url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            )
+            if is_safe:
+                return redirect(next_url)
         return redirect('home')
 
     if request.method == "POST":
@@ -218,8 +230,14 @@ def login_view(request):
             auth_login(request, user)
             log_activity(user, "Logged in.")
             messages.success(request, f"Welcome back, {username}!")
-            if next_url and next_url.startswith('/'):
-                return redirect(next_url)
+            if next_url:
+                is_safe = url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                )
+                if is_safe:
+                    return redirect(next_url)
             return redirect('home')
         else:
             messages.error(request, "Invalid username or password.")
@@ -480,6 +498,11 @@ def create_booking_view(request, freelancer_id):
             start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
 
+            today = timezone.now().date()
+            if start_date < today:
+                messages.error(request, "Start date cannot be in the past.")
+                return redirect('talent_detail', profile_id=freelancer_id)
+
             if start_date > end_date:
                 messages.error(request, "Start date cannot be after end date.")
                 return redirect('talent_detail', profile_id=freelancer_id)
@@ -606,6 +629,11 @@ def booking_edit_view(request, booking_id):
             start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
 
+            today = timezone.now().date()
+            if start_date < today:
+                messages.error(request, "Start date cannot be in the past.")
+                return render(request, "core/booking_edit.html", {"booking": booking})
+
             if start_date > end_date:
                 messages.error(request, "Start date cannot be after end date.")
                 return render(request, "core/booking_edit.html", {"booking": booking})
@@ -716,6 +744,14 @@ def chat_view(request, username):
     if request.method == "POST":
         body = request.POST.get("body", "").strip()
         attachment = request.FILES.get("attachment")
+        
+        if attachment:
+            import os
+            ext = os.path.splitext(attachment.name)[1].lower()
+            allowed_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.docx', '.doc', '.xls', '.xlsx', '.txt', '.zip', '.rar', '.tar.gz', '.csv']
+            if ext not in allowed_extensions:
+                messages.error(request, "Unsupported file attachment. Only PDF, DOCX, ZIP, TXT, CSV, and images are allowed.")
+                return redirect('chat', username=username)
         
         if body or attachment:
             msg = Message.objects.create(

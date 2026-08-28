@@ -164,5 +164,54 @@
             icon.classList.add('fa-eye');
         }
     }
+
+    // Client-side password matching validation
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('.auth-modern-form');
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('password_confirm');
+        
+        if (form && password && confirm) {
+            form.addEventListener('submit', (e) => {
+                if (password.value !== confirm.value) {
+                    e.preventDefault();
+                    
+                    // Create alert elements
+                    let container = document.querySelector('.alert-container');
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'alert-container';
+                        const parent = document.querySelector('.container');
+                        if (parent) {
+                            parent.appendChild(container);
+                        } else {
+                            document.body.appendChild(container);
+                        }
+                    }
+                    
+                    // Remove existing client errors first
+                    container.querySelectorAll('.client-error-alert').forEach(el => el.remove());
+                    
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger animate-slide-in client-error-alert';
+                    alertDiv.innerHTML = `
+                        <span><i class="fa-solid fa-circle-exclamation"></i> Passwords do not match.</span>
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                    `;
+                    container.appendChild(alertDiv);
+                    
+                    // Auto dismiss after 5s
+                    setTimeout(() => {
+                        alertDiv.style.opacity = '0';
+                        alertDiv.style.transform = 'translateY(-10px)';
+                        alertDiv.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        setTimeout(() => alertDiv.remove(), 400);
+                    }, 5000);
+                    
+                    confirm.focus();
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}

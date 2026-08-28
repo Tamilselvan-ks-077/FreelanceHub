@@ -6,7 +6,7 @@ import datetime
 
 from .models import (
     Profile, Booking, Invoice, Review, Portfolio, Skill, FreelancerSkill, Payment,
-    normalize_skill_name
+    Message, normalize_skill_name
 )
 
 class FreelanceHubWorkflowTests(TestCase):
@@ -376,4 +376,86 @@ class SecurityAndAuthorizationTests(TestCase):
         # User one is updated
         self.assertEqual(self.u1.profile.title, 'Hacked Title')
         self.assertEqual(self.u1.profile.hourly_rate, Decimal('150.00'))
+
+
+class AuditAndFixesTests(TestCase):
+    """TESTS: Verifying fixes for open redirect, role validation, file extensions, and booking dates."""
+
+    def setUp(self):
+        self.client = Client()
+        self.u1 = User.objects.create_user(username='u1', email='u1@test.com', password='Password123!')
+        self.u1.profile.role = 'client'
+        self.u1.profile.save()
+
+        self.u2 = User.objects.create_user(username='u2', email='u2@test.com', password='Password123!')
+        self.u2.profile.role = 'freelancer'
+        self.u2.profile.title = 'Specialist'
+        self.u2.profile.bio = 'Bio description'
+        self.u2.profile.location = 'London'
+        self.u2.profile.hourly_rate = Decimal('50.00')
+        self.u2.profile.experience_years = 3
+        self.u2.profile.save()
+        
+        self.skill = Skill.objects.create(name='Django')
+        FreelancerSkill.objects.create(profile=self.u2.profile, skill=self.skill)
+
+    def test_signup_role_validation(self):
+        """Signup must reject roles other than client/freelancer."""
+        response = self.client.post(reverse('signup'), {
+            'username': 'attacker',
+            'email': 'attacker@test.com',
+            'role': 'admin',
+            'password': 'Password123!',
+            'password_confirm': 'Password123!',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(User.objects.filter(username='attacker').exists())
+
+    def test_open_redirect_protection(self):
+        """Login redirect is sanitized using url_has_allowed_host_and_scheme."""
+        response = self.client.post(reverse('login') + '?next=//evil.com', {
+            'username': 'u1',
+            'password': 'Password123!',
+        })
+        self.assertEqual(response.status_code, 302)
+        # Should redirect to home, NOT evil.com
+        self.assertRedirects(response, reverse('home'))
+
+    def test_chat_file_extension_whitelist(self):
+        """Chat attachments only allow safe extensions."""
+        self.client.login(username='u1', password='Password123!')
+        
+        # Test disallowed extension
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        bad_file = SimpleUploadedFile("malicious.py", b"print('hack')")
+        response = self.client.post(reverse('chat', args=['u2']), {
+            'body': 'Check this file out',
+            'attachment': bad_file
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Message.objects.filter(attachment__contains='malicious.py').count(), 0)
+
+        # Test allowed extension
+        good_file = SimpleUploadedFile("resume.pdf", b"pdf content")
+        response = self.client.post(reverse('chat', args=['u2']), {
+            'body': 'Here is my resume',
+            'attachment': good_file
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Message.objects.filter(attachment__contains='resume.pdf').count(), 1)
+
+    def test_booking_past_start_date_rejected(self):
+        """Start date in the past should be rejected in booking request."""
+        self.client.login(username='u1', password='Password123!')
+        
+        past_date = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+        future_date = (datetime.date.today() + datetime.timedelta(days=5)).strftime('%Y-%m-%d')
+        
+        response = self.client.post(reverse('create_booking', args=[self.u2.profile.id]), {
+            'start_date': past_date,
+            'end_date': future_date,
+            'description': 'Help in the past'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Booking.objects.count(), 0)
 
