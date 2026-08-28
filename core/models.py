@@ -161,6 +161,7 @@ class Profile(models.Model):
     experience_detail = models.TextField(blank=True, null=True)
     certificates = models.TextField(blank=True, null=True)
     languages = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     objects = ProfileQuerySet.as_manager()
 
@@ -194,6 +195,10 @@ class Profile(models.Model):
     def get_average_rating(self):
         avg = Review.objects.filter(reviewee=self.user).aggregate(Avg('rating'))['rating__avg']
         return round(float(avg), 1) if avg is not None else None
+
+    def get_average_rating_percentage(self):
+        avg = self.get_average_rating()
+        return int(avg * 20) if avg is not None else 0
 
     def get_completed_projects_count(self):
         return Booking.objects.filter(freelancer=self.user, status='completed').count()

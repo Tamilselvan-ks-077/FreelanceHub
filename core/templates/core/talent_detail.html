@@ -17,7 +17,13 @@
             <div class="glass-panel profile-main-card">
                 <div class="profile-header-details">
                     <div class="profile-avatar-large">
-                        {{ freelancer.user.username|slice:":2"|upper }}
+                        {% if freelancer.avatar %}
+                            <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" class="avatar-img">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                {{ freelancer.user.username|slice:":2"|upper }}
+                            </div>
+                        {% endif %}
                     </div>
                     
                     <div class="profile-titles">
@@ -30,12 +36,15 @@
                         
                         <p class="profile-subtitle-title">{{ freelancer.title|default:"Professional Freelancer" }}</p>
                         
-                        <div class="profile-metrics-row">
+                        <div class="profile-metrics-row" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             {% if freelancer.get_reviews_count > 0 %}
-                                <span class="rating-badge"><i class="fa-solid fa-star text-accent"></i> {{ freelancer.get_average_rating }}</span>
+                                <div class="stars-outer" title="{{ freelancer.get_average_rating }} / 5 stars">
+                                    <div class="stars-inner" style="width: {{ freelancer.get_average_rating_percentage }}%;"></div>
+                                </div>
+                                <span class="rating-badge" style="font-weight: 600; color: var(--text-main); font-size: 0.90rem; background: none; padding: 0; border: none; margin: 0;">{{ freelancer.get_average_rating }}</span>
                                 <span class="muted-text">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
                             {% else %}
-                                <span class="no-reviews-tag muted-text"><i class="fa-regular fa-star"></i> No reviews yet</span>
+                                <span class="no-reviews-tag muted-text" style="font-size: 0.85rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
                             {% endif %}
                             <span class="completed-badge"><i class="fa-solid fa-circle-check"></i> {{ freelancer.get_completed_projects_count }} Completed Project{{ freelancer.get_completed_projects_count|pluralize }}</span>
                         </div>

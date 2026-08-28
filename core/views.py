@@ -282,6 +282,9 @@ def profile_edit_view(request):
                 request.user.last_name = last_name
                 request.user.save()
             
+            if request.FILES.get("avatar"):
+                profile.avatar = request.FILES.get("avatar")
+            
             if profile.role == 'freelancer':
                 title = request.POST.get("title", "").strip()
                 hourly_rate_raw = request.POST.get("hourly_rate")

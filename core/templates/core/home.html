@@ -118,10 +118,16 @@
                         {% endif %}
                         
                         <div class="avatar">
-                            {% if freelancer.user.first_name %}
-                                {{ freelancer.user.first_name|slice:":1" }}{{ freelancer.user.last_name|slice:":1" }}
+                            {% if freelancer.avatar %}
+                                <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" class="avatar-img">
                             {% else %}
-                                {{ freelancer.user.username|slice:":2"|upper }}
+                                <div class="avatar-placeholder">
+                                    {% if freelancer.user.first_name %}
+                                        {{ freelancer.user.first_name|slice:":1" }}{{ freelancer.user.last_name|slice:":1" }}
+                                    {% else %}
+                                        {{ freelancer.user.username|slice:":2"|upper }}
+                                    {% endif %}
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -135,12 +141,15 @@
                         </h3>
                         <p class="talent-title">{{ freelancer.title|default:"Freelance Professional" }}</p>
                         
-                        <div class="talent-rating-wrapper">
+                        <div class="talent-rating-wrapper" style="display: flex; align-items: center; gap: 8px;">
                             {% if freelancer.get_reviews_count > 0 %}
-                                <span class="star-rating"><i class="fa-solid fa-star text-accent"></i> {{ freelancer.get_average_rating }}</span>
+                                <div class="stars-outer" title="{{ freelancer.get_average_rating }} / 5 stars">
+                                    <div class="stars-inner" style="width: {{ freelancer.get_average_rating_percentage }}%;"></div>
+                                </div>
+                                <span class="star-rating" style="font-weight: 600; color: var(--text-main); font-size: 0.90rem;">{{ freelancer.get_average_rating }}</span>
                                 <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
                             {% else %}
-                                <span class="no-reviews-tag muted-text"><i class="fa-regular fa-star"></i> No reviews yet</span>
+                                <span class="no-reviews-tag muted-text" style="font-size: 0.85rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
                             {% endif %}
                         </div>
                         

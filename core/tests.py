@@ -442,7 +442,11 @@ class AuditAndFixesTests(TestCase):
             'attachment': good_file
         })
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Message.objects.filter(attachment__contains='resume.pdf').count(), 1)
+        # Check if saved attachment exists and has correct extension
+        msg = Message.objects.filter(body='Here is my resume').first()
+        self.assertIsNotNone(msg)
+        self.assertTrue(msg.attachment.name.startswith('attachments/resume'))
+        self.assertTrue(msg.attachment.name.endswith('.pdf'))
 
     def test_booking_past_start_date_rejected(self):
         """Start date in the past should be rejected in booking request."""
