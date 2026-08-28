@@ -16,27 +16,29 @@
         <form method="GET" action="{% url 'home' %}" class="filters-form" id="filterForm">
             <h3><i class="fa-solid fa-filter"></i> Filters</h3>
             
+            <div id="filterErrorMsg" class="alert alert-danger" style="display: none; margin-bottom: 15px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;"></div>
+
             <div class="filter-group">
                 <label for="q">Keyword Search</label>
-                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Name, title, bio...">
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Name, title, bio..." maxlength="100">
             </div>
             
             <div class="filter-group">
                 <label for="skill">Required Skill</label>
-                <input type="text" name="skill" id="skill" value="{{ skill_query }}" placeholder="Python, Django, UI/UX...">
+                <input type="text" name="skill" id="skill" value="{{ skill_query }}" placeholder="Python, Django, UI/UX..." maxlength="100">
             </div>
             
             <div class="filter-group">
                 <label>Hourly Rate ($)</label>
                 <div class="range-inputs">
-                    <input type="number" name="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
-                    <input type="number" name="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
+                    <input type="number" step="0.01" name="min_rate" id="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
+                    <input type="number" step="0.01" name="max_rate" id="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
                 </div>
             </div>
             
             <div class="filter-group">
                 <label for="location">Location</label>
-                <input type="text" name="location" id="location" value="{{ location }}" placeholder="Germany, Remote, India...">
+                <input type="text" name="location" id="location" value="{{ location }}" placeholder="Germany, Remote, India..." maxlength="100">
             </div>
             
             <div class="filter-group">
@@ -68,15 +70,15 @@
             <!-- Hidden sort to maintain sort order when applying filters -->
             <input type="hidden" name="sort_by" value="{{ sort_by }}">
             
-            <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Apply Filters</button>
-            <a href="{% url 'home' %}" class="btn-secondary-link text-center">Clear All</a>
+            <button type="submit" class="btn-primary" id="applyFiltersBtn"><i class="fa-solid fa-magnifying-glass"></i> Apply Filters</button>
+            <a href="{% url 'home' %}" class="btn-secondary-link text-center">Clear Filters</a>
         </form>
     </aside>
 
     <!-- Main Results Column -->
     <div class="main-directory-content">
         <div class="directory-control-bar glass-panel animate-fade-in">
-            <span class="results-count">{{ freelancers.count }} Freelancers Available</span>
+            <span class="results-count">{{ freelancers.count }} Freelancer{{ freelancers.count|pluralize }} Available</span>
             
             <!-- Sorting Dropdown -->
             <div class="sort-selector">
@@ -101,7 +103,7 @@
             <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('DevOps')">DevOps</button>
         </div>
 
-        <div class="cards-grid">
+        <div id="cardsGridContainer" class="cards-grid">
             {% for freelancer in freelancers %}
                 <article class="talent-card animate-fade-in">
                     {% if freelancer.is_verified %}
@@ -126,7 +128,7 @@
                     
                     <div class="card-body">
                         <h3 class="talent-name">
-                            {{ freelancer.user.username }}
+                            {{ freelancer.user.get_full_name|default:freelancer.user.username }}
                             {% if freelancer.is_verified %}
                                 <i class="fa-solid fa-circle-check text-accent" title="Verified Account"></i>
                             {% endif %}
@@ -134,8 +136,12 @@
                         <p class="talent-title">{{ freelancer.title|default:"Freelance Professional" }}</p>
                         
                         <div class="talent-rating-wrapper">
-                            <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
-                            <span class="reviews-count">({{ freelancer.get_reviews_count }} reviews)</span>
+                            {% if freelancer.get_reviews_count > 0 %}
+                                <span class="star-rating"><i class="fa-solid fa-star text-accent"></i> {{ freelancer.get_average_rating }}</span>
+                                <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
+                            {% else %}
+                                <span class="no-reviews-tag muted-text"><i class="fa-regular fa-star"></i> No reviews yet</span>
+                            {% endif %}
                         </div>
                         
                         {% if freelancer.location %}
@@ -161,9 +167,13 @@
                     </div>
                 </article>
             {% empty %}
-                <div class="empty-state glass-panel" style="width: 100%;">
-                    <i class="fa-solid fa-user-slash empty-icon"></i>
-                    <p>No freelancers match your criteria. Try loosening your filter requirements!</p>
+                <div class="empty-state glass-panel text-center" style="grid-column: 1 / -1; width: 100%; padding: 48px 24px;">
+                    <i class="fa-solid fa-user-slash empty-icon" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 8px;">No freelancers found</h3>
+                    <p class="muted-text" style="margin-bottom: 24px;">Try changing your search or filters.</p>
+                    <a href="{% url 'home' %}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-rotate-left"></i> Clear Filters
+                    </a>
                 </div>
             {% endfor %}
         </div>
@@ -181,7 +191,7 @@
                     {{ profile.user.username|slice:":2"|upper }}
                 </div>
                 <div class="recent-meta">
-                    <h4>{{ profile.user.username }}</h4>
+                    <h4>{{ profile.user.get_full_name|default:profile.user.username }}</h4>
                     <p>{{ profile.title|default:"Professional" }}</p>
                 </div>
             </a>
@@ -195,9 +205,52 @@
 {% block extra_js %}
 <script>
     const filterForm = document.getElementById('filterForm');
+    const filterErrorMsg = document.getElementById('filterErrorMsg');
     const searchInput = document.getElementById('q');
     const skillInput = document.getElementById('skill');
+    const minRateInput = document.getElementById('min_rate');
+    const maxRateInput = document.getElementById('max_rate');
+    const expInput = document.getElementById('experience');
     
+    function showFilterError(msg) {
+        if (filterErrorMsg) {
+            filterErrorMsg.textContent = msg;
+            filterErrorMsg.style.display = 'block';
+        }
+    }
+
+    function hideFilterError() {
+        if (filterErrorMsg) {
+            filterErrorMsg.style.display = 'none';
+            filterErrorMsg.textContent = '';
+        }
+    }
+
+    function validateFilters() {
+        const minRateVal = minRateInput && minRateInput.value.trim() !== '' ? parseFloat(minRateInput.value) : null;
+        const maxRateVal = maxRateInput && maxRateInput.value.trim() !== '' ? parseFloat(maxRateInput.value) : null;
+        const expVal = expInput && expInput.value.trim() !== '' ? parseFloat(expInput.value) : null;
+
+        if (minRateVal !== null && (isNaN(minRateVal) || minRateVal < 0)) {
+            showFilterError("Minimum rate cannot be negative.");
+            return false;
+        }
+        if (maxRateVal !== null && (isNaN(maxRateVal) || maxRateVal < 0)) {
+            showFilterError("Maximum rate cannot be negative.");
+            return false;
+        }
+        if (minRateVal !== null && maxRateVal !== null && minRateVal > maxRateVal) {
+            showFilterError("Minimum rate cannot exceed maximum rate.");
+            return false;
+        }
+        if (expVal !== null && (isNaN(expVal) || expVal < 0)) {
+            showFilterError("Experience cannot be negative.");
+            return false;
+        }
+        hideFilterError();
+        return true;
+    }
+
     // Auto-apply sort parameter
     function applySort(value) {
         const url = new URL(window.location.href);
@@ -212,7 +265,7 @@
         } else if (searchInput) {
             searchInput.value = skill;
         }
-        if (filterForm) {
+        if (filterForm && validateFilters()) {
             filterForm.submit();
         }
     }
@@ -227,17 +280,32 @@
     }
 
     if (filterForm) {
+        filterForm.addEventListener('submit', (e) => {
+            if (!validateFilters()) {
+                e.preventDefault();
+            }
+        });
+
+        // Real-time validation on rate input change
+        if (minRateInput) minRateInput.addEventListener('input', validateFilters);
+        if (maxRateInput) maxRateInput.addEventListener('input', validateFilters);
+        if (expInput) expInput.addEventListener('input', validateFilters);
+
         // Auto-submit form when selects or checkboxes change
         filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(el => {
             el.addEventListener('change', () => {
-                filterForm.submit();
+                if (validateFilters()) {
+                    filterForm.submit();
+                }
             });
         });
 
         // Debounced auto-submit on typing in search fields
         if (searchInput) {
             searchInput.addEventListener('input', debounce(() => {
-                filterForm.submit();
+                if (validateFilters()) {
+                    filterForm.submit();
+                }
             }, 600));
         }
     }

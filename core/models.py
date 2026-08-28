@@ -3,7 +3,90 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db.models import Avg
+from django.db.models import Avg, Q, Count
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from decimal import Decimal
+
+def normalize_skill_name(name):
+    """
+    Canonical skill normalization.
+    Storage/search should be case-insensitive, and display should always use a clean format.
+    """
+    if not name:
+        return ""
+    cleaned = " ".join(str(name).strip().split())
+    
+    CANONICAL_MAP = {
+        'react': 'React',
+        'react.js': 'React',
+        'reactjs': 'React',
+        'python': 'Python',
+        'django': 'Django',
+        'full stack': 'Full Stack',
+        'full-stack': 'Full Stack',
+        'fullstack': 'Full Stack',
+        'ui/ux': 'UI/UX',
+        'ui design': 'UI Design',
+        'ux design': 'UX Design',
+        'javascript': 'JavaScript',
+        'typescript': 'TypeScript',
+        'node.js': 'Node.js',
+        'nodejs': 'Node.js',
+        'vue.js': 'Vue.js',
+        'vue': 'Vue.js',
+        'vuejs': 'Vue.js',
+        'next.js': 'Next.js',
+        'nextjs': 'Next.js',
+        'graphql': 'GraphQL',
+        'devops': 'DevOps',
+        'aws': 'AWS',
+        'css': 'CSS',
+        'html': 'HTML',
+        'html5': 'HTML5',
+        'css3': 'CSS3',
+        'postgresql': 'PostgreSQL',
+        'postgres': 'PostgreSQL',
+        'mysql': 'MySQL',
+        'sql': 'SQL',
+        'nosql': 'NoSQL',
+        'mongodb': 'MongoDB',
+        'docker': 'Docker',
+        'kubernetes': 'Kubernetes',
+        'k8s': 'Kubernetes',
+        'fastapi': 'FastAPI',
+        'flask': 'Flask',
+        'tailwind': 'TailwindCSS',
+        'tailwindcss': 'TailwindCSS',
+        'redis': 'Redis',
+        'ai/ml': 'AI/ML',
+        'machine learning': 'Machine Learning',
+        'deep learning': 'Deep Learning',
+        'pytorch': 'PyTorch',
+        'tensorflow': 'TensorFlow',
+        'seo': 'SEO',
+        'ci/cd': 'CI/CD',
+        'api': 'API',
+        'rest api': 'REST API',
+        'restful api': 'RESTful API',
+        'php': 'PHP',
+        'c#': 'C#',
+        'c++': 'C++',
+        '.net': '.NET',
+        'golang': 'Golang',
+        'go': 'Go',
+        'rust': 'Rust',
+        'ruby': 'Ruby',
+        'ruby on rails': 'Ruby on Rails',
+        'rails': 'Ruby on Rails',
+        'figma': 'Figma',
+    }
+    
+    lower_name = cleaned.lower()
+    if lower_name in CANONICAL_MAP:
+        return CANONICAL_MAP[lower_name]
+    
+    return cleaned.title()
 
 # Kept for backward compatibility
 class Student(models.Model):
@@ -20,12 +103,47 @@ ROLE_CHOICES = (
     ('freelancer', 'Freelancer'),
 )
 
+class ProfileQuerySet(models.QuerySet):
+    def public_freelancers(self):
+        """
+        Returns only complete, published freelancer profiles.
+        Requirements:
+        - role == 'freelancer'
+        - hourly_rate > 0
+        - title is non-empty
+        - bio is non-empty
+        - location is non-empty
+        - experience_years >= 0
+        - availability is not None
+        - at least 1 linked skill
+        """
+        return self.filter(
+            role='freelancer',
+            hourly_rate__gt=0,
+            title__isnull=False,
+            bio__isnull=False,
+            location__isnull=False,
+            experience_years__gte=0,
+            availability__isnull=False,
+        ).exclude(
+            Q(title__exact='') | Q(bio__exact='') | Q(location__exact='')
+        ).annotate(
+            num_skills=Count('skills')
+        ).filter(
+            num_skills__gt=0
+        )
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
     bio = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
-    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    hourly_rate = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
     age = models.IntegerField(default=18)
     contact_email = models.EmailField(blank=True, null=True)
     
@@ -44,12 +162,38 @@ class Profile(models.Model):
     certificates = models.TextField(blank=True, null=True)
     languages = models.TextField(blank=True, null=True)
 
+    objects = ProfileQuerySet.as_manager()
+
     def __str__(self):
         return f"{self.user.username} - {self.get_role_display()}"
 
+    def clean(self):
+        super().clean()
+        if self.role == 'freelancer':
+            if self.hourly_rate is not None and self.hourly_rate <= 0:
+                raise ValidationError({'hourly_rate': 'Hourly rate must be greater than $0.'})
+            if self.experience_years is not None and self.experience_years < 0:
+                raise ValidationError({'experience_years': 'Experience cannot be negative.'})
+
+    def is_complete(self):
+        """
+        Check if freelancer profile has all required fields to be publicly listed.
+        """
+        if self.role != 'freelancer':
+            return False
+        has_name = bool((self.user.first_name and self.user.first_name.strip()) or self.user.username.strip())
+        has_title = bool(self.title and self.title.strip())
+        has_bio = bool(self.bio and self.bio.strip())
+        has_skills = self.skills.exists()
+        has_rate = bool(self.hourly_rate is not None and self.hourly_rate > 0)
+        has_location = bool(self.location and self.location.strip())
+        has_experience = bool(self.experience_years is not None and self.experience_years >= 0)
+        has_availability = self.availability is not None
+        return all([has_name, has_title, has_bio, has_skills, has_rate, has_location, has_experience, has_availability])
+
     def get_average_rating(self):
         avg = Review.objects.filter(reviewee=self.user).aggregate(Avg('rating'))['rating__avg']
-        return round(avg, 1) if avg else 0.0
+        return round(float(avg), 1) if avg is not None else None
 
     def get_completed_projects_count(self):
         return Booking.objects.filter(freelancer=self.user, status='completed').count()
@@ -59,6 +203,10 @@ class Profile(models.Model):
 
 class Skill(models.Model):
     name = models.CharField(max_length=50, unique=True)
+
+    def save(self, *args, **kwargs):
+        self.name = normalize_skill_name(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

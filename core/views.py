@@ -4,17 +4,20 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg, Count, Sum
+from django.http import Http404
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime, timedelta
+from decimal import Decimal
 import json
 import uuid
 
 from .models import (
     Student, Profile, Skill, FreelancerSkill, Booking, Invoice,
-    Review, Portfolio, Notification, Message, Favourite, Payment, ActivityLog
+    Review, Portfolio, Notification, Message, Favourite, Payment, ActivityLog,
+    normalize_skill_name
 )
 from .serializers import StudentSerializer
 
@@ -34,37 +37,71 @@ def log_activity(user, action):
 def home(request):
     """
     SaaS Home landing and advanced search directory.
+    Only complete, published freelancer profiles are listed publicly.
     """
-    freelancers = Profile.objects.filter(role='freelancer').select_related('user').prefetch_related('skills__skill')
+    freelancers = Profile.objects.public_freelancers().select_related('user').prefetch_related('skills__skill')
     
     # Advanced Filters
     query = request.GET.get('q', '').strip()
     if query:
+        safe_query = query[:100]
         freelancers = freelancers.filter(
-            Q(user__username__icontains=query) |
-            Q(title__icontains=query) |
-            Q(bio__icontains=query)
+            Q(user__username__icontains=safe_query) |
+            Q(user__first_name__icontains=safe_query) |
+            Q(user__last_name__icontains=safe_query) |
+            Q(title__icontains=safe_query) |
+            Q(bio__icontains=safe_query)
         )
         
     skill_query = request.GET.get('skill', '').strip()
     if skill_query:
-        freelancers = freelancers.filter(skills__skill__name__icontains=skill_query)
+        safe_skill = skill_query[:100]
+        freelancers = freelancers.filter(skills__skill__name__icontains=safe_skill)
         
-    min_rate = request.GET.get('min_rate')
-    if min_rate:
-        freelancers = freelancers.filter(hourly_rate__gte=min_rate)
-        
-    max_rate = request.GET.get('max_rate')
-    if max_rate:
-        freelancers = freelancers.filter(hourly_rate__lte=max_rate)
+    min_rate_raw = request.GET.get('min_rate', '').strip()
+    max_rate_raw = request.GET.get('max_rate', '').strip()
+    
+    min_rate = None
+    max_rate = None
+    
+    if min_rate_raw:
+        try:
+            val = Decimal(min_rate_raw)
+            if val > 0:
+                min_rate = val
+        except (ValueError, ArithmeticError):
+            pass
+            
+    if max_rate_raw:
+        try:
+            val = Decimal(max_rate_raw)
+            if val > 0:
+                max_rate = val
+        except (ValueError, ArithmeticError):
+            pass
+            
+    if min_rate is not None and max_rate is not None and min_rate > max_rate:
+        messages.warning(request, "Minimum rate cannot exceed maximum rate.")
+    else:
+        if min_rate is not None:
+            freelancers = freelancers.filter(hourly_rate__gte=min_rate)
+        if max_rate is not None:
+            freelancers = freelancers.filter(hourly_rate__lte=max_rate)
         
     location = request.GET.get('location', '').strip()
     if location:
-        freelancers = freelancers.filter(location__icontains=location)
+        freelancers = freelancers.filter(location__icontains=location[:100])
         
-    experience = request.GET.get('experience')
-    if experience:
-        freelancers = freelancers.filter(experience_years__gte=experience)
+    experience_raw = request.GET.get('experience', '').strip()
+    experience = None
+    if experience_raw:
+        try:
+            exp_val = int(experience_raw)
+            if exp_val >= 0:
+                experience = exp_val
+                freelancers = freelancers.filter(experience_years__gte=experience)
+        except (ValueError, TypeError):
+            pass
         
     availability = request.GET.get('availability')
     if availability == 'true':
@@ -83,9 +120,16 @@ def home(request):
         reviews_count=Count('user__reviews_received')
     )
     
-    min_rating = request.GET.get('rating')
-    if min_rating:
-        freelancers = freelancers.filter(avg_rating__gte=min_rating)
+    min_rating_raw = request.GET.get('rating', '').strip()
+    min_rating = None
+    if min_rating_raw:
+        try:
+            rating_val = float(min_rating_raw)
+            if 0 <= rating_val <= 5:
+                min_rating = min_rating_raw
+                freelancers = freelancers.filter(avg_rating__gte=rating_val)
+        except (ValueError, TypeError):
+            pass
         
     # Sorting
     sort_by = request.GET.get('sort_by', 'newest')
@@ -100,20 +144,20 @@ def home(request):
     elif sort_by == 'most_completed':
         freelancers = freelancers.order_by('-completed_count')
 
-    # Recently Viewed (Session-based)
+    # Recently Viewed (Session-based) - only complete profiles
     recently_viewed_ids = request.session.get('recently_viewed', [])
     recently_viewed = []
     if recently_viewed_ids:
-        recently_viewed = Profile.objects.filter(id__in=recently_viewed_ids, role='freelancer').select_related('user')
+        recently_viewed = Profile.objects.public_freelancers().filter(id__in=recently_viewed_ids).select_related('user')
 
     return render(request, "core/home.html", {
         "freelancers": freelancers,
         "query": query,
         "skill_query": skill_query,
-        "min_rate": min_rate,
-        "max_rate": max_rate,
+        "min_rate": min_rate_raw,
+        "max_rate": max_rate_raw,
         "location": location,
-        "experience": experience,
+        "experience": experience_raw,
         "availability": availability,
         "verified": verified,
         "min_rating": min_rating,
@@ -199,15 +243,79 @@ def profile_edit_view(request):
         action = request.POST.get("action")
         
         if action == "update_profile":
-            profile.bio = request.POST.get("bio")
-            profile.age = request.POST.get("age", 18)
-            profile.contact_email = request.POST.get("contact_email")
-            profile.location = request.POST.get("location")
+            bio = request.POST.get("bio", "").strip()
+            age_raw = request.POST.get("age", 18)
+            contact_email = request.POST.get("contact_email", "").strip()
+            location = request.POST.get("location", "").strip()
+            
+            try:
+                profile.age = int(age_raw)
+            except (ValueError, TypeError):
+                profile.age = 18
+                
+            profile.bio = bio
+            profile.contact_email = contact_email
+            profile.location = location
+            
+            first_name = request.POST.get("first_name", "").strip()
+            last_name = request.POST.get("last_name", "").strip()
+            if first_name or last_name:
+                request.user.first_name = first_name
+                request.user.last_name = last_name
+                request.user.save()
             
             if profile.role == 'freelancer':
-                profile.title = request.POST.get("title")
-                profile.hourly_rate = request.POST.get("hourly_rate", 0.00)
-                profile.experience_years = request.POST.get("experience_years", 0)
+                title = request.POST.get("title", "").strip()
+                hourly_rate_raw = request.POST.get("hourly_rate")
+                experience_raw = request.POST.get("experience_years", 0)
+                
+                # Priority 2: Strict backend validation for hourly rate > 0
+                if hourly_rate_raw is None or str(hourly_rate_raw).strip() == "":
+                    messages.error(request, "Hourly rate must be greater than $0.")
+                    return render(request, "core/profile_edit.html", {
+                        "profile": profile,
+                        "current_skills": FreelancerSkill.objects.filter(profile=profile).select_related('skill'),
+                        "portfolio_items": Portfolio.objects.filter(profile=profile)
+                    }, status=400)
+                
+                try:
+                    hourly_rate_val = Decimal(str(hourly_rate_raw).strip())
+                    if hourly_rate_val <= Decimal('0'):
+                        messages.error(request, "Hourly rate must be greater than $0.")
+                        return render(request, "core/profile_edit.html", {
+                            "profile": profile,
+                            "current_skills": FreelancerSkill.objects.filter(profile=profile).select_related('skill'),
+                            "portfolio_items": Portfolio.objects.filter(profile=profile)
+                        }, status=400)
+                    profile.hourly_rate = hourly_rate_val
+                except (ValueError, ArithmeticError, TypeError):
+                    messages.error(request, "Hourly rate must be greater than $0.")
+                    return render(request, "core/profile_edit.html", {
+                        "profile": profile,
+                        "current_skills": FreelancerSkill.objects.filter(profile=profile).select_related('skill'),
+                        "portfolio_items": Portfolio.objects.filter(profile=profile)
+                    }, status=400)
+                
+                # Experience validation >= 0
+                try:
+                    exp_val = int(experience_raw)
+                    if exp_val < 0:
+                        messages.error(request, "Experience cannot be negative.")
+                        return render(request, "core/profile_edit.html", {
+                            "profile": profile,
+                            "current_skills": FreelancerSkill.objects.filter(profile=profile).select_related('skill'),
+                            "portfolio_items": Portfolio.objects.filter(profile=profile)
+                        }, status=400)
+                    profile.experience_years = exp_val
+                except (ValueError, TypeError):
+                    messages.error(request, "Invalid experience value.")
+                    return render(request, "core/profile_edit.html", {
+                        "profile": profile,
+                        "current_skills": FreelancerSkill.objects.filter(profile=profile).select_related('skill'),
+                        "portfolio_items": Portfolio.objects.filter(profile=profile)
+                    }, status=400)
+
+                profile.title = title
                 profile.availability = request.POST.get("availability") == "true"
                 profile.education = request.POST.get("education")
                 profile.experience_detail = request.POST.get("experience_detail")
@@ -223,11 +331,14 @@ def profile_edit_view(request):
             messages.success(request, "Profile updated successfully!")
             
         elif action == "add_skill" and profile.role == 'freelancer':
-            skill_name = request.POST.get("skill_name", "").strip()
-            if skill_name:
-                skill, created = Skill.objects.get_or_create(name=skill_name)
+            raw_skill_name = request.POST.get("skill_name", "").strip()
+            if raw_skill_name:
+                canonical_name = normalize_skill_name(raw_skill_name)
+                skill = Skill.objects.filter(name__iexact=canonical_name).first()
+                if not skill:
+                    skill = Skill.objects.create(name=canonical_name)
                 FreelancerSkill.objects.get_or_create(profile=profile, skill=skill)
-                messages.success(request, f"Added skill: {skill_name}")
+                messages.success(request, f"Added skill: {skill.name}")
                 
         elif action == "remove_skill" and profile.role == 'freelancer':
             skill_id = request.POST.get("skill_id")
@@ -270,17 +381,24 @@ def profile_edit_view(request):
 def talent_detail_view(request, profile_id):
     freelancer = get_object_or_404(Profile, id=profile_id, role='freelancer')
     
+    # Priority 1: Prevent public access to incomplete profiles
+    is_owner = request.user.is_authenticated and freelancer.user == request.user
+    is_staff = request.user.is_authenticated and request.user.is_staff
+    
+    if not freelancer.is_complete() and not is_owner and not is_staff:
+        raise Http404("Freelancer profile is unpublished or incomplete.")
+    
     # Increment views count
     if request.user.is_authenticated and freelancer.user != request.user:
         freelancer.views_count += 1
         freelancer.save()
 
-    # Session storage for recently viewed
-    recently_viewed = request.session.get('recently_viewed', [])
-    if freelancer.id not in recently_viewed:
-        recently_viewed.insert(0, freelancer.id)
-        # Keep only last 5
-        request.session['recently_viewed'] = recently_viewed[:5]
+    # Session storage for recently viewed (only if complete)
+    if freelancer.is_complete():
+        recently_viewed = request.session.get('recently_viewed', [])
+        if freelancer.id not in recently_viewed:
+            recently_viewed.insert(0, freelancer.id)
+            request.session['recently_viewed'] = recently_viewed[:5]
 
     skills = FreelancerSkill.objects.filter(profile=freelancer).select_related('skill')
     portfolio_items = Portfolio.objects.filter(profile=freelancer)
@@ -300,14 +418,23 @@ def talent_detail_view(request, profile_id):
         ).exists() and not Review.objects.filter(reviewer=request.user, reviewee=freelancer.user).exists()
 
     if request.method == "POST" and request.user.is_authenticated:
-        # Submit review
-        rating = request.POST.get("rating", 5)
-        comment = request.POST.get("comment", "")
+        if not can_review:
+            messages.error(request, "You cannot review this freelancer.")
+            return redirect('talent_detail', profile_id=profile_id)
+            
+        try:
+            rating_val = int(request.POST.get("rating", 5))
+            if rating_val < 1 or rating_val > 5:
+                rating_val = 5
+        except (ValueError, TypeError):
+            rating_val = 5
+            
+        comment = request.POST.get("comment", "").strip()
         
         Review.objects.create(
             reviewer=request.user,
             reviewee=freelancer.user,
-            rating=rating,
+            rating=rating_val,
             comment=comment
         )
         messages.success(request, "Review submitted successfully!")
@@ -320,6 +447,7 @@ def talent_detail_view(request, profile_id):
         "reviews": reviews,
         "is_favourited": is_favourited,
         "can_review": can_review,
+        "is_owner": is_owner,
     })
 
 # --- Favourites wishlist ---

@@ -36,6 +36,17 @@
                 
                 <div class="flex-row">
                     <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" id="first_name" value="{{ profile.user.first_name|default:'' }}" placeholder="First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" value="{{ profile.user.last_name|default:'' }}" placeholder="Last Name">
+                    </div>
+                </div>
+
+                <div class="flex-row">
+                    <div class="form-group">
                         <label for="contact_email">Public Contact Email</label>
                         <input type="email" name="contact_email" id="contact_email" value="{{ profile.contact_email|default:'' }}" required>
                     </div>
@@ -48,13 +59,13 @@
                 <div class="flex-row">
                     <div class="form-group">
                         <label for="location">Location</label>
-                        <input type="text" name="location" id="location" value="{{ profile.location|default:'' }}" placeholder="e.g. San Francisco, US">
+                        <input type="text" name="location" id="location" value="{{ profile.location|default:'' }}" placeholder="e.g. San Francisco, US" required>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="bio">Bio Overview</label>
-                    <textarea name="bio" id="bio" rows="4" placeholder="Tell clients about yourself..." required>{{ profile.bio|default:'' }}</textarea>
+                    <textarea name="bio" id="bio" rows="4" placeholder="Tell clients about yourself and your expertise..." required>{{ profile.bio|default:'' }}</textarea>
                 </div>
                 
                 <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save General Changes</button>
@@ -64,8 +75,34 @@
         {% if profile.role == 'freelancer' %}
             <!-- Professional Info Section -->
             <section id="professional-info" class="tab-content glass-panel">
-                <h2><i class="fa-solid fa-briefcase text-primary"></i> Professional Profile</h2>
-                <form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin:0;"><i class="fa-solid fa-briefcase text-primary"></i> Professional Profile</h2>
+                    {% if profile.is_complete %}
+                        <span class="badge-verified" style="font-size: 0.85rem; padding: 6px 12px;"><i class="fa-solid fa-circle-check"></i> Profile Live & Published</span>
+                    {% else %}
+                        <span class="badge-offline" style="font-size: 0.85rem; padding: 6px 12px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);"><i class="fa-solid fa-lock"></i> Incomplete (Private / Hidden)</span>
+                    {% endif %}
+                </div>
+
+                <!-- Completeness Requirements Box -->
+                {% if not profile.is_complete %}
+                    <div class="glass-panel" style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 25px;">
+                        <h4 style="color: #fbbf24; font-size: 0.95rem; margin-bottom: 8px;"><i class="fa-solid fa-list-check"></i> Public Publication Checklist</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Your profile will automatically be published to Explore once all required items are filled:</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 0.85rem;">
+                            <div><i class="fa-solid {% if profile.user.username or profile.user.first_name %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Username / Name</div>
+                            <div><i class="fa-solid {% if profile.title %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Professional Title</div>
+                            <div><i class="fa-solid {% if profile.bio %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Bio Description</div>
+                            <div><i class="fa-solid {% if current_skills %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> At Least 1 Skill</div>
+                            <div><i class="fa-solid {% if profile.hourly_rate > 0 %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Hourly Rate > $0</div>
+                            <div><i class="fa-solid {% if profile.location %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Location</div>
+                            <div><i class="fa-solid {% if profile.experience_years >= 0 %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Experience (Years)</div>
+                            <div><i class="fa-solid fa-circle-check text-accent"></i> Availability State</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="{% url 'profile_edit' %}" id="proProfileForm" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="update_profile">
                     
@@ -76,14 +113,17 @@
                         </div>
                         <div class="form-group">
                             <label for="hourly_rate">Hourly Rate ($)</label>
-                            <input type="number" step="0.01" name="hourly_rate" id="hourly_rate" value="{{ profile.hourly_rate }}" required>
+                            <input type="number" step="0.01" min="0.01" name="hourly_rate" id="hourly_rate" value="{{ profile.hourly_rate }}" required>
+                            <div id="rateErrorMsg" style="display: none; color: #f87171; font-size: 0.82rem; margin-top: 5px; font-weight: 500;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Hourly rate must be greater than $0.
+                            </div>
                         </div>
                     </div>
                     
                     <div class="flex-row">
                         <div class="form-group">
                             <label for="experience_years">Experience (Years)</label>
-                            <input type="number" name="experience_years" id="experience_years" value="{{ profile.experience_years }}" required>
+                            <input type="number" name="experience_years" id="experience_years" value="{{ profile.experience_years }}" min="0" required>
                         </div>
                         <div class="form-group">
                             <label for="availability">Availability</label>
@@ -123,7 +163,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Pro Changes</button>
+                    <button type="submit" class="btn-primary" id="saveProChangesBtn"><i class="fa-solid fa-floppy-disk"></i> Save Pro Changes</button>
                 </form>
             </section>
 
@@ -240,7 +280,9 @@
 {% block extra_js %}
 <script>
     function switchTab(event, tabId) {
-        event.preventDefault();
+        if (event && event.preventDefault) {
+            event.preventDefault();
+        }
         
         // Remove active class from links
         document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -253,8 +295,16 @@
         });
         
         // Add active class
-        event.currentTarget.classList.add('active');
-        document.getElementById(tabId).classList.add('active-tab');
+        const targetLink = document.querySelector(`.sidebar-link[href="#${tabId}"]`);
+        if (targetLink) {
+            targetLink.classList.add('active');
+        } else if (event && event.currentTarget && event.currentTarget.classList) {
+            event.currentTarget.classList.add('active');
+        }
+        const targetSection = document.getElementById(tabId);
+        if (targetSection) {
+            targetSection.classList.add('active-tab');
+        }
     }
     
     // Switch to tab if hash is present in URL
@@ -267,5 +317,37 @@
             }
         }
     });
+
+    // Client-side validation for hourly rate
+    const proForm = document.getElementById('proProfileForm');
+    const rateInput = document.getElementById('hourly_rate');
+    const rateError = document.getElementById('rateErrorMsg');
+
+    function validateHourlyRate() {
+        if (!rateInput) return true;
+        const val = parseFloat(rateInput.value);
+        if (isNaN(val) || val <= 0) {
+            if (rateError) rateError.style.display = 'block';
+            rateInput.style.borderColor = '#f87171';
+            return false;
+        }
+        if (rateError) rateError.style.display = 'none';
+        rateInput.style.borderColor = '';
+        return true;
+    }
+
+    if (rateInput) {
+        rateInput.addEventListener('input', validateHourlyRate);
+    }
+
+    if (proForm) {
+        proForm.addEventListener('submit', (e) => {
+            if (!validateHourlyRate()) {
+                e.preventDefault();
+                switchTab(null, 'professional-info');
+                rateInput.focus();
+            }
+        });
+    }
 </script>
 {% endblock %}

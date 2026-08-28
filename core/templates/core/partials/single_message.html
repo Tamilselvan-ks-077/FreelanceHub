@@ -1,0 +1,17 @@
+<div class="chat-message-bubble {% if message.sender == request.user %}bubble-sent{% else %}bubble-received{% endif %}">
+    <div class="bubble-content">
+        {% if message.body %}
+            <p class="msg-text">{{ message.body }}</p>
+        {% endif %}
+        
+        {% if message.attachment %}
+            <div class="msg-attachment-link">
+                <i class="fa-solid fa-file-arrow-down"></i> 
+                <a href="{{ message.attachment.url }}" target="_blank" download>
+                    {{ message.attachment.name|default:"Attachment" }}
+                </a>
+            </div>
+        {% endif %}
+        <span class="msg-time">{{ message.created_at|date:"H:i" }}</span>
+    </div>
+</div>
