@@ -3,15 +3,15 @@
   "builds": [
     {
       "src": "myapp/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "headers": {
-        "cache-control": "no-cache, must-revalidate"
-      },
       "dest": "/staticfiles/$1"
     },
     {
