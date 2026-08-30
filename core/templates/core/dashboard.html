@@ -9,278 +9,285 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container animate-fade-in">
-    <!-- Sidebar Navigation -->
-    <aside class="dashboard-sidebar glass-panel">
-        <div class="sidebar-user-info">
-            <div class="sidebar-avatar">
-                {{ user.username|slice:":2"|upper }}
-            </div>
-            <h4>{{ user.username }}</h4>
-            <span class="role-badge">{% if role == 'freelancer' %}Freelancer{% else %}Client{% endif %}</span>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="#overview" class="sidebar-link active" onclick="switchDashTab(event, 'dash-overview')"><i class="fa-solid fa-chart-line"></i> Performance Overview</a>
-            <a href="#bookings" class="sidebar-link" onclick="switchDashTab(event, 'dash-bookings')"><i class="fa-solid fa-folder-open"></i> Projects & Bookings</a>
-            <a href="#invoices" class="sidebar-link" onclick="switchDashTab(event, 'dash-invoices')"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices & Billing</a>
-            <a href="{% url 'profile_edit' %}" class="sidebar-link"><i class="fa-solid fa-user-pen"></i> Settings</a>
-        </nav>
-    </aside>
-
-    <!-- Main Content Panel -->
-    <div class="dashboard-main-content">
-        <!-- Tab 1: Overview -->
-        <div id="dash-overview" class="dash-tab active-tab">
-            <h1>Welcome Back, {{ user.username }}!</h1>
-            
-            {% if role == 'freelancer' %}
-                <!-- Freelancer Metric Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
-                        <div class="stat-details">
-                            <h3>${{ total_earnings|floatformat:2 }}</h3>
-                            <p>Total Earnings</p>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-danger"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                        <div class="stat-details">
-                            <h3>${{ unpaid_amount|floatformat:2 }}</h3>
-                            <p>Pending Invoices</p>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-accent"><i class="fa-solid fa-circle-check"></i></div>
-                        <div class="stat-details">
-                            <h3>{{ success_rate }}%</h3>
-                            <p>Success Rate</p>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-primary"><i class="fa-solid fa-people-carry-box"></i></div>
-                        <div class="stat-details">
-                            <h3>{{ active_clients }}</h3>
-                            <p>Active Clients</p>
-                        </div>
-                    </div>
+<div class="container">
+    <div class="dashboard-container">
+        <!-- Toptal-Style Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-user-info">
+                <div class="sidebar-avatar">
+                    {{ user.username|slice:":2"|upper }}
                 </div>
+                <h4>{{ user.username }}</h4>
+                <span class="badge-status {% if role == 'freelancer' %}status-accepted{% else %}status-completed{% endif %}">
+                    {% if role == 'freelancer' %}Freelancer Account{% else %}Client Account{% endif %}
+                </span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="sidebar-link active" onclick="switchDashTab(event, 'dash-overview')">
+                    <i class="fa-solid fa-chart-line"></i> Performance Overview
+                </a>
+                <a href="#bookings" class="sidebar-link" onclick="switchDashTab(event, 'dash-bookings')">
+                    <i class="fa-solid fa-folder-open"></i> Projects & Bookings
+                </a>
+                <a href="#invoices" class="sidebar-link" onclick="switchDashTab(event, 'dash-invoices')">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Invoices & Billing
+                </a>
+                <a href="{% url 'profile_edit' %}" class="sidebar-link">
+                    <i class="fa-solid fa-sliders"></i> Account Settings
+                </a>
+            </nav>
+        </aside>
 
-                <div class="dashboard-graphs-layout">
-                    <!-- ChartJS earnings graph -->
-                    <div class="glass-panel graph-card">
-                        <h3>Monthly Earnings ($)</h3>
-                        <div class="chart-container" style="position: relative; height:240px;">
-                            <canvas id="earningsChart"></canvas>
-                        </div>
-                    </div>
-                    <!-- Stats list -->
-                    <div class="glass-panel stats-info-card">
-                        <h3>Booking Summary</h3>
-                        <ul class="specs-list">
-                            <li><span>Total Bookings</span><strong>{{ total_bookings }}</strong></li>
-                            <li><span>Pending Requests</span><strong class="text-accent">{{ pending }}</strong></li>
-                            <li><span>In-Progress Projects</span><strong class="text-primary">{{ accepted }}</strong></li>
-                            <li><span>Completed Work</span><strong class="text-success">{{ completed }}</strong></li>
-                            <li><span>Cancelled Bookings</span><strong class="text-danger">{{ cancelled }}</strong></li>
-                        </ul>
-                    </div>
+        <!-- Main Content Workspace -->
+        <div class="dashboard-main-content">
+            <!-- Tab 1: Performance Overview -->
+            <div id="dash-overview" class="dash-tab active-tab">
+                <div style="margin-bottom: 24px;">
+                    <h1 style="font-family: var(--font-outfit); font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">Welcome Back, {{ user.username }}!</h1>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">Track your contracts, performance metrics, and pending invoices</p>
                 </div>
                 
-            {% else %}
-                <!-- Client Metric Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
-                        <div class="stat-details">
-                            <h3>${{ total_paid|floatformat:2 }}</h3>
-                            <p>Total Spent</p>
+                {% if role == 'freelancer' %}
+                    <!-- Freelancer Metric Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card card">
+                            <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                            <div class="stat-details">
+                                <h3>${{ total_earnings|floatformat:2 }}</h3>
+                                <p>Total Earnings</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon" style="background: var(--error-bg); color: var(--error);"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                            <div class="stat-details">
+                                <h3>${{ unpaid_amount|floatformat:2 }}</h3>
+                                <p>Pending Invoices</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon" style="background: var(--success-bg); color: var(--success);"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="stat-details">
+                                <h3>{{ success_rate }}%</h3>
+                                <p>Success Rate</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="stat-details">
+                                <h3>{{ active_clients }}</h3>
+                                <p>Active Clients</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-danger"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                        <div class="stat-details">
-                            <h3>${{ outstanding|floatformat:2 }}</h3>
-                            <p>Outstanding Invoices</p>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-primary"><i class="fa-solid fa-diagram-project"></i></div>
-                        <div class="stat-details">
-                            <h3>{{ active }}</h3>
-                            <p>Active Contracts</p>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel animate-slide-in">
-                        <div class="stat-icon text-accent"><i class="fa-solid fa-heart"></i></div>
-                        <div class="stat-details">
-                            <h3>{{ favourites_count }}</h3>
-                            <p>Saved Talents</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Client Booking Timeline Preview -->
-                <div class="glass-panel pipeline-panel" style="margin-top: 20px;">
-                    <h3>Project Booking Pipeline</h3>
-                    <p class="muted-text" style="font-size:0.85rem; margin-bottom:15px;">Monitor pipeline milestones: Create Request &rarr; Acceptance &rarr; Pay Invoice &rarr; Project Completion &rarr; Review</p>
-                    <div class="pipeline-visual-timeline">
-                        <div class="step step-active"><i class="fa-solid fa-file-signature"></i><span>Request</span></div>
-                        <div class="step-line"></div>
-                        <div class="step"><i class="fa-solid fa-signature"></i><span>Accept</span></div>
-                        <div class="step-line"></div>
-                        <div class="step"><i class="fa-solid fa-credit-card"></i><span>Pay</span></div>
-                        <div class="step-line"></div>
-                        <div class="step"><i class="fa-solid fa-briefcase"></i><span>Work</span></div>
-                        <div class="step-line"></div>
-                        <div class="step"><i class="fa-solid fa-star"></i><span>Feedback</span></div>
-                    </div>
-                </div>
-            {% endif %}
 
-            <!-- Recent Activity Log Section -->
-            <div class="glass-panel recent-activities-panel" style="margin-top:20px;">
-                <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activities</h3>
-                <div class="activities-list">
-                    {% for act in activities %}
-                        <div class="activity-item">
-                            <span class="activity-time">{{ act.timestamp|date:"M d, H:i" }}</span>
-                            <span class="activity-desc">{{ act.action }}</span>
+                    <div class="dashboard-graphs-layout">
+                        <!-- ChartJS Earnings -->
+                        <div class="card" style="padding: 24px;">
+                            <h3 style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 18px;"><i class="fa-solid fa-chart-area text-accent"></i> Monthly Earnings ($)</h3>
+                            <div style="position: relative; height: 240px;">
+                                <canvas id="earningsChart"></canvas>
+                            </div>
                         </div>
-                    {% empty %}
-                        <p class="muted-text" style="font-size:0.85rem;">No activities logged yet.</p>
-                    {% endfor %}
+                        
+                        <!-- Booking Summary -->
+                        <div class="card" style="padding: 24px;">
+                            <h3 style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 18px;"><i class="fa-solid fa-list-check text-accent"></i> Contract Summary</h3>
+                            <ul style="list-style: none; margin: 0; padding: 0;">
+                                <li style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Total Bookings</span>
+                                    <strong>{{ total_bookings }}</strong>
+                                </li>
+                                <li style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Pending Requests</span>
+                                    <strong style="color: var(--warning);">{{ pending }}</strong>
+                                </li>
+                                <li style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">In-Progress Contracts</span>
+                                    <strong style="color: var(--brand-primary);">{{ accepted }}</strong>
+                                </li>
+                                <li style="display: flex; justify-content: space-between; padding: 10px 0; font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Completed Work</span>
+                                    <strong style="color: var(--success);">{{ completed }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Client Metric Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card card">
+                            <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="stat-details">
+                                <h3>${{ total_paid|floatformat:2 }}</h3>
+                                <p>Total Spent</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon" style="background: var(--error-bg); color: var(--error);"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                            <div class="stat-details">
+                                <h3>${{ outstanding|floatformat:2 }}</h3>
+                                <p>Pending Invoices</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                            <div class="stat-details">
+                                <h3>{{ active }}</h3>
+                                <p>Active Contracts</p>
+                            </div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-icon" style="background: var(--brand-light); color: var(--brand-primary);"><i class="fa-solid fa-heart"></i></div>
+                            <div class="stat-details">
+                                <h3>{{ favourites_count }}</h3>
+                                <p>Saved Experts</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Recent Activity Feed -->
+                <div class="card" style="padding: 24px;">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); margin-bottom: 16px;">
+                        <i class="fa-solid fa-clock-rotate-left text-accent"></i> Recent Activity Log
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        {% for act in activities %}
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 0.88rem;">
+                                <span>{{ act.action }}</span>
+                                <span style="color: var(--text-tertiary); font-size: 0.78rem;">{{ act.timestamp|date:"M d, H:i" }}</span>
+                            </div>
+                        {% empty %}
+                            <p style="color: var(--text-tertiary); font-size: 0.88rem;">No activity logged yet.</p>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tab 2: Bookings -->
-        <div id="dash-bookings" class="dash-tab">
-            <h2><i class="fa-solid fa-folder-open text-primary"></i> Projects & Bookings</h2>
-            <div class="table-container glass-panel">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>{% if role == 'freelancer' %}Client{% else %}Freelancer{% endif %}</th>
-                            <th>Dates</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for b in bookings %}
+            <!-- Tab 2: Bookings Table -->
+            <div id="dash-bookings" class="dash-tab">
+                <div style="margin-bottom: 20px;">
+                    <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-folder-open text-accent"></i> Projects & Bookings</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <td>#{{ b.id }}</td>
-                                <td>
-                                    <strong>
-                                        {% if role == 'freelancer' %}
-                                            {{ b.client.username }}
-                                        {% else %}
-                                            {{ b.freelancer.username }}
-                                        {% endif %}
-                                    </strong>
-                                </td>
-                                <td>
-                                    <span style="font-size:0.85rem;">{{ b.start_date }} to {{ b.end_date }}</span>
-                                </td>
-                                <td>
-                                    <span class="table-desc-text" title="{{ b.description }}">{{ b.description|truncatewords:8 }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge-status status-{{ b.status }}">{{ b.get_status_display }}</span>
-                                </td>
-                                <td>
-                                    <div class="table-action-btns">
-                                        {% if role == 'freelancer' %}
-                                            {% if b.status == 'pending' %}
-                                                <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="action" value="accept">
-                                                    <button type="submit" class="btn-success-small"><i class="fa-solid fa-check"></i> Accept</button>
-                                                </form>
-                                                <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="action" value="reject">
-                                                    <button type="submit" class="btn-danger-small"><i class="fa-solid fa-xmark"></i> Reject</button>
-                                                </form>
-                                            {% elif b.status == 'accepted' %}
-                                                <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="action" value="complete">
-                                                    <button type="submit" class="btn-primary-small"><i class="fa-solid fa-circle-check"></i> Complete</button>
-                                                </form>
-                                            {% else %}
-                                                <span class="muted-text">None</span>
-                                            {% endif %}
-                                        {% else %}
-                                            {% if b.status == 'pending' %}
-                                                <a href="{% url 'booking_edit' b.id %}" class="btn-primary-small"><i class="fa-solid fa-pen"></i> Edit</a>
-                                                <form method="POST" action="{% url 'booking_cancel' b.id %}" style="display:inline;" onsubmit="return confirm('Cancel this booking request?')">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn-danger-small"><i class="fa-solid fa-trash"></i> Cancel</button>
-                                                </form>
-                                            {% elif b.status == 'completed' %}
-                                                <a href="{% url 'talent_detail' b.freelancer.profile.id %}#reviews-section" class="btn-success-small"><i class="fa-solid fa-star"></i> Review</a>
-                                            {% else %}
-                                                <span class="muted-text">None</span>
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                </td>
+                                <th>Booking ID</th>
+                                <th>{% if role == 'freelancer' %}Client{% else %}Freelancer{% endif %}</th>
+                                <th>Duration</th>
+                                <th>Task Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">No bookings listed yet.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                                <tr>
+                                    <td><strong>#{{ b.id }}</strong></td>
+                                    <td>
+                                        <strong>
+                                            {% if role == 'freelancer' %}
+                                                {{ b.client.username }}
+                                            {% else %}
+                                                {{ b.freelancer.username }}
+                                            {% endif %}
+                                        </strong>
+                                    </td>
+                                    <td><span style="font-size: 0.84rem;">{{ b.start_date }} to {{ b.end_date }}</span></td>
+                                    <td><span style="color: var(--text-secondary); font-size: 0.85rem;">{{ b.description|truncatewords:8 }}</span></td>
+                                    <td><span class="badge-status status-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                                    <td>
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                            {% if role == 'freelancer' %}
+                                                {% if b.status == 'pending' %}
+                                                    <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="accept">
+                                                        <button type="submit" class="btn-success-small"><i class="fa-solid fa-check"></i> Accept</button>
+                                                    </form>
+                                                    <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="reject">
+                                                        <button type="submit" class="btn-danger-small"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                                    </form>
+                                                {% elif b.status == 'accepted' %}
+                                                    <form method="POST" action="{% url 'booking_action' b.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="complete">
+                                                        <button type="submit" class="btn-primary-small"><i class="fa-solid fa-circle-check"></i> Mark Complete</button>
+                                                    </form>
+                                                {% else %}
+                                                    <span style="color: var(--text-tertiary); font-size: 0.82rem;">None</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if b.status == 'pending' %}
+                                                    <a href="{% url 'booking_edit' b.id %}" class="btn-primary-small"><i class="fa-solid fa-pen"></i> Edit</a>
+                                                    <form method="POST" action="{% url 'booking_cancel' b.id %}" style="display:inline;" onsubmit="return confirm('Cancel this booking request?')">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn-danger-small"><i class="fa-solid fa-trash"></i> Cancel</button>
+                                                    </form>
+                                                {% elif b.status == 'completed' %}
+                                                    <a href="{% url 'talent_detail' b.freelancer.profile.id %}#reviews-section" class="btn-success-small"><i class="fa-solid fa-star"></i> Review</a>
+                                                {% else %}
+                                                    <span style="color: var(--text-tertiary); font-size: 0.82rem;">None</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 30px;">No bookings listed yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- Tab 3: Invoices -->
-        <div id="dash-invoices" class="dash-tab">
-            <h2><i class="fa-solid fa-file-invoice-dollar text-primary"></i> Invoices & Billing</h2>
-            <div class="table-container glass-panel">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Invoice ID</th>
-                            <th>Booking</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Issued At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for inv in invoices %}
+            <!-- Tab 3: Invoices Table -->
+            <div id="dash-invoices" class="dash-tab">
+                <div style="margin-bottom: 20px;">
+                    <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-file-invoice-dollar text-accent"></i> Invoices & Payments</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <td>#INV-{{ inv.id }}</td>
-                                <td>Booking #{{ inv.booking.id }}</td>
-                                <td><strong>${{ inv.amount }}</strong></td>
-                                <td>
-                                    <span class="badge-status invoice-{{ inv.status }}">{{ inv.get_status_display }}</span>
-                                </td>
-                                <td>{{ inv.issued_at|date:"M d, Y" }}</td>
-                                <td>
-                                    <div class="table-action-btns">
-                                        {% if role == 'client' and inv.status == 'due' %}
-                                            <a href="{% url 'pay_invoice' inv.id %}" class="btn-primary-small"><i class="fa-solid fa-credit-card"></i> Pay Now</a>
-                                        {% endif %}
-                                        <a href="{% url 'invoice_print' inv.id %}" target="_blank" class="btn-secondary-small"><i class="fa-solid fa-print"></i> PDF/Print</a>
-                                    </div>
-                                </td>
+                                <th>Invoice ID</th>
+                                <th>Booking Ref</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Issued Date</th>
+                                <th>Actions</th>
                             </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">No invoices found.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for inv in invoices %}
+                                <tr>
+                                    <td><strong>#INV-{{ inv.id }}</strong></td>
+                                    <td>Booking #{{ inv.booking.id }}</td>
+                                    <td><strong style="color: var(--brand-primary);">${{ inv.amount }}</strong></td>
+                                    <td><span class="badge-status {% if inv.status == 'paid' %}status-completed{% else %}status-rejected{% endif %}">{{ inv.get_status_display }}</span></td>
+                                    <td>{{ inv.issued_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div style="display: flex; gap: 8px;">
+                                            {% if role == 'client' and inv.status == 'due' %}
+                                                <a href="{% url 'pay_invoice' inv.id %}" class="btn-primary-small"><i class="fa-solid fa-credit-card"></i> Pay Now</a>
+                                            {% endif %}
+                                            <a href="{% url 'invoice_print' inv.id %}" target="_blank" class="btn-secondary-small" style="padding: 6px 12px; font-size: 0.78rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-secondary);"><i class="fa-solid fa-print"></i> PDF/Print</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 30px;">No invoices found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -290,49 +297,31 @@
 {% block extra_js %}
 <script>
     function switchDashTab(event, tabId) {
-        if (event) {
-            event.preventDefault();
-        }
+        if (event) { event.preventDefault(); }
+        document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.dash-tab').forEach(tab => tab.classList.remove('active-tab'));
         
-        // Remove active class from links
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        // Remove active class from tab contents
-        document.querySelectorAll('.dash-tab').forEach(tab => {
-            tab.classList.remove('active-tab');
-        });
-        
-        // Add active classes
         const targetTab = document.getElementById(tabId);
         if (targetTab) {
             targetTab.classList.add('active-tab');
             let targetHash = '#' + tabId.replace('dash-', '');
             const targetLink = document.querySelector(`.sidebar-link[href="${targetHash}"]`);
-            if (targetLink) {
-                targetLink.classList.add('active');
-            }
+            if (targetLink) { targetLink.classList.add('active'); }
             history.pushState(null, null, targetHash);
         }
     }
 
-    // Switch to tab if hash is present in URL
     window.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash.substring(1);
-        if (hash) {
-            switchDashTab(null, 'dash-' + hash);
-        }
+        if (hash) { switchDashTab(null, 'dash-' + hash); }
     });
 
-    // ChartJS implementation
     {% if role == 'freelancer' %}
     document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('earningsChart').getContext('2d');
         const labels = {{ chart_labels|safe }};
         const data = {{ chart_values|safe }};
         
-        // Setup Chart
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -340,38 +329,20 @@
                 datasets: [{
                     label: 'Earnings ($)',
                     data: data,
-                    borderColor: '#2b84eb',
-                    backgroundColor: 'rgba(43, 132, 235, 0.1)',
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.12)',
                     borderWidth: 2,
-                    tension: 0.35,
+                    tension: 0.3,
                     fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.05)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.05)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    }
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: 'rgba(255, 255, 255, 0.6)' } },
+                    x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: 'rgba(255, 255, 255, 0.6)' } }
                 }
             }
         });

@@ -3,137 +3,95 @@
 {% block title %}Sign In | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-split-wrapper animate-fade-in">
-    <!-- Left Showcase Side -->
-    <div class="auth-showcase-panel glass-panel">
-        <div class="showcase-badge">
-            <i class="fa-solid fa-sparkles text-accent"></i>
-            <span>Next-Gen Talent Marketplace</span>
-        </div>
-        
-        <h1 class="showcase-title">
-            Unlock High-Impact Freelancers & Global Opportunities.
-        </h1>
-        
-        <p class="showcase-desc">
-            Connect with verified elite professionals, manage milestones with protected escrow billing, and scale projects faster than ever.
-        </p>
+<div class="container" style="max-width: 1000px; padding-top: 40px;">
+    <div class="auth-split-wrapper">
+        <!-- Left Showcase Side -->
+        <div class="auth-showcase-panel">
+            <div class="showcase-badge">
+                <i class="fa-solid fa-bolt"></i> Global Freelance Marketplace
+            </div>
+            
+            <h1 class="showcase-title">
+                Hire Top 3% Talent & Manage Projects <span>With Confidence.</span>
+            </h1>
+            
+            <p class="showcase-subtitle">
+                Connect with verified experts, manage milestones with secure escrow billing, and scale software development effortlessly.
+            </p>
 
-        <div class="showcase-features">
-            <div class="showcase-feature-item">
-                <div class="feature-icon-box">
+            <div class="showcase-features">
+                <div class="showcase-feature-item">
                     <i class="fa-solid fa-shield-halved"></i>
+                    <span>Vetted & Verified Talent Network</span>
                 </div>
-                <div class="feature-text">
-                    <h4>Vetted & Verified Talent</h4>
-                    <p>Only top-tier developers, designers, and domain specialists.</p>
-                </div>
-            </div>
-
-            <div class="showcase-feature-item">
-                <div class="feature-icon-box">
+                <div class="showcase-feature-item">
                     <i class="fa-solid fa-lock"></i>
+                    <span>Escrow Protected Project Billing</span>
                 </div>
-                <div class="feature-text">
-                    <h4>Escrow Protected Invoicing</h4>
-                    <p>Funds are secured and released upon completed deliverables.</p>
-                </div>
-            </div>
-
-            <div class="showcase-feature-item">
-                <div class="feature-icon-box">
+                <div class="showcase-feature-item">
                     <i class="fa-solid fa-comments"></i>
+                    <span>Direct Live Messaging & File Sharing</span>
                 </div>
-                <div class="feature-text">
-                    <h4>Direct Live Messaging</h4>
-                    <p>Instant collaboration, file sharing, and project alerts.</p>
+            </div>
+
+            <div class="showcase-stats-row">
+                <div class="showcase-stat">
+                    <strong>10K+</strong>
+                    <span>Experts</span>
+                </div>
+                <div class="showcase-stat">
+                    <strong>98.4%</strong>
+                    <span>Satisfaction</span>
+                </div>
+                <div class="showcase-stat">
+                    <strong>$25M+</strong>
+                    <span>Earned</span>
                 </div>
             </div>
         </div>
 
-        <div class="showcase-stat-pill">
-            <div class="avatars-cluster">
-                <span class="mini-av av-1">JD</span>
-                <span class="mini-av av-2">AK</span>
-                <span class="mini-av av-3">MS</span>
-            </div>
-            <div class="stat-text">
-                <strong>Verified Community</strong>
-                <span>Secure project management & workspace collaboration</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Form Card -->
-    <div class="auth-form-panel glass-panel">
-        <div class="auth-card-glow"></div>
-        
-        <div class="auth-card-header">
-            <div class="auth-header-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <h2>Welcome Back</h2>
-            <p>Enter your credentials to access your FreelanceHub workspace</p>
-        </div>
-
-        <form method="POST" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="auth-modern-form">
-            {% csrf_token %}
-            {% if next %}
-                <input type="hidden" name="next" value="{{ next }}">
-            {% endif %}
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-user"></i>
-                    <input type="text" name="username" id="username" required placeholder="Enter your username" autocomplete="username">
+        <!-- Right Form Card -->
+        <div class="auth-form-panel">
+            <div class="auth-form-header">
+                <div class="auth-icon-ring">
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to your FreelanceHub account</p>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-with-icon password-input-wrapper">
-                    <i class="fa-solid fa-key"></i>
-                    <input type="password" name="password" id="password" required placeholder="Enter your password" autocomplete="current-password">
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" aria-label="Toggle password visibility">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
+            <form method="POST" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+                {% csrf_token %}
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" name="username" id="username" required placeholder="Enter username" autocomplete="username">
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" name="password" id="password" required placeholder="Enter password" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign In to Workspace
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <p style="margin-bottom: 8px;">Don't have an account?</p>
+                <a href="{% url 'signup' %}" class="btn-secondary-link btn-block">Create Free Account</a>
             </div>
-
-            <button type="submit" class="btn-auth-submit">
-                <span>Sign In to Workspace</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </form>
-
-        <div class="auth-divider">
-            <span>New to FreelanceHub?</span>
-        </div>
-
-        <div class="auth-switch-cta">
-            <a href="{% url 'signup' %}" class="btn-secondary-link btn-block">
-                <i class="fa-solid fa-user-plus"></i> Create Free Account
-            </a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    function togglePasswordVisibility(fieldId, btn) {
-        const field = document.getElementById(fieldId);
-        const icon = btn.querySelector('i');
-        if (field.type === 'password') {
-            field.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            field.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
-</script>
 {% endblock %}

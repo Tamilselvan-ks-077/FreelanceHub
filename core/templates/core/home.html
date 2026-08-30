@@ -1,329 +1,327 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Explore Expert Freelancers | FreelanceHub{% endblock %}
+{% block title %}FreelanceHub | Hire Top Freelance Developers & Designers{% endblock %}
 
 {% block content %}
-<div class="marketplace-hero animate-fade-in">
-    <h1>Find Expert Freelancers Instantly</h1>
-    <p>Connect with top-tier developers, designers, and consultants for your projects.</p>
-</div>
-
-<!-- Advanced Search & Directory Layout -->
-<div class="search-directory-layout">
-    <!-- Filters Sidebar Panel -->
-    <aside class="glass-panel sidebar-filters animate-slide-in">
-        <form method="GET" action="{% url 'home' %}" class="filters-form" id="filterForm">
-            <h3><i class="fa-solid fa-filter"></i> Filters</h3>
-            
-            <div id="filterErrorMsg" class="alert alert-danger" style="display: none; margin-bottom: 15px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;"></div>
-
-            <div class="filter-group">
-                <label for="q">Keyword Search</label>
-                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Name, title, bio..." maxlength="100">
-            </div>
-            
-            <div class="filter-group">
-                <label for="skill">Required Skill</label>
-                <input type="text" name="skill" id="skill" value="{{ skill_query }}" placeholder="Python, Django, UI/UX..." maxlength="100">
-            </div>
-            
-            <div class="filter-group">
-                <label>Hourly Rate ($)</label>
-                <div class="range-inputs">
-                    <input type="number" step="0.01" name="min_rate" id="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
-                    <input type="number" step="0.01" name="max_rate" id="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label for="location">Location</label>
-                <input type="text" name="location" id="location" value="{{ location }}" placeholder="Germany, Remote, India..." maxlength="100">
-            </div>
-            
-            <div class="filter-group">
-                <label for="experience">Min Experience (Years)</label>
-                <input type="number" name="experience" id="experience" value="{{ experience }}" placeholder="0" min="0">
-            </div>
-            
-            <div class="filter-group">
-                <label for="rating">Min Rating</label>
-                <select name="rating" id="rating">
-                    <option value="">Any Rating</option>
-                    <option value="4" {% if min_rating == '4' %}selected{% endif %}>4+ Stars</option>
-                    <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>4.5+ Stars</option>
-                    <option value="5" {% if min_rating == '5' %}selected{% endif %}>5 Stars Only</option>
-                </select>
-            </div>
-            
-            <div class="filter-group checkboxes">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="availability" value="true" {% if availability == 'true' %}checked{% endif %}>
-                    Available Now Only
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="verified" value="true" {% if verified == 'true' %}checked{% endif %}>
-                    Verified Freelancers
-                </label>
-            </div>
-            
-            <!-- Hidden sort to maintain sort order when applying filters -->
-            <input type="hidden" name="sort_by" value="{{ sort_by }}">
-            
-            <button type="submit" class="btn-primary" id="applyFiltersBtn"><i class="fa-solid fa-magnifying-glass"></i> Apply Filters</button>
-            <a href="{% url 'home' %}" class="btn-secondary-link text-center">Clear Filters</a>
+<!-- Commercial Hero Section -->
+<section class="commercial-hero">
+    <div class="container">
+        <div class="hero-badge-trust">
+            <i class="fa-solid fa-shield-halved"></i> Toptal-Vetted & Verified Talent Network
+        </div>
+        <h1>Hire the Top 3% of <span>Freelance Talent</span></h1>
+        <p>Connect instantly with elite software engineers, UI/UX designers, and technology consultants ready to build your project.</p>
+        
+        <form method="GET" action="{% url 'home' %}" class="hero-search-box">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by name, skill, or role (e.g. Django, React, Senior Architect)..." maxlength="100">
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search Talent</button>
         </form>
-    </aside>
-
-    <!-- Main Results Column -->
-    <div class="main-directory-content">
-        <div class="directory-control-bar glass-panel animate-fade-in">
-            <span class="results-count">{{ freelancers.count }} Freelancer{{ freelancers.count|pluralize }} Available</span>
-            
-            <!-- Sorting Dropdown -->
-            <div class="sort-selector">
-                <label for="sort_by_select">Sort By:</label>
-                <select id="sort_by_select" onchange="applySort(this.value)">
-                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
-                    <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
-                    <option value="lowest_price" {% if sort_by == 'lowest_price' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="highest_price" {% if sort_by == 'highest_price' %}selected{% endif %}>Price: High to Low</option>
-                    <option value="most_completed" {% if sort_by == 'most_completed' %}selected{% endif %}>Projects Completed</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Quick Category Suggestion Pills -->
-        <div class="suggestion-pills-bar glass-panel animate-fade-in" style="margin-bottom: 25px; padding: 15px 30px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);"><i class="fa-solid fa-fire text-accent animate-pulse"></i> Popular Skills:</span>
-            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('Django')">Django</button>
-            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('React')">React</button>
-            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('Python')">Python</button>
-            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('UI Design')">UI Design</button>
-            <button type="button" class="btn-secondary-small pill-btn" onclick="quickSearch('DevOps')">DevOps</button>
-        </div>
-
-        <div id="cardsGridContainer" class="cards-grid">
-            {% for freelancer in freelancers %}
-                <article class="talent-card animate-fade-in">
-                    {% if freelancer.is_verified %}
-                        <div class="verified-tag" title="Verified Professional"><i class="fa-solid fa-circle-check"></i> Verified</div>
-                    {% endif %}
-                    
-                    <div class="card-avatar-wrapper">
-                        {% if freelancer.cover_banner %}
-                            <div class="card-avatar-banner" style="background-image: url('{{ freelancer.cover_banner.url }}')"></div>
-                        {% else %}
-                            <div class="card-avatar-banner default-banner"></div>
-                        {% endif %}
-                        
-                        <div class="avatar">
-                            {% if freelancer.avatar %}
-                                <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" class="avatar-img">
-                            {% else %}
-                                <div class="avatar-placeholder">
-                                    {% if freelancer.user.first_name %}
-                                        {{ freelancer.user.first_name|slice:":1" }}{{ freelancer.user.last_name|slice:":1" }}
-                                    {% else %}
-                                        {{ freelancer.user.username|slice:":2"|upper }}
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <h3 class="talent-name">
-                            {{ freelancer.user.get_full_name|default:freelancer.user.username }}
-                            {% if freelancer.is_verified %}
-                                <i class="fa-solid fa-circle-check text-accent" title="Verified Account"></i>
-                            {% endif %}
-                        </h3>
-                        <p class="talent-title">{{ freelancer.title|default:"Freelance Professional" }}</p>
-                        
-                        <div class="talent-rating-wrapper" style="display: flex; align-items: center; gap: 8px;">
-                            {% if freelancer.get_reviews_count > 0 %}
-                                <div class="stars-outer" title="{{ freelancer.get_average_rating }} / 5 stars">
-                                    <div class="stars-inner" style="width: {{ freelancer.get_average_rating_percentage }}%;"></div>
-                                </div>
-                                <span class="star-rating" style="font-weight: 600; color: var(--text-main); font-size: 0.90rem;">{{ freelancer.get_average_rating }}</span>
-                                <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
-                            {% else %}
-                                <span class="no-reviews-tag muted-text" style="font-size: 0.85rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
-                            {% endif %}
-                        </div>
-                        
-                        {% if freelancer.location %}
-                            <span class="talent-location"><i class="fa-solid fa-location-dot"></i> {{ freelancer.location }}</span>
-                        {% endif %}
-                        
-                        <p class="talent-bio-snippet">{{ freelancer.bio|default:"No bio available."|truncatewords:15 }}</p>
-                        
-                        <div class="card-skills">
-                            {% for freelancer_skill in freelancer.skills.all|slice:":4" %}
-                                <span class="card-skill-tag">{{ freelancer_skill.skill.name }}</span>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="talent-meta">
-                            <span class="talent-rate"><strong>${{ freelancer.hourly_rate }}</strong> / hr</span>
-                            <span class="talent-availability {% if freelancer.availability %}status-online{% else %}status-offline{% endif %}">
-                                {% if freelancer.availability %}Available{% else %}Busy{% endif %}
-                            </span>
-                        </div>
-                        
-                        <a href="{% url 'talent_detail' freelancer.id %}" class="btn-primary"><i class="fa-solid fa-arrow-pointer"></i> View Profile</a>
-                    </div>
-                </article>
-            {% empty %}
-                <div class="empty-state glass-panel text-center" style="grid-column: 1 / -1; width: 100%; padding: 48px 24px;">
-                    <i class="fa-solid fa-user-slash empty-icon" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 16px;"></i>
-                    <h3 style="font-size: 1.3rem; margin-bottom: 8px;">No freelancers found</h3>
-                    <p class="muted-text" style="margin-bottom: 24px;">Try changing your search or filters.</p>
-                    <a href="{% url 'home' %}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-rotate-left"></i> Clear Filters
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<!-- Recently Viewed Section -->
-{% if recently_viewed %}
-<section class="recently-viewed-section animate-fade-in">
-    <h2><i class="fa-solid fa-clock-rotate-left animate-pulse"></i> Recently Viewed</h2>
-    <div class="cards-grid">
-        {% for profile in recently_viewed %}
-            <a href="{% url 'talent_detail' profile.id %}" class="recent-profile-card glass-panel">
-                <div class="recent-avatar-initials">
-                    {{ profile.user.username|slice:":2"|upper }}
-                </div>
-                <div class="recent-meta">
-                    <h4>{{ profile.user.get_full_name|default:profile.user.username }}</h4>
-                    <p>{{ profile.title|default:"Professional" }}</p>
-                </div>
-            </a>
-        {% endfor %}
     </div>
 </section>
-{% endif %}
 
+<div class="container">
+    <!-- Live Platform Statistics Ribbon -->
+    <div class="platform-stats-ribbon">
+        <div class="stat-item">
+            <h4>10,000+</h4>
+            <p>Vetted Experts</p>
+        </div>
+        <div class="stat-item">
+            <h4>98.4%</h4>
+            <p>Satisfaction Rate</p>
+        </div>
+        <div class="stat-item">
+            <h4>15,000+</h4>
+            <p>Projects Delivered</p>
+        </div>
+        <div class="stat-item">
+            <h4>$25M+</h4>
+            <p>Earned by Talent</p>
+        </div>
+    </div>
+
+    <!-- Skill Categories Grid -->
+    <section style="margin-bottom: 60px;">
+        <div class="section-title-block">
+            <h2>Explore Popular Talent Categories</h2>
+            <p>Find specialized experts tailored for your industry and tech stack</p>
+        </div>
+        
+        <div class="categories-grid">
+            <div class="category-card" onclick="quickSearch('Django')">
+                <div class="category-icon"><i class="fa-solid fa-code"></i></div>
+                <h3>Backend Development</h3>
+                <p>Python, Django, FastAPI, Node</p>
+            </div>
+            <div class="category-card" onclick="quickSearch('React')">
+                <div class="category-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h3>Frontend & UI/UX</h3>
+                <p>React, Next.js, Figma, Tailwind</p>
+            </div>
+            <div class="category-card" onclick="quickSearch('DevOps')">
+                <div class="category-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <h3>Cloud & DevOps</h3>
+                <p>AWS, Kubernetes, Docker, CI/CD</p>
+            </div>
+            <div class="category-card" onclick="quickSearch('Python')">
+                <div class="category-icon"><i class="fa-solid fa-brain"></i></div>
+                <h3>AI & Data Science</h3>
+                <p>Machine Learning, PyTorch, LLMs</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Directory & Filter Sidebar Section -->
+    <div class="search-directory-layout" id="directory">
+        <!-- Filters Sidebar -->
+        <aside class="sidebar-filters">
+            <form method="GET" action="{% url 'home' %}" class="filters-form" id="filterForm">
+                <h3><i class="fa-solid fa-filter"></i> Refine Search</h3>
+                
+                <div id="filterErrorMsg" class="alert alert-danger" style="display: none; margin-bottom: 15px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;"></div>
+
+                <div class="filter-group">
+                    <label for="q">Keyword</label>
+                    <input type="text" name="q" id="q" value="{{ query }}" placeholder="Name, title, bio..." maxlength="100">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="skill">Skill</label>
+                    <input type="text" name="skill" id="skill" value="{{ skill_query }}" placeholder="Python, React, AWS..." maxlength="100">
+                </div>
+                
+                <div class="filter-group">
+                    <label>Hourly Rate ($)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" step="0.01" name="min_rate" id="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
+                        <input type="number" step="0.01" name="max_rate" id="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="location">Location</label>
+                    <input type="text" name="location" id="location" value="{{ location }}" placeholder="Germany, Remote, US..." maxlength="100">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="experience">Min Experience (Years)</label>
+                    <input type="number" name="experience" id="experience" value="{{ experience }}" placeholder="0" min="0">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="rating">Min Rating</label>
+                    <select name="rating" id="rating">
+                        <option value="">Any Rating</option>
+                        <option value="4" {% if min_rating == '4' %}selected{% endif %}>4+ Stars</option>
+                        <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>4.5+ Stars</option>
+                        <option value="5" {% if min_rating == '5' %}selected{% endif %}>5 Stars Only</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; text-transform: none; margin-bottom: 8px; cursor: pointer;">
+                        <input type="checkbox" name="availability" value="true" {% if availability == 'true' %}checked{% endif %}> Available Now Only
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; text-transform: none; cursor: pointer;">
+                        <input type="checkbox" name="verified" value="true" {% if verified == 'true' %}checked{% endif %}> Verified Talent Only
+                    </label>
+                </div>
+                
+                <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                
+                <button type="submit" class="btn-primary" id="applyFiltersBtn" style="margin-top: 10px;"><i class="fa-solid fa-check"></i> Apply Filters</button>
+                <a href="{% url 'home' %}" class="btn-secondary-link text-center">Reset All</a>
+            </form>
+        </aside>
+
+        <!-- Main Directory Grid Content -->
+        <div class="main-directory-content">
+            <div class="directory-control-bar">
+                <span class="results-count"><i class="fa-solid fa-users"></i> Showing {{ freelancers.count }} Available Expert{{ freelancers.count|pluralize }}</span>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="sort_by_select" style="font-size: 0.8rem; font-weight: 700; color: var(--text-tertiary); margin: 0;">SORT BY:</label>
+                    <select id="sort_by_select" onchange="applySort(this.value)" style="width: auto; padding: 6px 30px 6px 12px; font-size: 0.88rem;">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
+                        <option value="lowest_price" {% if sort_by == 'lowest_price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="highest_price" {% if sort_by == 'highest_price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="most_completed" {% if sort_by == 'most_completed' %}selected{% endif %}>Projects Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quick Suggestion Pills -->
+            <div class="suggestion-pills-bar">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-tertiary);"><i class="fa-solid fa-fire text-accent"></i> Trending Skills:</span>
+                <button type="button" class="pill-btn" onclick="quickSearch('Django')">Django</button>
+                <button type="button" class="pill-btn" onclick="quickSearch('React')">React</button>
+                <button type="button" class="pill-btn" onclick="quickSearch('Python')">Python</button>
+                <button type="button" class="pill-btn" onclick="quickSearch('UI Design')">UI Design</button>
+                <button type="button" class="pill-btn" onclick="quickSearch('DevOps')">DevOps</button>
+            </div>
+
+            <!-- Talent Cards Grid -->
+            <div id="cardsGridContainer" class="cards-grid">
+                {% for freelancer in freelancers %}
+                    <article class="talent-card">
+                        {% if freelancer.is_verified %}
+                            <div class="verified-tag"><i class="fa-solid fa-circle-check"></i> Verified</div>
+                        {% endif %}
+                        
+                        <div class="card-avatar-wrapper">
+                            {% if freelancer.cover_banner %}
+                                <div class="card-avatar-banner" style="background-image: url('{{ freelancer.cover_banner.url }}')"></div>
+                            {% else %}
+                                <div class="card-avatar-banner default-banner"></div>
+                            {% endif %}
+                            
+                            <div class="avatar">
+                                {% if freelancer.avatar %}
+                                    <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" class="avatar-img">
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        {{ freelancer.user.username|slice:":2"|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h3 class="talent-name">
+                                {{ freelancer.user.get_full_name|default:freelancer.user.username }}
+                            </h3>
+                            <p class="talent-title">{{ freelancer.title|default:"Professional Freelancer" }}</p>
+                            
+                            <div class="talent-rating-wrapper">
+                                {% if freelancer.get_reviews_count > 0 %}
+                                    <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
+                                    <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
+                                {% else %}
+                                    <span class="muted-text" style="font-size: 0.82rem;"><i class="fa-regular fa-star"></i> New Talent</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if freelancer.location %}
+                                <span class="talent-location"><i class="fa-solid fa-location-dot"></i> {{ freelancer.location }}</span>
+                            {% endif %}
+                            
+                            <p class="talent-bio-snippet">{{ freelancer.bio|default:"No bio description available."|truncatewords:15 }}</p>
+                            
+                            {% if freelancer.skills.all %}
+                                <div class="card-skills">
+                                    {% for freelancer_skill in freelancer.skills.all|slice:":3" %}
+                                        <span class="card-skill-tag">{{ freelancer_skill.skill.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="talent-meta">
+                                <div class="talent-rate">
+                                    <strong>${{ freelancer.hourly_rate }}</strong> / hr
+                                </div>
+                                <a href="{% url 'talent_detail' freelancer.id %}" class="btn-primary-small">View Profile &rarr;</a>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;">
+                        <i class="fa-solid fa-user-slash" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+                        <h3>No Freelancers Found</h3>
+                        <p>Try adjusting your keyword, rate range, or filter criteria.</p>
+                        <a href="{% url 'home' %}" class="btn-secondary-link" style="display: inline-block; width: auto; margin-top: 16px;">Clear Filters</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <section style="margin: 80px 0 60px;">
+        <div class="section-title-block">
+            <h2>How FreelanceHub Works</h2>
+            <p>Simple 3-step workflow to connect, collaborate, and deliver world-class products</p>
+        </div>
+
+        <div class="how-it-works-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Search & Filter Experts</h3>
+                <p>Browse top-rated developers and designers filtered by skill, rating, hourly rate, and verified credentials.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Book with Escrow Safety</h3>
+                <p>Send project bookings securely. Funds are held safely in escrow until you approve completed deliverables.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Collaborate & Pay</h3>
+                <p>Communicate via direct chat messaging, track project progress, and release payment seamlessly.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Grid -->
+    <section style="margin-bottom: 60px;">
+        <div class="section-title-block">
+            <h2>Trusted by Technology Leaders</h2>
+            <p>See why founders and product leads choose FreelanceHub for engineering scale</p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-quote">
+                    "FreelanceHub allowed us to scale our backend team in under 48 hours with senior Django engineers. Exceptional quality!"
+                </div>
+                <div class="testimonial-user">
+                    <div class="testimonial-avatar">MK</div>
+                    <div class="testimonial-info">
+                        <h4>Marcus K.</h4>
+                        <p>CTO, FinTech Cloud</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-quote">
+                    "The escrow payment system gives us complete peace of mind. We've hired 5 senior UI designers through the platform."
+                </div>
+                <div class="testimonial-user">
+                    <div class="testimonial-avatar">SL</div>
+                    <div class="testimonial-info">
+                        <h4>Sarah L.</h4>
+                        <p>VP Product, Nexus AI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enterprise CTA Banner -->
+    <section class="cta-banner">
+        <h2>Ready to Hire Top Freelance Talent?</h2>
+        <p>Join thousands of businesses scaling faster with verified software developers and designers.</p>
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="{% url 'signup' %}" class="btn-primary" style="width: auto; padding: 14px 32px;"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
+            <a href="#directory" class="btn-secondary-link" style="margin: 0; padding: 14px 32px;">Browse Directory</a>
+        </div>
+    </section>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    const filterForm = document.getElementById('filterForm');
-    const filterErrorMsg = document.getElementById('filterErrorMsg');
-    const searchInput = document.getElementById('q');
-    const skillInput = document.getElementById('skill');
-    const minRateInput = document.getElementById('min_rate');
-    const maxRateInput = document.getElementById('max_rate');
-    const expInput = document.getElementById('experience');
-    
-    function showFilterError(msg) {
-        if (filterErrorMsg) {
-            filterErrorMsg.textContent = msg;
-            filterErrorMsg.style.display = 'block';
-        }
+    function quickSearch(skillName) {
+        document.getElementById('skill').value = skillName;
+        document.getElementById('filterForm').submit();
     }
 
-    function hideFilterError() {
-        if (filterErrorMsg) {
-            filterErrorMsg.style.display = 'none';
-            filterErrorMsg.textContent = '';
-        }
-    }
-
-    function validateFilters() {
-        const minRateVal = minRateInput && minRateInput.value.trim() !== '' ? parseFloat(minRateInput.value) : null;
-        const maxRateVal = maxRateInput && maxRateInput.value.trim() !== '' ? parseFloat(maxRateInput.value) : null;
-        const expVal = expInput && expInput.value.trim() !== '' ? parseFloat(expInput.value) : null;
-
-        if (minRateVal !== null && (isNaN(minRateVal) || minRateVal < 0)) {
-            showFilterError("Minimum rate cannot be negative.");
-            return false;
-        }
-        if (maxRateVal !== null && (isNaN(maxRateVal) || maxRateVal < 0)) {
-            showFilterError("Maximum rate cannot be negative.");
-            return false;
-        }
-        if (minRateVal !== null && maxRateVal !== null && minRateVal > maxRateVal) {
-            showFilterError("Minimum rate cannot exceed maximum rate.");
-            return false;
-        }
-        if (expVal !== null && (isNaN(expVal) || expVal < 0)) {
-            showFilterError("Experience cannot be negative.");
-            return false;
-        }
-        hideFilterError();
-        return true;
-    }
-
-    // Auto-apply sort parameter
-    function applySort(value) {
+    function applySort(sortValue) {
         const url = new URL(window.location.href);
-        url.searchParams.set('sort_by', value);
+        url.searchParams.set('sort_by', sortValue);
         window.location.href = url.toString();
-    }
-
-    // Set search text and submit
-    function quickSearch(skill) {
-        if (skillInput) {
-            skillInput.value = skill;
-        } else if (searchInput) {
-            searchInput.value = skill;
-        }
-        if (filterForm && validateFilters()) {
-            filterForm.submit();
-        }
-    }
-
-    // Debounce helper
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
-    if (filterForm) {
-        filterForm.addEventListener('submit', (e) => {
-            if (!validateFilters()) {
-                e.preventDefault();
-            }
-        });
-
-        // Real-time validation on rate input change
-        if (minRateInput) minRateInput.addEventListener('input', validateFilters);
-        if (maxRateInput) maxRateInput.addEventListener('input', validateFilters);
-        if (expInput) expInput.addEventListener('input', validateFilters);
-
-        // Auto-submit form when selects or checkboxes change
-        filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(el => {
-            el.addEventListener('change', () => {
-                if (validateFilters()) {
-                    filterForm.submit();
-                }
-            });
-        });
-
-        // Debounced auto-submit on typing in search fields
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(() => {
-                if (validateFilters()) {
-                    filterForm.submit();
-                }
-            }, 600));
-        }
-        if (skillInput) {
-            skillInput.addEventListener('input', debounce(() => {
-                if (validateFilters()) {
-                    filterForm.submit();
-                }
-            }, 600));
-        }
     }
 </script>
 {% endblock %}

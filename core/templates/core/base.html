@@ -7,21 +7,18 @@
     <title>{% block title %}FreelanceHub | Premium Marketplace{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Premium next-generation marketplace connecting expert freelancers and forward-thinking clients worldwide.{% endblock %}">
     
-    <!-- Preconnect & DNS Prefetch for Fonts & CDNs -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    
-    <!-- Fonts with font-display:swap -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=3.0">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=4.0">
     
-    <!-- Theme Initializer (prevents theme flash) -->
+    <!-- Theme Initializer -->
     <script>
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -30,102 +27,95 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Neumorphism: no background blobs needed — flat unified surface -->
-
-    <div class="container">
-        <!-- Floating Navigation Header -->
-        <nav class="nav-header">
-            <a href="{% url 'home' %}" class="nav-brand">
-                <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
+    <!-- Commercial Navigation Header -->
+    <nav class="nav-header">
+        <a href="{% url 'home' %}" class="nav-brand">
+            <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
+        </a>
+        
+        <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <div class="nav-links" id="navLinks">
+            <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fa-solid fa-compass"></i> Explore Talent
             </a>
             
-            <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            
-            <div class="nav-links" id="navLinks">
-                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-                    <i class="fa-solid fa-compass"></i> Explore
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-simple"></i> Dashboard
+                </a>
+                <a href="{% url 'messages' %}" class="{% if request.resolver_match.url_name == 'messages' or request.resolver_match.url_name == 'chat' %}active{% endif %}">
+                    <i class="fa-solid fa-envelope"></i> Messages
+                    {% if unread_messages_count > 0 %}
+                        <span class="badge-count text-danger">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'notifications' %}" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                    <i class="fa-solid fa-bell"></i> Alerts
+                    {% if unread_notifications_count > 0 %}
+                        <span class="badge-count text-accent">{{ unread_notifications_count }}</span>
+                    {% endif %}
                 </a>
                 
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                        <i class="fa-solid fa-chart-simple"></i> Dashboard
+                {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="admin-link">
+                        <i class="fa-solid fa-gauge-high"></i> Analytics
                     </a>
-                    <a href="{% url 'messages' %}" class="{% if request.resolver_match.url_name == 'messages' or request.resolver_match.url_name == 'chat' %}active{% endif %} relative">
-                        <i class="fa-solid fa-envelope"></i> Inbox
-                        {% if unread_messages_count > 0 %}
-                            <span class="badge-count text-danger">{{ unread_messages_count }}</span>
-                        {% endif %}
-                    </a>
-                    <a href="{% url 'notifications' %}" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %} relative">
-                        <i class="fa-solid fa-bell"></i> Alerts
-                        {% if unread_notifications_count > 0 %}
-                            <span class="badge-count text-accent">{{ unread_notifications_count }}</span>
-                        {% endif %}
-                    </a>
-                    
-                    {% if user.is_staff %}
-                        <a href="{% url 'admin_dashboard' %}" class="admin-link">
-                            <i class="fa-solid fa-gauge-high"></i> Analytics
-                        </a>
-                    {% endif %}
-                    
-                    <div class="user-menu-dropdown">
-                        <a href="{% url 'profile_edit' %}" class="nav-user-btn">
-                            <i class="fa-solid fa-circle-user"></i> {{ user.username }}
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="{% url 'profile_edit' %}"><i class="fa-solid fa-sliders"></i> Edit Profile</a>
-                            <a href="{% url 'logout' %}" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
-                        </div>
-                    </div>
-                {% else %}
-                    <a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Log In</a>
-                    <a href="{% url 'signup' %}" class="btn-primary-small"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
                 {% endif %}
                 
-                <!-- Dark/Light Toggle -->
-                <button class="theme-toggle-btn" id="themeToggler" aria-label="Toggle dark/light mode">
-                    <i class="fa-solid fa-moon moon-icon"></i>
-                    <i class="fa-solid fa-sun sun-icon"></i>
-                </button>
-            </div>
-        </nav>
-        <div class="nav-overlay" id="navOverlay"></div>
-
-        <!-- Messages Notification System -->
-        {% if messages %}
-            <div class="alert-container">
-                {% for message in messages %}
-                    <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %} animate-slide-in">
-                        <span><i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i> {{ message }}</span>
-                        <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="user-menu-dropdown">
+                    <a href="{% url 'profile_edit' %}" class="nav-user-btn">
+                        <i class="fa-solid fa-circle-user"></i> {{ user.username }}
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'profile_edit' %}"><i class="fa-solid fa-sliders"></i> Edit Profile</a>
+                        <a href="{% url 'logout' %}" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
+                <a href="{% url 'signup' %}" class="btn-primary-small"><i class="fa-solid fa-user-plus"></i> Join Marketplace</a>
+            {% endif %}
+            
+            <!-- Dark / Light Theme Toggler -->
+            <button class="theme-toggle-btn" id="themeToggler" aria-label="Toggle light/dark theme">
+                <i class="fa-solid fa-moon moon-icon"></i>
+                <i class="fa-solid fa-sun sun-icon"></i>
+            </button>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay"></div>
 
-        <!-- Main Content Area -->
-        <main class="page-content">
-            {% block content %}{% endblock %}
-        </main>
+    <!-- Alert Notifications -->
+    {% if messages %}
+        <div class="container" style="margin-top: 20px;">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-radius: 12px; margin-bottom: 12px; font-weight: 500;">
+                    <span><i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i> {{ message }}</span>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer;">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-        <!-- Premium Footer -->
-        <footer class="app-footer">
-            <div class="footer-top-glow"></div>
+    <!-- Main Body Container -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Enterprise Footer -->
+    <footer class="app-footer">
+        <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="{% url 'home' %}" class="footer-brand-logo">
                         <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
                     </a>
-                    <p>The premium, next-generation talent marketplace connecting expert freelancers and forward-thinking clients worldwide.</p>
-                    <div class="footer-status-pill">
-                        <span class="status-dot-pulse"></span>
-                        <span>All Systems Operational</span>
-                    </div>
+                    <p>Connecting world-class freelance engineers, designers, and consultants with ambitious technology leaders worldwide.</p>
                 </div>
                 
                 <div class="footer-links-group">
@@ -138,25 +128,25 @@
                 <div class="footer-links-group">
                     <h4>Account</h4>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-simple"></i> User Dashboard</a>
-                        <a href="{% url 'messages' %}"><i class="fa-solid fa-envelope"></i> Inbox Messages</a>
-                        <a href="{% url 'profile_edit' %}"><i class="fa-solid fa-sliders"></i> Account Settings</a>
+                        <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+                        <a href="{% url 'messages' %}"><i class="fa-solid fa-envelope"></i> Inbox</a>
+                        <a href="{% url 'profile_edit' %}"><i class="fa-solid fa-sliders"></i> Settings</a>
                     {% else %}
                         <a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
-                        <a href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Create Account</a>
+                        <a href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Register</a>
                     {% endif %}
                 </div>
 
                 <div class="footer-links-group">
                     <h4>Trust & Safety</h4>
                     <a href="{% url 'home' %}"><i class="fa-solid fa-lock"></i> Escrow Protection</a>
-                    <a href="{% url 'home' %}"><i class="fa-solid fa-headset"></i> Help & Support</a>
+                    <a href="{% url 'home' %}"><i class="fa-solid fa-headset"></i> Support Center</a>
                     <a href="{% url 'home' %}"><i class="fa-solid fa-file-contract"></i> Terms of Service</a>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2026 FreelanceHub. All rights reserved.</p>
+                <p>&copy; 2026 FreelanceHub Inc. All rights reserved.</p>
                 <div class="footer-socials">
                     <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
                     <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
@@ -164,12 +154,10 @@
                     <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
                 </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
 
-    <!-- Global Scripts -->
-    <script src="{% static 'core/js/main.js' %}"></script>
-    <!-- Theme Switcher Logic -->
+    <!-- Theme Switcher Script -->
     <script>
         const toggler = document.getElementById('themeToggler');
         if (toggler) {
@@ -180,10 +168,8 @@
                 localStorage.setItem('theme', newTheme);
             });
         }
-    </script>
-    {% block extra_js %}{% endblock %}
-    <!-- Mobile Navigation Logic -->
-    <script>
+
+        // Mobile Nav Drawer Toggle
         const hamburger = document.getElementById('navHamburger');
         const navLinks = document.getElementById('navLinks');
         const navOverlay = document.getElementById('navOverlay');
@@ -196,15 +182,8 @@
             }
             hamburger.addEventListener('click', toggleMobileNav);
             navOverlay.addEventListener('click', toggleMobileNav);
-            // Close on link click
-            navLinks.querySelectorAll('a, button').forEach(el => {
-                el.addEventListener('click', () => {
-                    if (navLinks.classList.contains('mobile-open')) {
-                        toggleMobileNav();
-                    }
-                });
-            });
         }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

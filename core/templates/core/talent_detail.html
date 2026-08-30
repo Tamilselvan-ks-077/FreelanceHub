@@ -1,128 +1,115 @@
 {% extends "core/base.html" %}
 
-{% block title %}{{ freelancer.user.username }} - {{ freelancer.title|default:"Freelancer" }} | FreelanceHub{% endblock %}
+{% block title %}{{ freelancer.user.username }} - {{ freelancer.title|default:"Freelance Expert" }} | FreelanceHub{% endblock %}
 
 {% block content %}
-<!-- Premium Profile Cover Area -->
-<div class="profile-detail-container animate-fade-in">
+<div class="container" style="padding-top: 30px;">
+    <!-- Profile Banner Cover -->
     {% if freelancer.cover_banner %}
-        <div class="profile-banner-hero" style="background-image: url('{{ freelancer.cover_banner.url }}');"></div>
+        <div style="height: 220px; border-radius: 16px; background-image: url('{{ freelancer.cover_banner.url }}'); background-size: cover; background-position: center; margin-bottom: 24px; box-shadow: var(--shadow-md);"></div>
     {% else %}
-        <div class="profile-banner-hero default-banner"></div>
+        <div style="height: 180px; border-radius: 16px; background: linear-gradient(135deg, hsl(222, 35%, 15%) 0%, hsl(222, 28%, 22%) 100%); margin-bottom: 24px; border: 1px solid var(--border-subtle);"></div>
     {% endif %}
 
-    <div class="profile-layout">
-        <!-- Left Side Column (General Info & Bio) -->
-        <div class="profile-left-col">
-            <div class="glass-panel profile-main-card">
-                <div class="profile-header-details">
-                    <div class="profile-avatar-large">
+    <div class="search-directory-layout" style="gap: 28px;">
+        <!-- Main Profile Info Column (Left) -->
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+            <!-- Profile Overview Card -->
+            <div class="card" style="padding: 32px;">
+                <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="width: 84px; height: 84px; border-radius: 50%; background: var(--brand-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 800; font-family: var(--font-outfit); box-shadow: var(--shadow-md); flex-shrink: 0; overflow: hidden;">
                         {% if freelancer.avatar %}
-                            <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" class="avatar-img">
+                            <img src="{{ freelancer.avatar.url }}" alt="{{ freelancer.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
                         {% else %}
-                            <div class="avatar-placeholder">
-                                {{ freelancer.user.username|slice:":2"|upper }}
-                            </div>
+                            {{ freelancer.user.username|slice:":2"|upper }}
                         {% endif %}
                     </div>
                     
-                    <div class="profile-titles">
-                        <div class="profile-name-row">
-                            <h1>{{ freelancer.user.get_full_name|default:freelancer.user.username }}</h1>
+                    <div style="flex: 1; min-width: 240px;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                            <h1 style="font-family: var(--font-outfit); font-size: 1.8rem; font-weight: 800; margin: 0; color: var(--text-primary);">
+                                {{ freelancer.user.get_full_name|default:freelancer.user.username }}
+                            </h1>
                             {% if freelancer.is_verified %}
-                                <span class="badge-verified" title="Verified Professional"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                                <span class="verified-tag" style="position: static; font-size: 0.75rem;"><i class="fa-solid fa-circle-check"></i> Verified Expert</span>
                             {% endif %}
                         </div>
                         
-                        <p class="profile-subtitle-title">{{ freelancer.title|default:"Professional Freelancer" }}</p>
+                        <p style="font-size: 1rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 12px;">
+                            {{ freelancer.title|default:"Senior Professional Freelancer" }}
+                        </p>
                         
-                        <div class="profile-metrics-row" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.88rem;">
                             {% if freelancer.get_reviews_count > 0 %}
-                                <div class="stars-outer" title="{{ freelancer.get_average_rating }} / 5 stars">
-                                    <div class="stars-inner" style="width: {{ freelancer.get_average_rating_percentage }}%;"></div>
-                                </div>
-                                <span class="rating-badge" style="font-weight: 600; color: var(--text-main); font-size: 0.90rem; background: none; padding: 0; border: none; margin: 0;">{{ freelancer.get_average_rating }}</span>
-                                <span class="muted-text">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
+                                <span style="color: var(--warning); font-weight: 700;"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
+                                <span style="color: var(--text-tertiary);">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
                             {% else %}
-                                <span class="no-reviews-tag muted-text" style="font-size: 0.85rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
+                                <span style="color: var(--text-tertiary);"><i class="fa-regular fa-star"></i> New Member</span>
                             {% endif %}
-                            <span class="completed-badge"><i class="fa-solid fa-circle-check"></i> {{ freelancer.get_completed_projects_count }} Completed Project{{ freelancer.get_completed_projects_count|pluralize }}</span>
+                            <span style="color: var(--success); font-weight: 600;"><i class="fa-solid fa-circle-check"></i> {{ freelancer.get_completed_projects_count }} Project{{ freelancer.get_completed_projects_count|pluralize }} Completed</span>
                         </div>
                     </div>
                 </div>
 
-                <hr class="card-divider">
+                <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 24px 0;">
 
-                <div class="profile-bio-section">
-                    <h3>About Me</h3>
-                    <p>{{ freelancer.bio|default:"No bio description available."|linebreaksbr }}</p>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-primary); margin-bottom: 10px;">About Me</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7; font-size: 0.96rem;">{{ freelancer.bio|default:"No detailed bio description available."|linebreaksbr }}</p>
                 </div>
 
                 {% if freelancer.skills.all %}
-                    <div class="profile-section">
-                        <h3><i class="fa-solid fa-tags text-accent"></i> Skills & Expertise</h3>
-                        <div class="card-skills" style="justify-content: flex-start; margin-top: 10px; margin-bottom: 5px;">
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-primary); margin-bottom: 12px;"><i class="fa-solid fa-tags"></i> Skills & Technical Stack</h3>
+                        <div class="card-skills">
                             {% for freelancer_skill in freelancer.skills.all %}
-                                <span class="card-skill-tag">{{ freelancer_skill.skill.name }}</span>
+                                <span class="card-skill-tag" style="font-size: 0.82rem; padding: 6px 14px;">{{ freelancer_skill.skill.name }}</span>
                             {% endfor %}
                         </div>
                     </div>
                 {% endif %}
-                
+
                 {% if freelancer.experience_detail %}
-                    <div class="profile-section">
-                        <h3><i class="fa-solid fa-briefcase"></i> Work Experience</h3>
-                        <p>{{ freelancer.experience_detail|linebreaksbr }}</p>
-                    </div>
-                {% endif %}
-                
-                {% if freelancer.education %}
-                    <div class="profile-section">
-                        <h3><i class="fa-solid fa-graduation-cap"></i> Education</h3>
-                        <p>{{ freelancer.education|linebreaksbr }}</p>
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-primary); margin-bottom: 10px;"><i class="fa-solid fa-briefcase"></i> Experience</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.7;">{{ freelancer.experience_detail|linebreaksbr }}</p>
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Portfolio Showcase Section -->
-            <div class="glass-panel profile-portfolio-section">
-                <h3><i class="fa-solid fa-images text-accent"></i> Portfolio Showcase</h3>
-                <div class="portfolio-grid">
+            <!-- Portfolio Grid Card -->
+            <div class="card" style="padding: 28px;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;"><i class="fa-solid fa-images text-accent"></i> Portfolio Showcase</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
                     {% for item in portfolio_items %}
-                        <div class="portfolio-show-card glass-panel">
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden;">
                             {% if item.image %}
-                                <div class="portfolio-show-img" style="background-image: url('{{ item.image.url }}');"></div>
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 130px; object-fit: cover;">
                             {% endif %}
-                            <div class="portfolio-show-body">
-                                <h4>{{ item.title }}</h4>
-                                <p>{{ item.description }}</p>
-                                <div class="portfolio-show-links">
-                                    {% if item.external_link %}
-                                        <a href="{{ item.external_link }}" target="_blank"><i class="fa-solid fa-link"></i> Live Project</a>
-                                    {% endif %}
-                                    {% if item.video_url %}
-                                        <a href="{{ item.video_url }}" target="_blank"><i class="fa-solid fa-circle-play"></i> Watch Demo</a>
-                                    {% endif %}
-                                </div>
+                            <div style="padding: 14px;">
+                                <h4 style="font-size: 0.95rem; margin-bottom: 4px;">{{ item.title }}</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-tertiary); margin-bottom: 10px;">{{ item.description }}</p>
+                                {% if item.external_link %}
+                                    <a href="{{ item.external_link }}" target="_blank" class="btn-primary-small" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Project Link</a>
+                                {% endif %}
                             </div>
                         </div>
                     {% empty %}
-                        <p class="muted-text">No portfolio items uploaded yet.</p>
+                        <p style="color: var(--text-tertiary); font-size: 0.9rem;">No portfolio items uploaded yet.</p>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Reviews Log Section -->
-            <div class="glass-panel profile-reviews-section" id="reviews-section">
-                <h3><i class="fa-solid fa-star text-accent animate-pulse"></i> Reviews & Feedback</h3>
+            <!-- Reviews Card -->
+            <div class="card" style="padding: 28px;" id="reviews-section">
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;"><i class="fa-solid fa-star text-accent"></i> Reviews & Ratings</h3>
                 
-                <!-- Review Submission (For authenticated clients with completed projects) -->
                 {% if can_review %}
-                    <form method="POST" action="{% url 'talent_detail' freelancer.id %}" class="review-submission-form glass-panel">
+                    <form method="POST" action="{% url 'talent_detail' freelancer.id %}" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
                         {% csrf_token %}
-                        <h4>Add Your Review</h4>
+                        <h4 style="margin-bottom: 14px; font-size: 1rem;">Add Client Review</h4>
                         <div class="form-group">
-                            <label for="rating_input">Rating (1 to 5 Stars)</label>
+                            <label for="rating_input">Rating Score</label>
                             <select name="rating" id="rating_input">
                                 <option value="5">5 Stars (Excellent)</option>
                                 <option value="4">4 Stars (Good)</option>
@@ -132,61 +119,65 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="comment_input">Feedback Comments</label>
-                            <textarea name="comment" id="comment_input" rows="3" required placeholder="Write comments about project output, response time..."></textarea>
+                            <label for="comment_input">Written Feedback</label>
+                            <textarea name="comment" id="comment_input" rows="3" required placeholder="Describe project communication, code quality, and delivery speed..."></textarea>
                         </div>
-                        <button type="submit" class="btn-primary">Submit Review</button>
+                        <button type="submit" class="btn-primary" style="width: auto;"><i class="fa-solid fa-paper-plane"></i> Submit Feedback</button>
                     </form>
                 {% endif %}
 
-                <div class="reviews-list">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
                     {% for r in reviews %}
-                        <div class="review-item glass-panel">
-                            <div class="review-header">
-                                <div class="reviewer-avatar">
-                                    {{ r.reviewer.username|slice:":2"|upper }}
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
+                                        {{ r.reviewer.username|slice:":2"|upper }}
+                                    </div>
+                                    <div>
+                                        <h5 style="font-size: 0.92rem; margin: 0;">{{ r.reviewer.username }}</h5>
+                                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">{{ r.created_at|date:"M d, Y" }}</span>
+                                    </div>
                                 </div>
-                                <div class="reviewer-meta">
-                                    <h5>{{ r.reviewer.username }}</h5>
-                                    <span class="review-date">{{ r.created_at|date:"F d, Y" }}</span>
-                                </div>
-                                <div class="reviewer-score">
-                                    <span class="stars-gold"><i class="fa-solid fa-star"></i> {{ r.rating }}</span>
+                                <div style="color: var(--warning); font-weight: 700; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-star"></i> {{ r.rating }}
                                 </div>
                             </div>
-                            <p class="review-comment">{{ r.comment }}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; line-height: 1.55;">{{ r.comment }}</p>
                         </div>
                     {% empty %}
-                        <p class="muted-text">No reviews yet. Be the first to book and leave feedback!</p>
+                        <p style="color: var(--text-tertiary); font-size: 0.9rem;">No reviews yet.</p>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Right Side Column (Booking Action Form & Quick Stats) -->
-        <div class="profile-right-col">
-            <!-- Booking Hiring Box -->
-            <div class="glass-panel booking-hiring-card">
-                <div class="booking-card-header">
-                    <span class="hiring-price"><strong>${{ freelancer.hourly_rate }}</strong> / hr</span>
-                    <span class="avail-badge {% if freelancer.availability %}badge-online{% else %}badge-offline{% endif %}">
-                        {% if freelancer.availability %}Available{% else %}Busy{% endif %}
+        <!-- Sticky Hiring Sidebar Column (Right) -->
+        <div style="width: 320px; flex-shrink: 0; position: sticky; top: 90px;">
+            <!-- Hiring Action Box -->
+            <div class="card" style="padding: 24px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <span style="font-size: 1.35rem; font-family: var(--font-outfit); color: var(--brand-primary); font-weight: 800;">
+                        ${{ freelancer.hourly_rate }} <span style="font-size: 0.85rem; color: var(--text-tertiary); font-weight: 400;">/ hr</span>
+                    </span>
+                    <span class="badge-status {% if freelancer.availability %}status-completed{% else %}status-cancelled{% endif %}">
+                        {% if freelancer.availability %}Available Now{% else %}Unavailable{% endif %}
                     </span>
                 </div>
-                
+
                 {% if user.is_authenticated %}
                     {% if user == freelancer.user %}
                         {% if not freelancer.is_complete %}
-                            <div class="alert alert-warning" style="margin-top:15px; font-size:0.88rem; line-height: 1.5; border-radius: 10px; padding: 12px 14px;">
-                                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Profile Incomplete:</strong> Your profile is currently hidden from public search. Complete all required fields in <a href="{% url 'profile_edit' %}" style="text-decoration: underline !important; font-weight: 600;">Edit Profile</a> to publish it.
+                            <div class="alert alert-danger" style="font-size: 0.85rem; padding: 12px; border-radius: 10px; margin-bottom: 0;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Profile Draft:</strong> Complete profile settings to list publicly.
                             </div>
                         {% else %}
-                            <div class="alert alert-success" style="margin-top:15px; font-size:0.85rem; border-radius: 10px; padding: 10px 14px;">
-                                <i class="fa-solid fa-circle-check"></i> This is your live public freelancer profile.
+                            <div style="font-size: 0.85rem; color: var(--success); text-align: center; padding: 10px; background: var(--success-bg); border-radius: 8px;">
+                                <i class="fa-solid fa-circle-check"></i> Live Freelancer Profile
                             </div>
                         {% endif %}
                     {% else %}
-                        <form method="POST" action="{% url 'create_booking' freelancer.id %}" class="booking-hiring-form">
+                        <form method="POST" action="{% url 'create_booking' freelancer.id %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="start_date">Start Date</label>
@@ -197,69 +188,58 @@
                                 <input type="date" name="end_date" id="end_date" required min="{% now 'Y-m-d' %}">
                             </div>
                             <div class="form-group">
-                                <label for="description">Task Description</label>
-                                <textarea name="description" id="description" rows="3" required placeholder="Describe task, milestones, expectations..."></textarea>
+                                <label for="description">Task Details</label>
+                                <textarea name="description" id="description" rows="3" required placeholder="Describe task scope, deliverable milestones..."></textarea>
                             </div>
-                            
-                            <button type="submit" class="btn-primary btn-block" {% if not freelancer.availability %}disabled{% endif %}>
-                                <i class="fa-solid fa-paper-plane"></i> Book Session Request
+                            <button type="submit" class="btn-primary" {% if not freelancer.availability %}disabled{% endif %}>
+                                <i class="fa-solid fa-paper-plane"></i> Send Booking Offer
                             </button>
                         </form>
                     {% endif %}
                 {% else %}
-                    <div class="login-prompt-box">
-                        <p>You must be signed in to request a booking from this freelancer.</p>
-                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary btn-block text-center" style="text-decoration:none;">Log In to Book</a>
+                    <div style="text-align: center; padding: 10px 0;">
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">Sign in to send booking proposals or message this expert.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary">Sign In to Book</a>
                     </div>
                 {% endif %}
-                
+
                 {% if user.is_authenticated and user != freelancer.user %}
-                    <hr class="card-divider">
-                    <div class="profile-action-buttons">
-                        <a href="{% url 'toggle_favourite' freelancer.id %}" class="btn-secondary-link {% if is_favourited %}active-wishlist{% endif %}">
+                    <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 18px 0;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="{% url 'toggle_favourite' freelancer.id %}" class="btn-secondary-link" style="margin: 0;">
                             {% if is_favourited %}
-                                <i class="fa-solid fa-heart text-danger animate-pulse"></i> Bookmarked
+                                <i class="fa-solid fa-heart text-danger"></i> Saved to Wishlist
                             {% else %}
                                 <i class="fa-regular fa-heart"></i> Add to Wishlist
                             {% endif %}
                         </a>
-                        <a href="{% url 'chat' freelancer.user.username %}" class="btn-secondary-link">
-                            <i class="fa-solid fa-comments"></i> Send Message
+                        <a href="{% url 'chat' freelancer.user.username %}" class="btn-secondary-link" style="margin: 0;">
+                            <i class="fa-solid fa-comments"></i> Direct Message
                         </a>
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Quick Specs Info Box -->
-            <div class="glass-panel profile-specs-card">
-                <h4>Hiring Specifications</h4>
-                <ul class="specs-list">
-                    <li>
-                        <span>Location</span>
+            <!-- Specs Box -->
+            <div class="card" style="padding: 24px;">
+                <h4 style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; color: var(--text-tertiary);">Quick Specifications</h4>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
+                        <span style="color: var(--text-tertiary);">Location</span>
                         <strong>{{ freelancer.location|default:"Remote" }}</strong>
                     </li>
-                    <li>
-                        <span>Experience</span>
+                    <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
+                        <span style="color: var(--text-tertiary);">Experience</span>
                         <strong>{{ freelancer.experience_years }} Years</strong>
                     </li>
-                    <li>
-                        <span>Response Time</span>
+                    <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
+                        <span style="color: var(--text-tertiary);">Response Time</span>
                         <strong>{{ freelancer.response_time }}</strong>
                     </li>
-                    <li>
-                        <span>Response Rate</span>
-                        <strong>{{ freelancer.response_rate }}%</strong>
-                    </li>
-                    <li>
-                        <span>Languages</span>
+                    <li style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.88rem;">
+                        <span style="color: var(--text-tertiary);">Languages</span>
                         <strong>{{ freelancer.languages|default:"English" }}</strong>
                     </li>
-                    {% if freelancer.certificates %}
-                        <li>
-                            <span>Certificates</span>
-                            <strong>{{ freelancer.certificates }}</strong>
-                        </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>
