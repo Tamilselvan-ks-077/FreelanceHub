@@ -138,7 +138,7 @@
         <!-- Main Directory Grid Content -->
         <div class="main-directory-content">
             <div class="directory-control-bar">
-                <span class="results-count"><i class="fa-solid fa-users"></i> Showing {{ freelancers.count }} Available Expert{{ freelancers.count|pluralize }}</span>
+                <span class="results-count"><i class="fa-solid fa-users"></i> {{ freelancers.count }} Freelance{{ freelancers.count|pluralize:"r,rs" }} Available</span>
                 
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <label for="sort_by_select" style="font-size: 0.8rem; font-weight: 700; color: var(--text-tertiary); margin: 0;">SORT BY:</label>
@@ -199,7 +199,7 @@
                                     <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
                                     <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
                                 {% else %}
-                                    <span class="muted-text" style="font-size: 0.82rem;"><i class="fa-regular fa-star"></i> New Talent</span>
+                                    <span class="muted-text" style="font-size: 0.82rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
                                 {% endif %}
                             </div>
                             
@@ -228,8 +228,8 @@
                 {% empty %}
                     <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;">
                         <i class="fa-solid fa-user-slash" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 16px;"></i>
-                        <h3>No Freelancers Found</h3>
-                        <p>Try adjusting your keyword, rate range, or filter criteria.</p>
+                        <h3>No freelancers found</h3>
+                        <p>Try changing your search or filters.</p>
                         <a href="{% url 'home' %}" class="btn-secondary-link" style="display: inline-block; width: auto; margin-top: 16px;">Clear Filters</a>
                     </div>
                 {% endfor %}
