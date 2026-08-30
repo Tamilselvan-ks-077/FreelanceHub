@@ -7,16 +7,19 @@
     <title>{% block title %}FreelanceHub | Premium Marketplace{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Premium next-generation marketplace connecting expert freelancers and forward-thinking clients worldwide.{% endblock %}">
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Preconnect & DNS Prefetch for Fonts & CDNs -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Fonts with font-display:swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=1.2">
-    
-    <!-- Core UI CSS imports style.css -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=3.0">
     
     <!-- Theme Initializer (prevents theme flash) -->
     <script>
@@ -27,11 +30,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <!-- Neumorphism: no background blobs needed — flat unified surface -->
 
     <div class="container">
         <!-- Floating Navigation Header -->

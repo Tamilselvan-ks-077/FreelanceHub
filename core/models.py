@@ -165,6 +165,14 @@ class Profile(models.Model):
 
     objects = ProfileQuerySet.as_manager()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['role', 'hourly_rate']),
+            models.Index(fields=['role', 'is_verified']),
+            models.Index(fields=['role', 'availability']),
+            models.Index(fields=['role', 'experience_years']),
+        ]
+
     def __str__(self):
         return f"{self.user.username} - {self.get_role_display()}"
 
@@ -193,6 +201,10 @@ class Profile(models.Model):
         return all([has_name, has_title, has_bio, has_skills, has_rate, has_location, has_experience, has_availability])
 
     def get_average_rating(self):
+        # Fast path: check if already annotated from QuerySet
+        if hasattr(self, 'avg_rating'):
+            avg = self.avg_rating
+            return round(float(avg), 1) if avg is not None else None
         avg = Review.objects.filter(reviewee=self.user).aggregate(Avg('rating'))['rating__avg']
         return round(float(avg), 1) if avg is not None else None
 
@@ -201,9 +213,13 @@ class Profile(models.Model):
         return int(avg * 20) if avg is not None else 0
 
     def get_completed_projects_count(self):
+        if hasattr(self, 'completed_count'):
+            return self.completed_count
         return Booking.objects.filter(freelancer=self.user, status='completed').count()
 
     def get_reviews_count(self):
+        if hasattr(self, 'reviews_count'):
+            return self.reviews_count
         return Review.objects.filter(reviewee=self.user).count()
 
 class Skill(models.Model):
@@ -243,6 +259,13 @@ class Booking(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['client', 'status']),
+            models.Index(fields=['freelancer', 'status']),
+            models.Index(fields=['status', '-created_at']),
+        ]
+
     def __str__(self):
         return f"Booking #{self.id}: {self.client.username} -> {self.freelancer.username} ({self.status})"
 # Chat models for booking-specific communication
@@ -259,6 +282,11 @@ class ChatMessage(models.Model):
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['room', 'timestamp']),
+        ]
 
     def __str__(self):
         return f"Message from {self.sender.username} in Booking #{self.room.booking.id}"
@@ -280,6 +308,11 @@ class Invoice(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='unpaid')
     issued_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['status', '-issued_at']),
+        ]
+
     def __str__(self):
         return f"Invoice #{self.id} for Booking #{self.booking.id} ({self.status})"
 
@@ -290,6 +323,12 @@ class Review(models.Model):
     rating = models.IntegerField(default=5)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['reviewee', 'rating']),
+            models.Index(fields=['reviewee', '-created_at']),
+        ]
 
     def __str__(self):
         return f"Review by {self.reviewer.username} -> {self.reviewee.username} ({self.rating}★)"
@@ -320,6 +359,12 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'is_read', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+        ]
+
     def __str__(self):
         return f"Notification for {self.user.username}: {self.verb}"
 
@@ -330,6 +375,12 @@ class Message(models.Model):
     attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['recipient', 'is_read']),
+            models.Index(fields=['sender', 'recipient', '-created_at']),
+        ]
 
     def __str__(self):
         return f"Message: {self.sender.username} -> {self.recipient.username}"
@@ -351,6 +402,11 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50, default='credit_card')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_at']),
+        ]
 
     def __str__(self):
         return f"Payment #{self.transaction_id} - ${self.amount}"

@@ -423,7 +423,7 @@ def talent_detail_view(request, profile_id):
 
     skills = FreelancerSkill.objects.filter(profile=freelancer).select_related('skill')
     portfolio_items = Portfolio.objects.filter(profile=freelancer)
-    reviews = Review.objects.filter(reviewee=freelancer.user).select_related('reviewer__profile').order_by('-created_at')
+    reviews = Review.objects.filter(reviewee=freelancer.user).select_related('reviewer__profile', 'reviewer').order_by('-created_at')
     
     is_favourited = False
     if request.user.is_authenticated:
@@ -824,17 +824,27 @@ def dashboard_view(request):
         bookings = Booking.objects.filter(freelancer=request.user).select_related('client__profile').order_by('-created_at')
         invoices = Invoice.objects.filter(booking__freelancer=request.user).select_related('booking__client').order_by('-issued_at')
         
-        # Stats Aggregates
-        total_bookings = bookings.count()
-        pending = bookings.filter(status='pending').count()
-        accepted = bookings.filter(status='accepted').count()
-        completed = bookings.filter(status='completed').count()
-        cancelled = bookings.filter(status='cancelled').count()
+        # Single-query stats aggregation
+        booking_stats = bookings.aggregate(
+            total=Count('id'),
+            pending=Count('id', filter=Q(status='pending')),
+            accepted=Count('id', filter=Q(status='accepted')),
+            completed=Count('id', filter=Q(status='completed')),
+            cancelled=Count('id', filter=Q(status='cancelled')),
+        )
+        total_bookings = booking_stats['total'] or 0
+        pending = booking_stats['pending'] or 0
+        accepted = booking_stats['accepted'] or 0
+        completed = booking_stats['completed'] or 0
+        cancelled = booking_stats['cancelled'] or 0
         
-        # Financial Aggregates
-        paid_invoices = invoices.filter(status='paid')
-        total_earnings = paid_invoices.aggregate(Sum('amount'))['amount__sum'] or 0.00
-        unpaid_amount = invoices.filter(status__in=['unpaid', 'due']).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        # Financial Aggregates in single-pass
+        invoice_stats = invoices.aggregate(
+            total_earnings=Sum('amount', filter=Q(status='paid')),
+            unpaid_amount=Sum('amount', filter=Q(status__in=['unpaid', 'due']))
+        )
+        total_earnings = invoice_stats['total_earnings'] or 0.00
+        unpaid_amount = invoice_stats['unpaid_amount'] or 0.00
         
         # Active Clients count
         active_clients = bookings.filter(status='accepted').values('client').distinct().count()
@@ -846,7 +856,8 @@ def dashboard_view(request):
             m_key = m_date.strftime("%b %Y")
             earnings_by_month[m_key] = 0.00
 
-        for inv in paid_invoices.filter(issued_at__date__gte=six_months_ago):
+        recent_paid_invoices = invoices.filter(status='paid', issued_at__date__gte=six_months_ago)
+        for inv in recent_paid_invoices:
             m_key = inv.issued_at.strftime("%b %Y")
             if m_key in earnings_by_month:
                 earnings_by_month[m_key] += float(inv.amount)
@@ -881,16 +892,27 @@ def dashboard_view(request):
         bookings = Booking.objects.filter(client=request.user).select_related('freelancer__profile').order_by('-created_at')
         invoices = Invoice.objects.filter(booking__client=request.user).select_related('booking__freelancer').order_by('-issued_at')
         
-        # Stats
-        total_projects = bookings.count()
-        completed = bookings.filter(status='completed').count()
-        active = bookings.filter(status='accepted').count()
-        pending = bookings.filter(status='pending').count()
-        rejected = bookings.filter(status='rejected').count()
+        # Single-pass client booking stats
+        client_stats = bookings.aggregate(
+            total_projects=Count('id'),
+            completed=Count('id', filter=Q(status='completed')),
+            active=Count('id', filter=Q(status='accepted')),
+            pending=Count('id', filter=Q(status='pending')),
+            rejected=Count('id', filter=Q(status='rejected')),
+        )
+        total_projects = client_stats['total_projects'] or 0
+        completed = client_stats['completed'] or 0
+        active = client_stats['active'] or 0
+        pending = client_stats['pending'] or 0
+        rejected = client_stats['rejected'] or 0
         
-        # Finance
-        total_paid = invoices.filter(status='paid').aggregate(Sum('amount'))['amount__sum'] or 0.00
-        outstanding = invoices.filter(status__in=['unpaid', 'due']).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        # Finance in single pass
+        finance_stats = invoices.aggregate(
+            total_paid=Sum('amount', filter=Q(status='paid')),
+            outstanding=Sum('amount', filter=Q(status__in=['unpaid', 'due']))
+        )
+        total_paid = finance_stats['total_paid'] or 0.00
+        outstanding = finance_stats['outstanding'] or 0.00
         
         # Favourite freelancers count
         favourites_count = Favourite.objects.filter(user=request.user).count()
