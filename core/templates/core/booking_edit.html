@@ -3,22 +3,26 @@
 {% block title %}Edit Booking Request | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-container animate-fade-in">
-    <div class="glass-panel auth-card">
-        <h1><i class="fa-solid fa-pen-to-square text-primary"></i> Edit Booking Request</h1>
-        <p class="auth-subtitle">Update booking details for Booking #{{ booking.id }}</p>
+<div class="container" style="max-width: 560px; padding-top: 40px;">
+    <div class="card" style="padding: 32px;">
+        <div style="margin-bottom: 24px;">
+            <h1 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-pen-to-square text-accent"></i> Edit Booking Request</h1>
+            <p style="color: var(--text-secondary); font-size: 0.92rem;">Update project dates and task description for Booking #{{ booking.id }}</p>
+        </div>
         
         <form method="POST" action="{% url 'booking_edit' booking.id %}">
             {% csrf_token %}
             
-            <div class="form-group">
-                <label for="start_date">Start Date</label>
-                <input type="date" name="start_date" id="start_date" value="{{ booking.start_date|date:'Y-m-d' }}" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="end_date">End Date</label>
-                <input type="date" name="end_date" id="end_date" value="{{ booking.end_date|date:'Y-m-d' }}" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ booking.start_date|date:'Y-m-d' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ booking.end_date|date:'Y-m-d' }}" required>
+                </div>
             </div>
             
             <div class="form-group">
@@ -26,8 +30,8 @@
                 <textarea name="description" id="description" rows="4" required>{{ booking.description }}</textarea>
             </div>
             
-            <button type="submit" class="btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Update Request</button>
-            <a href="{% url 'dashboard' %}" class="btn-secondary-link text-center btn-block">Back to Dashboard</a>
+            <button type="submit" class="btn-primary" style="margin-bottom: 12px;"><i class="fa-solid fa-floppy-disk"></i> Update Request</button>
+            <a href="{% url 'dashboard' %}" class="btn-secondary-link" style="margin: 0;">Back to Dashboard</a>
         </form>
     </div>
 </div>

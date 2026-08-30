@@ -3,43 +3,44 @@
 {% block title %}System Alerts & Notifications | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-container animate-fade-in" style="max-width: 700px; width: 100%;">
-    <div class="glass-panel" style="padding: 30px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
-            <h1 style="margin:0; font-size: 1.8rem;"><i class="fa-solid fa-bell text-accent animate-pulse"></i> Alerts & Notifications</h1>
+<div class="container" style="max-width: 800px; padding-top: 40px;">
+    <div class="card" style="padding: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h1 style="font-family: var(--font-outfit); font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-bell text-accent"></i> Alerts & Notifications</h1>
+                <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0;">Stay updated on contract milestones, messages, and invoices</p>
+            </div>
             {% if unread_notifications_count > 0 %}
-                <a href="{% url 'mark_notifications_read' %}" class="btn-secondary-small"><i class="fa-solid fa-check-double"></i> Mark All as Read</a>
+                <a href="{% url 'mark_notifications_read' %}" class="btn-secondary-small" style="padding: 8px 14px; font-size: 0.82rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-secondary);"><i class="fa-solid fa-check-double"></i> Mark All as Read</a>
             {% endif %}
         </div>
         
-        <div class="notifications-main-list">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
             {% for n in notifs %}
-                <a href="{% if n.notification_type == 'message' %}{% url 'messages' %}{% elif n.notification_type == 'booking' %}{% url 'dashboard' %}#bookings{% elif n.notification_type == 'payment' %}{% url 'dashboard' %}#invoices{% else %}{% url 'dashboard' %}{% endif %}" class="notification-item-link" style="display: block; margin-bottom: 12px; color: inherit;">
-                    <div class="notification-item-card glass-panel {% if not n.is_read %}unread-notif{% endif %} animate-fade-in" style="margin-bottom: 0; cursor: pointer; transition: transform 0.2s, background-color 0.2s;">
-                        <div class="notif-icon-col">
-                            {% if n.notification_type == 'booking' %}
-                                <i class="fa-solid fa-briefcase text-primary"></i>
-                            {% elif n.notification_type == 'payment' %}
-                                <i class="fa-solid fa-credit-card text-success"></i>
-                            {% elif n.notification_type == 'message' %}
-                                <i class="fa-solid fa-comment-dots text-accent"></i>
-                            {% else %}
-                                <i class="fa-solid fa-circle-exclamation text-muted"></i>
-                            {% endif %}
-                        </div>
-                        <div class="notif-details-col">
-                            <h4>{{ n.verb }}</h4>
-                            {% if n.description %}
-                                <p>{{ n.description }}</p>
-                            {% endif %}
-                            <span class="notif-date">{{ n.created_at|date:"F d, Y @ H:i" }}</span>
-                        </div>
+                <a href="{% if n.notification_type == 'message' %}{% url 'messages' %}{% elif n.notification_type == 'booking' %}{% url 'dashboard' %}#bookings{% elif n.notification_type == 'payment' %}{% url 'dashboard' %}#invoices{% else %}{% url 'dashboard' %}{% endif %}" class="card" style="display: flex; align-items: flex-start; gap: 16px; padding: 18px; text-decoration: none; color: inherit; background: var(--bg-surface); {% if not n.is_read %}border-color: var(--brand-primary); background: var(--brand-light);{% endif %}">
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        {% if n.notification_type == 'booking' %}
+                            <i class="fa-solid fa-briefcase" style="color: var(--brand-primary);"></i>
+                        {% elif n.notification_type == 'payment' %}
+                            <i class="fa-solid fa-credit-card" style="color: var(--success);"></i>
+                        {% elif n.notification_type == 'message' %}
+                            <i class="fa-solid fa-comment-dots" style="color: var(--info);"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-exclamation" style="color: var(--warning);"></i>
+                        {% endif %}
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 0.98rem; font-weight: 700; margin-bottom: 2px;">{{ n.verb }}</h4>
+                        {% if n.description %}
+                            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.5;">{{ n.description }}</p>
+                        {% endif %}
+                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">{{ n.created_at|date:"F d, Y @ H:i" }}</span>
                     </div>
                 </a>
             {% empty %}
-                <div class="empty-state">
-                    <i class="fa-regular fa-bell-slash empty-icon"></i>
-                    <p>You have no notifications yet.</p>
+                <div style="text-align: center; padding: 50px 20px; color: var(--text-tertiary);">
+                    <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 12px;"></i>
+                    <p style="font-size: 0.95rem;">You have no notifications yet.</p>
                 </div>
             {% endfor %}
         </div>

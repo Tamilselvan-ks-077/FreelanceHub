@@ -1,293 +1,291 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Edit Profile | FreelanceHub{% endblock %}
+{% block title %}Account & Profile Settings | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="dashboard-container animate-fade-in">
-    <!-- Sidebar Header Navigation -->
-    <aside class="dashboard-sidebar glass-panel">
-        <div class="sidebar-user-info">
-            <div class="sidebar-avatar">
-                {{ profile.user.username|slice:":2"|upper }}
+<div class="container">
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-user-info">
+                <div class="sidebar-avatar">
+                    {{ profile.user.username|slice:":2"|upper }}
+                </div>
+                <h4>{{ profile.user.username }}</h4>
+                <span class="badge-status status-accepted">{{ profile.get_role_display }}</span>
             </div>
-            <h4>{{ profile.user.username }}</h4>
-            <span class="role-badge">{{ profile.get_role_display }}</span>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="#general-info" class="sidebar-link active" onclick="switchTab(event, 'general-info')"><i class="fa-solid fa-user-gear"></i> General Settings</a>
-            {% if profile.role == 'freelancer' %}
-                <a href="#professional-info" class="sidebar-link" onclick="switchTab(event, 'professional-info')"><i class="fa-solid fa-briefcase"></i> Pro Profile</a>
-                <a href="#skills-info" class="sidebar-link" onclick="switchTab(event, 'skills-info')"><i class="fa-solid fa-tags"></i> Manage Skills</a>
-                <a href="#portfolio-info" class="sidebar-link" onclick="switchTab(event, 'portfolio-info')"><i class="fa-solid fa-images"></i> Portfolio Gallery</a>
-            {% endif %}
-            <a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa-solid fa-circle-chevron-left"></i> Back to Dashboard</a>
-        </nav>
-    </aside>
-
-    <!-- Main Settings Form Column -->
-    <div class="dashboard-main-content">
-        <h1 class="visually-hidden" style="display: none;">Account & Profile Settings</h1>
-        <!-- General Info Section -->
-        <section id="general-info" class="tab-content active-tab glass-panel">
-            <h2><i class="fa-solid fa-user-gear text-primary"></i> General Settings</h2>
-            <form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="update_profile">
-                
-                <div class="flex-row" style="align-items: center; gap: 20px; margin-bottom: 25px;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; background: var(--bg-card-hover); border: 1px solid var(--border-color); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                        {% if profile.avatar %}
-                            <img src="{{ profile.avatar.url }}" alt="{{ profile.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        {% else %}
-                            <span style="font-size: 1.8rem; font-weight: 700; color: var(--text-muted);">{{ profile.user.username|slice:":2"|upper }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="form-group" style="margin: 0; flex-grow: 1;">
-                        <label for="avatar">Profile Picture / Avatar</label>
-                        <input type="file" name="avatar" id="avatar" accept="image/*">
-                    </div>
-                </div>
-                
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" name="first_name" id="first_name" value="{{ profile.user.first_name|default:'' }}" placeholder="First Name">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" name="last_name" id="last_name" value="{{ profile.user.last_name|default:'' }}" placeholder="Last Name">
-                    </div>
-                </div>
-
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label for="contact_email">Public Contact Email</label>
-                        <input type="email" name="contact_email" id="contact_email" value="{{ profile.contact_email|default:'' }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" name="age" id="age" value="{{ profile.age }}" min="18" required>
-                    </div>
-                </div>
-                
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label for="location">Location</label>
-                        <input type="text" name="location" id="location" value="{{ profile.location|default:'' }}" placeholder="e.g. San Francisco, US" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="bio">Bio Overview</label>
-                    <textarea name="bio" id="bio" rows="4" placeholder="Tell clients about yourself and your expertise..." required>{{ profile.bio|default:'' }}</textarea>
-                </div>
-                
-                <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save General Changes</button>
-            </form>
-        </section>
-
-        {% if profile.role == 'freelancer' %}
-            <!-- Professional Info Section -->
-            <section id="professional-info" class="tab-content glass-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="margin:0;"><i class="fa-solid fa-briefcase text-primary"></i> Professional Profile</h2>
-                    {% if profile.is_complete %}
-                        <span class="badge-verified" style="font-size: 0.85rem; padding: 6px 12px;"><i class="fa-solid fa-circle-check"></i> Profile Live & Published</span>
-                    {% else %}
-                        <span class="badge-offline" style="font-size: 0.85rem; padding: 6px 12px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);"><i class="fa-solid fa-lock"></i> Incomplete (Private / Hidden)</span>
-                    {% endif %}
-                </div>
-
-                <!-- Completeness Requirements Box -->
-                {% if not profile.is_complete %}
-                    <div class="glass-panel" style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 25px;">
-                        <h4 style="color: #fbbf24; font-size: 0.95rem; margin-bottom: 8px;"><i class="fa-solid fa-list-check"></i> Public Publication Checklist</h4>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Your profile will automatically be published to Explore once all required items are filled:</p>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 0.85rem;">
-                            <div><i class="fa-solid {% if profile.user.username or profile.user.first_name %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Username / Name</div>
-                            <div><i class="fa-solid {% if profile.title %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Professional Title</div>
-                            <div><i class="fa-solid {% if profile.bio %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Bio Description</div>
-                            <div><i class="fa-solid {% if current_skills %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> At Least 1 Skill</div>
-                            <div><i class="fa-solid {% if profile.hourly_rate > 0 %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Hourly Rate > $0</div>
-                            <div><i class="fa-solid {% if profile.location %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Location</div>
-                            <div><i class="fa-solid {% if profile.experience_years >= 0 %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Experience (Years)</div>
-                            <div><i class="fa-solid fa-circle-check text-accent"></i> Availability State</div>
-                        </div>
-                    </div>
+            <nav class="sidebar-nav">
+                <a href="#general-info" class="sidebar-link active" onclick="switchTab(event, 'general-info')">
+                    <i class="fa-solid fa-user-gear"></i> General Settings
+                </a>
+                {% if profile.role == 'freelancer' %}
+                    <a href="#professional-info" class="sidebar-link" onclick="switchTab(event, 'professional-info')">
+                        <i class="fa-solid fa-briefcase"></i> Pro Profile
+                    </a>
+                    <a href="#skills-info" class="sidebar-link" onclick="switchTab(event, 'skills-info')">
+                        <i class="fa-solid fa-tags"></i> Manage Skills
+                    </a>
+                    <a href="#portfolio-info" class="sidebar-link" onclick="switchTab(event, 'portfolio-info')">
+                        <i class="fa-solid fa-images"></i> Portfolio Gallery
+                    </a>
                 {% endif %}
+                <a href="{% url 'dashboard' %}" class="sidebar-link">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </nav>
+        </aside>
 
-                <form method="POST" action="{% url 'profile_edit' %}" id="proProfileForm" enctype="multipart/form-data">
+        <!-- Settings Workspace Column -->
+        <div class="dashboard-main-content">
+            <h1 class="visually-hidden" style="display: none;">Account & Profile Settings</h1>
+            
+            <!-- Section 1: General Info -->
+            <section id="general-info" class="tab-content active-tab card" style="padding: 32px;">
+                <div style="margin-bottom: 24px;">
+                    <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-user-gear text-accent"></i> General Account Settings</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.92rem;">Update your personal information and profile picture</p>
+                </div>
+
+                <form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="update_profile">
                     
-                    <div class="flex-row">
-                        <div class="form-group">
-                            <label for="title">Professional Title</label>
-                            <input type="text" name="title" id="title" value="{{ profile.title|default:'' }}" placeholder="e.g. Lead React Developer" required>
+                    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; overflow: hidden; background: var(--brand-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.6rem; flex-shrink: 0; box-shadow: var(--shadow-md);">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="{{ profile.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                {{ profile.user.username|slice:":2"|upper }}
+                            {% endif %}
                         </div>
-                        <div class="form-group">
-                            <label for="hourly_rate">Hourly Rate ($)</label>
-                            <input type="number" step="0.01" min="0.01" name="hourly_rate" id="hourly_rate" value="{{ profile.hourly_rate }}" required>
-                            <div id="rateErrorMsg" style="display: none; color: #f87171; font-size: 0.82rem; margin-top: 5px; font-weight: 500;">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Hourly rate must be greater than $0.
-                            </div>
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 220px;">
+                            <label for="avatar">Upload Profile Picture / Avatar</label>
+                            <input type="file" name="avatar" id="avatar" accept="image/*">
                         </div>
                     </div>
                     
-                    <div class="flex-row">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="form-group">
-                            <label for="experience_years">Experience (Years)</label>
-                            <input type="number" name="experience_years" id="experience_years" value="{{ profile.experience_years }}" min="0" required>
+                            <label for="first_name">First Name</label>
+                            <input type="text" name="first_name" id="first_name" value="{{ profile.user.first_name|default:'' }}" placeholder="First Name">
                         </div>
                         <div class="form-group">
-                            <label for="availability">Availability</label>
-                            <select name="availability" id="availability">
-                                <option value="true" {% if profile.availability %}selected{% endif %}>Available Now</option>
-                                <option value="false" {% if not profile.availability %}selected{% endif %}>Busy / Closed</option>
-                            </select>
+                            <label for="last_name">Last Name</label>
+                            <input type="text" name="last_name" id="last_name" value="{{ profile.user.last_name|default:'' }}" placeholder="Last Name">
                         </div>
                     </div>
 
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label for="contact_email">Public Contact Email</label>
+                            <input type="email" name="contact_email" id="contact_email" value="{{ profile.contact_email|default:'' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" name="age" id="age" value="{{ profile.age }}" min="18" required>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
-                        <label for="cover_banner">Cover Banner Image</label>
-                        <input type="file" name="cover_banner" id="cover_banner" accept="image/*">
-                        {% if profile.cover_banner %}
-                            <div class="current-banner-preview" style="background-image: url('{{ profile.cover_banner.url }}'); margin-top: 10px; height: 120px; border-radius: 12px; background-size: cover; background-position: center;"></div>
+                        <label for="location">Location</label>
+                        <input type="text" name="location" id="location" value="{{ profile.location|default:'' }}" placeholder="e.g. San Francisco, CA" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Bio Description</label>
+                        <textarea name="bio" id="bio" rows="4" placeholder="Tell clients about your background and technical expertise..." required>{{ profile.bio|default:'' }}</textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" style="width: auto;"><i class="fa-solid fa-floppy-disk"></i> Save General Settings</button>
+                </form>
+            </section>
+
+            {% if profile.role == 'freelancer' %}
+                <!-- Section 2: Professional Profile -->
+                <section id="professional-info" class="tab-content card" style="padding: 32px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-briefcase text-accent"></i> Professional Profile Settings</h2>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem;">Set title, rate, availability, and public marketplace details</p>
+                        </div>
+                        {% if profile.is_complete %}
+                            <span class="badge-status status-completed"><i class="fa-solid fa-circle-check"></i> Profile Live & Published</span>
+                        {% else %}
+                            <span class="badge-status status-rejected"><i class="fa-solid fa-lock"></i> Incomplete (Draft State)</span>
                         {% endif %}
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="education">Education</label>
-                        <textarea name="education" id="education" rows="3" placeholder="Degrees, Universities...">{{ profile.education|default:'' }}</textarea>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="experience_detail">Work Experience Detail</label>
-                        <textarea name="experience_detail" id="experience_detail" rows="4" placeholder="Companies, positions, dates...">{{ profile.experience_detail|default:'' }}</textarea>
-                    </div>
-
-                    <div class="flex-row">
-                        <div class="form-group">
-                            <label for="certificates">Certificates</label>
-                            <textarea name="certificates" id="certificates" rows="2" placeholder="e.g. AWS Solutions Architect, Scrum Master">{{ profile.certificates|default:'' }}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="languages">Languages</label>
-                            <textarea name="languages" id="languages" rows="2" placeholder="e.g. English (Fluent), Spanish (Conversational)">{{ profile.languages|default:'' }}</textarea>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary" id="saveProChangesBtn"><i class="fa-solid fa-floppy-disk"></i> Save Pro Changes</button>
-                </form>
-            </section>
-
-            <!-- Skills Tab -->
-            <section id="skills-info" class="tab-content glass-panel">
-                <h2><i class="fa-solid fa-tags text-primary"></i> Manage Skills</h2>
-                
-                <!-- Add Skill Form -->
-                <form method="POST" action="{% url 'profile_edit' %}" class="inline-form" style="margin-bottom: 25px;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="add_skill">
-                    <div class="search-form">
-                        <input type="text" name="skill_name" placeholder="Enter skill name (e.g. JavaScript)" required>
-                        <button type="submit" class="btn-primary" style="height: 100%;"><i class="fa-solid fa-plus"></i> Add</button>
-                    </div>
-                </form>
-                
-                <!-- Current Skills Cloud -->
-                <label>Current Skills Cloud</label>
-                <div class="skills-list" style="margin-top: 10px;">
-                    {% for fs in current_skills %}
-                        <div class="skill-tag animate-fade-in">
-                            <span>{{ fs.skill.name }}</span>
-                            <form method="POST" action="{% url 'profile_edit' %}" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="remove_skill">
-                                <input type="hidden" name="skill_id" value="{{ fs.skill.id }}">
-                                <button type="submit" title="Remove Skill">&times;</button>
-                            </form>
-                        </div>
-                    {% empty %}
-                        <p class="text-muted">No skills added yet.</p>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <!-- Portfolio Tab -->
-            <section id="portfolio-info" class="tab-content glass-panel">
-                <h2><i class="fa-solid fa-images text-primary"></i> Portfolio Items</h2>
-                
-                <!-- Add Portfolio Item -->
-                <form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data" class="glass-panel" style="margin-bottom: 30px; border-color: rgba(255, 255, 255, 0.05);">
-                    <h3 style="margin-bottom: 15px; font-size: 1.15rem;">Add New Project</h3>
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="add_portfolio">
-                    
-                    <div class="form-group">
-                        <label for="portfolio_title">Project Title</label>
-                        <input type="text" name="portfolio_title" id="portfolio_title" required placeholder="e.g. E-Commerce Backend Refactoring">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="portfolio_desc">Description</label>
-                        <textarea name="portfolio_desc" id="portfolio_desc" rows="3" placeholder="Briefly describe what you did..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="portfolio_image">Project Screenshot/Image</label>
-                        <input type="file" name="portfolio_image" id="portfolio_image" accept="image/*">
-                    </div>
-                    
-                    <div class="flex-row">
-                        <div class="form-group">
-                            <label for="portfolio_video">Video URL (YouTube/Vimeo)</label>
-                            <input type="url" name="portfolio_video" id="portfolio_video" placeholder="https://youtube.com/watch?v=...">
-                        </div>
-                        <div class="form-group">
-                            <label for="portfolio_link">Project Live Link</label>
-                            <input type="url" name="portfolio_link" id="portfolio_link" placeholder="https://github.com/...">
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Project</button>
-                </form>
-                
-                <!-- Current Portfolio Gallery -->
-                <label>Current Projects</label>
-                <div class="cards-grid" style="margin-top: 15px;">
-                    {% for item in portfolio_items %}
-                        <div class="glass-panel portfolio-card animate-fade-in" style="padding: 15px; text-align: left;">
-                            {% if item.image %}
-                                <div class="portfolio-card-img" style="background-image: url('{{ item.image.url }}'); height: 140px; border-radius: 10px; background-size: cover; background-position: center; margin-bottom: 12px;"></div>
-                            {% endif %}
-                            <h4>{{ item.title }}</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">{{ item.description|truncatewords:15 }}</p>
-                            
-                            <div style="display:flex; justify-content: space-between; align-items: center;">
-                                <div style="display:flex; gap: 10px;">
-                                    {% if item.external_link %}
-                                        <a href="{{ item.external_link }}" target="_blank" class="text-accent" style="font-size: 0.9rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live</a>
-                                    {% endif %}
-                                    {% if item.video_url %}
-                                        <a href="{{ item.video_url }}" target="_blank" class="text-accent" style="font-size: 0.9rem;"><i class="fa-solid fa-circle-play"></i> Video</a>
-                                    {% endif %}
-                                </div>
-                                <form method="POST" action="{% url 'profile_edit' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="delete_portfolio">
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <button type="submit" class="text-danger" style="background:none; border:none; cursor:pointer;" title="Delete Project"><i class="fa-solid fa-trash-can"></i></button>
-                                </form>
+                    {% if not profile.is_complete %}
+                        <div style="background: var(--warning-bg); border: 1px solid hsla(38, 92%, 50%, 0.3); border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+                            <h4 style="color: var(--warning); font-size: 0.95rem; margin-bottom: 8px;"><i class="fa-solid fa-list-check"></i> Public Publication Checklist</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Complete all items below to publish your profile to Explore Talent:</p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 0.84rem;">
+                                <div><i class="fa-solid {% if profile.user.username or profile.user.first_name %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Username / Name</div>
+                                <div><i class="fa-solid {% if profile.title %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Professional Title</div>
+                                <div><i class="fa-solid {% if profile.bio %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Bio Description</div>
+                                <div><i class="fa-solid {% if current_skills %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> At Least 1 Skill</div>
+                                <div><i class="fa-solid {% if profile.hourly_rate > 0 %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Hourly Rate > $0</div>
+                                <div><i class="fa-solid {% if profile.location %}fa-circle-check text-accent{% else %}fa-circle-xmark text-danger{% endif %}"></i> Location</div>
                             </div>
                         </div>
-                    {% empty %}
-                        <p class="text-muted">No portfolio items added yet.</p>
-                    {% endfor %}
-                </div>
-            </section>
-        {% endif %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'profile_edit' %}" id="proProfileForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_profile">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label for="title">Professional Title</label>
+                                <input type="text" name="title" id="title" value="{{ profile.title|default:'' }}" placeholder="e.g. Lead React Engineer" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hourly_rate">Hourly Rate ($)</label>
+                                <input type="number" step="0.01" min="0.01" name="hourly_rate" id="hourly_rate" value="{{ profile.hourly_rate }}" required>
+                                <div id="rateErrorMsg" style="display: none; color: var(--error); font-size: 0.82rem; margin-top: 5px;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Hourly rate must be greater than $0.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label for="experience_years">Experience (Years)</label>
+                                <input type="number" name="experience_years" id="experience_years" value="{{ profile.experience_years }}" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="availability">Availability State</label>
+                                <select name="availability" id="availability">
+                                    <option value="true" {% if profile.availability %}selected{% endif %}>Available Now</option>
+                                    <option value="false" {% if not profile.availability %}selected{% endif %}>Busy / Closed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cover_banner">Cover Banner Image</label>
+                            <input type="file" name="cover_banner" id="cover_banner" accept="image/*">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="education">Education</label>
+                            <textarea name="education" id="education" rows="2" placeholder="Degrees, Certification, University...">{{ profile.education|default:'' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience_detail">Work Experience Detail</label>
+                            <textarea name="experience_detail" id="experience_detail" rows="3" placeholder="Previous companies, roles, key achievements...">{{ profile.experience_detail|default:'' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" id="saveProChangesBtn" style="width: auto;"><i class="fa-solid fa-floppy-disk"></i> Save Pro Settings</button>
+                    </form>
+                </section>
+
+                <!-- Section 3: Skills -->
+                <section id="skills-info" class="tab-content card" style="padding: 32px;">
+                    <div style="margin-bottom: 24px;">
+                        <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-tags text-accent"></i> Manage Skills</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.92rem;">Add technical skills to highlight your expertise on directory search</p>
+                    </div>
+                    
+                    <form method="POST" action="{% url 'profile_edit' %}" style="display: flex; gap: 12px; margin-bottom: 24px; max-width: 480px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_skill">
+                        <input type="text" name="skill_name" placeholder="Enter skill (e.g. Python, React)" required style="flex: 1;">
+                        <button type="submit" class="btn-primary" style="width: auto;"><i class="fa-solid fa-plus"></i> Add Skill</button>
+                    </form>
+                    
+                    <label>Current Skills Cloud</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                        {% for fs in current_skills %}
+                            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; background: var(--brand-light); color: var(--brand-primary); border: 1px solid hsla(217, 91%, 60%, 0.3); font-weight: 600; font-size: 0.85rem;">
+                                <span>{{ fs.skill.name }}</span>
+                                <form method="POST" action="{% url 'profile_edit' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_skill">
+                                    <input type="hidden" name="skill_id" value="{{ fs.skill.id }}">
+                                    <button type="submit" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0;">&times;</button>
+                                </form>
+                            </div>
+                        {% empty %}
+                            <p style="color: var(--text-tertiary); font-size: 0.88rem;">No skills added yet.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Section 4: Portfolio Gallery -->
+                <section id="portfolio-info" class="tab-content card" style="padding: 32px;">
+                    <div style="margin-bottom: 24px;">
+                        <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-images text-accent"></i> Portfolio Gallery</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.92rem;">Showcase screenshots, demo links, and code samples</p>
+                    </div>
+                    
+                    <form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 24px; border-radius: 14px; margin-bottom: 30px;">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 16px;">Add New Portfolio Project</h3>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_portfolio">
+                        
+                        <div class="form-group">
+                            <label for="portfolio_title">Project Title</label>
+                            <input type="text" name="portfolio_title" id="portfolio_title" required placeholder="e.g. E-Commerce Microservices Engine">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="portfolio_desc">Description</label>
+                            <textarea name="portfolio_desc" id="portfolio_desc" rows="3" placeholder="Brief description of tech stack, your role, and deliverables..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="portfolio_image">Project Screenshot / Cover Image</label>
+                            <input type="file" name="portfolio_image" id="portfolio_image" accept="image/*">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label for="portfolio_video">Video Demo URL</label>
+                                <input type="url" name="portfolio_video" id="portfolio_video" placeholder="https://youtube.com/watch?v=...">
+                            </div>
+                            <div class="form-group">
+                                <label for="portfolio_link">Project Live / GitHub Link</label>
+                                <input type="url" name="portfolio_link" id="portfolio_link" placeholder="https://github.com/...">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="width: auto;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Portfolio Item</button>
+                    </form>
+                    
+                    <h3 style="font-size: 1.05rem; margin-bottom: 16px;">Current Portfolio Items</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+                        {% for item in portfolio_items %}
+                            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
+                                {% if item.image %}
+                                    <img src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                                {% endif %}
+                                <h4 style="font-size: 0.95rem; margin-bottom: 4px;">{{ item.title }}</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-tertiary); margin-bottom: 12px;">{{ item.description|truncatewords:12 }}</p>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    {% if item.external_link %}
+                                        <a href="{{ item.external_link }}" target="_blank" style="color: var(--brand-primary); font-size: 0.8rem; font-weight: 600;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Link</a>
+                                    {% else %}
+                                        <span></span>
+                                    {% endif %}
+                                    <form method="POST" action="{% url 'profile_edit' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_portfolio">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <button type="submit" style="background: none; border: none; color: var(--error); cursor: pointer;" title="Delete Project"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p style="color: var(--text-tertiary); font-size: 0.88rem;">No portfolio items uploaded yet.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -295,45 +293,24 @@
 {% block extra_js %}
 <script>
     function switchTab(event, tabId) {
-        if (event && event.preventDefault) {
-            event.preventDefault();
-        }
+        if (event && event.preventDefault) { event.preventDefault(); }
+        document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active-tab'));
         
-        // Remove active class from links
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        // Remove active class from sections
-        document.querySelectorAll('.tab-content').forEach(section => {
-            section.classList.remove('active-tab');
-        });
-        
-        // Add active class
         const targetLink = document.querySelector(`.sidebar-link[href="#${tabId}"]`);
-        if (targetLink) {
-            targetLink.classList.add('active');
-        } else if (event && event.currentTarget && event.currentTarget.classList) {
-            event.currentTarget.classList.add('active');
-        }
+        if (targetLink) { targetLink.classList.add('active'); }
         const targetSection = document.getElementById(tabId);
-        if (targetSection) {
-            targetSection.classList.add('active-tab');
-        }
+        if (targetSection) { targetSection.classList.add('active-tab'); }
     }
     
-    // Switch to tab if hash is present in URL
     window.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash.substring(1);
         if (hash) {
             const link = document.querySelector(`a[href="#${hash}"]`);
-            if (link) {
-                link.click();
-            }
+            if (link) { link.click(); }
         }
     });
 
-    // Client-side validation for hourly rate
     const proForm = document.getElementById('proProfileForm');
     const rateInput = document.getElementById('hourly_rate');
     const rateError = document.getElementById('rateErrorMsg');
@@ -343,7 +320,7 @@
         const val = parseFloat(rateInput.value);
         if (isNaN(val) || val <= 0) {
             if (rateError) rateError.style.display = 'block';
-            rateInput.style.borderColor = '#f87171';
+            rateInput.style.borderColor = 'var(--error)';
             return false;
         }
         if (rateError) rateError.style.display = 'none';
@@ -351,10 +328,7 @@
         return true;
     }
 
-    if (rateInput) {
-        rateInput.addEventListener('input', validateHourlyRate);
-    }
-
+    if (rateInput) { rateInput.addEventListener('input', validateHourlyRate); }
     if (proForm) {
         proForm.addEventListener('submit', (e) => {
             if (!validateHourlyRate()) {

@@ -3,13 +3,13 @@
 {% block title %}Page Not Found (404) | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="auth-container animate-fade-in" style="max-width: 500px; width: 100%; margin: 60px auto;">
-    <div class="glass-panel" style="padding: 40px; text-align: center; border-radius: 20px;">
-        <div style="font-size: 5rem; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; font-family: var(--font-outfit);">404</div>
-        <h1 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 15px; font-family: var(--font-outfit);">Lost in Space?</h1>
-        <p class="muted-text" style="margin-bottom: 30px;">The page you are looking for doesn't exist or has been moved. Let's get you back to the marketplace.</p>
-        <a href="{% url 'home' %}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 10px; font-weight: 600; padding: 12px 24px; border-radius: 10px;">
-            <i class="fa-solid fa-house"></i> Return to Explore
+<div class="container" style="max-width: 520px; padding-top: 60px;">
+    <div class="card" style="padding: 40px; text-align: center;">
+        <div style="font-size: 5rem; font-weight: 800; background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-outfit); line-height: 1; margin-bottom: 16px;">404</div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; font-family: var(--font-outfit);">Page Not Found</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">The requested page could not be located or has been moved. Explore top freelancers from the marketplace directory.</p>
+        <a href="{% url 'home' %}" class="btn-primary" style="display: inline-flex; width: auto; padding: 12px 24px;">
+            <i class="fa-solid fa-house"></i> Return to Explore Talent
         </a>
     </div>
 </div>
