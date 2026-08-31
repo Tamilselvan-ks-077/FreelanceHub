@@ -179,21 +179,24 @@
                     {% else %}
                         <form method="POST" action="{% url 'create_booking' freelancer.id %}">
                             {% csrf_token %}
-                            <div class="form-field">
-                                <label for="start_date">Start Date</label>
-                                <input type="date" name="start_date" id="start_date" required min="{% now 'Y-m-d' %}">
+                            <div id="booking-widget-root">
+                                <!-- Progressive Enhancement Fallback (non-JS) -->
+                                <div class="form-field">
+                                    <label for="start_date">Start Date</label>
+                                    <input type="date" name="start_date" id="start_date" required min="{% now 'Y-m-d' %}">
+                                </div>
+                                <div class="form-field">
+                                    <label for="end_date">End Date</label>
+                                    <input type="date" name="end_date" id="end_date" required min="{% now 'Y-m-d' %}">
+                                </div>
+                                <div class="form-field">
+                                    <label for="description">Task Details</label>
+                                    <textarea name="description" id="description" rows="3" required placeholder="Describe task scope, deliverable milestones..."></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" {% if not freelancer.availability %}disabled{% endif %}>
+                                    <i class="fa-solid fa-paper-plane"></i> Send Booking Offer
+                                </button>
                             </div>
-                            <div class="form-field">
-                                <label for="end_date">End Date</label>
-                                <input type="date" name="end_date" id="end_date" required min="{% now 'Y-m-d' %}">
-                            </div>
-                            <div class="form-field">
-                                <label for="description">Task Details</label>
-                                <textarea name="description" id="description" rows="3" required placeholder="Describe task scope, deliverable milestones..."></textarea>
-                            </div>
-                            <button type="submit" class="btn-primary" {% if not freelancer.availability %}disabled{% endif %}>
-                                <i class="fa-solid fa-paper-plane"></i> Send Booking Offer
-                            </button>
                         </form>
                     {% endif %}
                 {% else %}
@@ -245,4 +248,128 @@
         </aside>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rootElement = document.getElementById('booking-widget-root');
+        if (!rootElement || !window.React || !window.ReactDOM) return;
+
+        const e = React.createElement;
+        const rate = parseFloat("{{ freelancer.hourly_rate }}") || 0;
+        const isAvailable = "{{ freelancer.availability }}" === "True";
+
+        function BookingWidget() {
+            const [startDate, setStartDate] = React.useState('');
+            const [endDate, setEndDate] = React.useState('');
+            const [description, setDescription] = React.useState('');
+            const [submitting, setSubmitting] = React.useState(false);
+
+            const durationDays = React.useMemo(() => {
+                if (!startDate || !endDate) return 0;
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+                const diffTime = end.getTime() - start.getTime();
+                if (diffTime < 0) return 0;
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            }, [startDate, endDate]);
+
+            const projectedCost = React.useMemo(() => {
+                return durationDays * 8 * rate;
+            }, [durationDays]);
+
+            const handleSubmit = () => {
+                setSubmitting(true);
+            };
+
+            return e('div', null,
+                // Start Date Form Field
+                e('div', { className: 'form-field' },
+                    e('label', { htmlFor: 'start_date' }, 'Start Date'),
+                    e('input', {
+                        type: 'date',
+                        name: 'start_date',
+                        id: 'start_date',
+                        required: true,
+                        value: startDate,
+                        min: new Date().toISOString().split('T')[0],
+                        onChange: (evt) => {
+                            setStartDate(evt.target.value);
+                            if (endDate && evt.target.value > endDate) {
+                                setEndDate(evt.target.value);
+                            }
+                        }
+                    })
+                ),
+
+                // End Date Form Field
+                e('div', { className: 'form-field' },
+                    e('label', { htmlFor: 'end_date' }, 'End Date'),
+                    e('input', {
+                        type: 'date',
+                        name: 'end_date',
+                        id: 'end_date',
+                        required: true,
+                        value: endDate,
+                        min: startDate || new Date().toISOString().split('T')[0],
+                        onChange: (evt) => setEndDate(evt.target.value)
+                    })
+                ),
+
+                // Live Estimate Preview Box
+                durationDays > 0 && e('div', { className: 'booking-estimate-preview' },
+                    e('div', { className: 'booking-estimate-title' }, 'Task Cost Projection'),
+                    e('div', { className: 'booking-estimate-row' },
+                        e('span', null, 'Contract Duration:'),
+                        e('strong', null, `${durationDays} Day${durationDays > 1 ? 's' : ''}`)
+                    ),
+                    e('div', { className: 'booking-estimate-row' },
+                        e('span', null, 'Daily Hours:'),
+                        e('strong', null, '8 hrs / day')
+                    ),
+                    e('div', { className: 'booking-estimate-row' },
+                        e('span', null, 'Hourly Rate:'),
+                        e('strong', null, `$${rate.toFixed(2)}/hr`)
+                    ),
+                    e('div', { className: 'booking-estimate-row booking-estimate-total' },
+                        e('span', null, 'Projected Total:'),
+                        e('strong', null, `$${projectedCost.toFixed(2)}`)
+                    )
+                ),
+
+                // Description Field
+                e('div', { className: 'form-field' },
+                    e('label', { htmlFor: 'description' }, 'Task Details'),
+                    e('textarea', {
+                        name: 'description',
+                        id: 'description',
+                        rows: 3,
+                        required: true,
+                        placeholder: 'Describe task scope, deliverable milestones...',
+                        value: description,
+                        onChange: (evt) => setDescription(evt.target.value)
+                    })
+                ),
+
+                // Submit Button
+                e('button', {
+                    type: 'submit',
+                    className: 'btn-primary',
+                    disabled: !isAvailable || submitting,
+                    onClick: handleSubmit
+                },
+                    submitting ? e('i', { className: 'fa-solid fa-spinner fa-spin mr-2' }) : e('i', { className: 'fa-solid fa-paper-plane mr-2' }),
+                    submitting ? ' Sending Offer...' : ' Send Booking Offer'
+                )
+            );
+        }
+
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(e(BookingWidget));
+    });
+</script>
 {% endblock %}
