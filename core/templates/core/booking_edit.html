@@ -3,35 +3,35 @@
 {% block title %}Edit Booking Request | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 560px; padding-top: 40px;">
-    <div class="card" style="padding: 32px;">
-        <div style="margin-bottom: 24px;">
-            <h1 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-pen-to-square text-accent"></i> Edit Booking Request</h1>
-            <p style="color: var(--text-secondary); font-size: 0.92rem;">Update project dates and task description for Booking #{{ booking.id }}</p>
+<div class="container-sm animate-fade-in">
+    <div class="card p-7">
+        <div class="mb-6">
+            <h1 class="text-h1 mb-1"><i class="fa-solid fa-pen-to-square text-accent"></i> Edit Booking Request</h1>
+            <p class="text-secondary">Update project dates and task description for Booking #{{ booking.id }}</p>
         </div>
         
         <form method="POST" action="{% url 'booking_edit' booking.id %}">
             {% csrf_token %}
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div class="form-group">
+            <div class="grid-2">
+                <div class="form-field">
                     <label for="start_date">Start Date</label>
                     <input type="date" name="start_date" id="start_date" value="{{ booking.start_date|date:'Y-m-d' }}" required>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-field">
                     <label for="end_date">End Date</label>
                     <input type="date" name="end_date" id="end_date" value="{{ booking.end_date|date:'Y-m-d' }}" required>
                 </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-field">
                 <label for="description">Task Description</label>
                 <textarea name="description" id="description" rows="4" required>{{ booking.description }}</textarea>
             </div>
             
-            <button type="submit" class="btn-primary" style="margin-bottom: 12px;"><i class="fa-solid fa-floppy-disk"></i> Update Request</button>
-            <a href="{% url 'dashboard' %}" class="btn-secondary-link" style="margin: 0;">Back to Dashboard</a>
+            <button type="submit" class="btn-primary mb-3"><i class="fa-solid fa-floppy-disk"></i> Update Request</button>
+            <a href="{% url 'dashboard' %}" class="btn-secondary-link m-0">Back to Dashboard</a>
         </form>
     </div>
 </div>

@@ -1,32 +1,57 @@
-Audit my entire FreelanceHub website UI and improve it professionally. First inspect the existing application page-by-page and identify all UI/UX problems such as poor spacing, inconsistent typography, weak colors, bad alignment, oversized elements, cluttered layouts, inconsistent buttons/cards, poor navigation, broken responsiveness, empty-looking sections, unnecessary components, and anything that makes the website look like an AI-generated project.
+You are acting as a senior frontend architect and UI/UX engineer working on an EXISTING production Django project called FreelanceHub (repo: https://github.com/Tamilselvan-ks-077/FreelanceHub). This is a full-stack freelancer marketplace with real backend logic — Bookings, Invoices, Payments, Reviews, Portfolio items, Favourites, Notifications, and a chat system — all already implemented in core/models.py and core/views.py. 
 
-Then redesign and fix the UI without breaking any existing functionality or backend. Make the entire website feel like a polished, production-ready freelance marketplace similar in quality to Upwork, Fiverr, and Toptal, while keeping FreelanceHub's own unique identity.
+CRITICAL CONSTRAINT: You must NOT modify core/models.py, core/views.py, core/urls.py, core/serializers.py, core/admin.py, myapp/settings.py, or any migration files. All backend logic, authentication (Django's built-in auth + custom login/signup/logout views), API endpoints, database queries, and URL routing must continue to work exactly as they do today. You are ONLY authorized to modify:
+- core/templates/**/*.html (structure and classes, NOT template context variables — do not rename or remove any Django template variable like {{ freelancer.hourly_rate }}, {% url 'name' %} tags, {% csrf_token %}, or form field names/names attributes, since these are wired to backend views and forms)
+- core/static/core/css/style.css
+- core/static/core/js/main.js (may add new JS files under core/static/core/js/ for new interactive behavior, e.g. skeleton loaders, mobile table fallback)
 
-Improve:
+GOAL: Transform FreelanceHub's frontend from an inconsistent, inline-style-heavy interface into a premium, production-ready marketplace UI — in the visual quality tier of Linear, Stripe, Contra, and Upwork — WITHOUT copying their layouts, copy, or specific visual patterns. Do not use Upwork/Toptal branding language ("Top 3%", "Toptal-vetted") anywhere in the copy you write.
 
-Modern navbar and navigation
-Premium homepage/hero section
-Search and filter UI
-Freelancer cards and profiles
-Project cards and project details
-Client and freelancer dashboards
-Login/Register pages
-Proposal pages
-Messaging/chat UI
-Notifications
-Reviews and ratings
-Settings/profile pages
-Forms and input fields
-Buttons, cards, badges and modals
-Loading, empty and error states
-Mobile, tablet and desktop responsiveness
+CURRENT STATE (verified from codebase):
+- core/static/core/css/style.css already contains a legitimate design token system (§1 DESIGN TOKENS in the file) — HSL-based CSS variables for colors, a dark/light theme via [data-theme] attribute, a 4-tier shadow elevation system, and named sections for nav/cards/hero/forms/dashboard/chat/tables/footer/responsive. EXTEND this system, do not replace it wholesale.
+- The single biggest problem: templates use extensive inline style="..." attributes (talent_detail.html has ~78, dashboard.html ~48, profile_edit.html ~54, checkout.html ~28, chat.html/inbox.html/notifications.html ~20 each) that duplicate what should be CSS classes, causing inconsistency and breaking responsive behavior (inline width/position:sticky rules are not reachable by the existing @media queries in §15 of style.css).
+- home.html and login.html both contain fabricated platform statistics ("10,000+ Vetted Experts", "98.4% Satisfaction Rate", "$25M+ Earned", "Toptal-Vetted & Verified Talent Network") and two fake testimonials. These must be REMOVED and replaced with either (a) real dynamically-computed numbers using existing model methods/querysets already in core/models.py (e.g. Profile.objects.public_freelancers().count(), Profile.get_average_rating(), Profile.get_completed_projects_count()), or (b) removed entirely if no real equivalent exists — never fabricate numbers.
+- Only 2 responsive breakpoints exist (991px, 768px) covering a limited set of class names — inline-styled layouts (notably talent_detail.html's 320px-wide sticky hiring sidebar, built with inline styles not classes) are NOT covered and will likely break or overflow on mobile.
+- Only one well-designed empty state exists (home.html's "No freelancers found") — dashboard tables (bookings, invoices) currently show a bare text string in a table cell for empty states with no icon/action.
+- No skeleton/loading states exist anywhere (Chart.js earnings graph, stat cards) — they currently pop in blank/zero on first paint.
+- login.html and signup.html are the CLEANEST, most class-based templates in the codebase (minimal inline styles) — use their component discipline as the reference pattern for componentizing the rest of the site.
 
-Use a consistent design system throughout the application: professional typography, balanced spacing, proper visual hierarchy, consistent border radius, subtle shadows, refined colors, clean icons, proper hover/focus states, smooth but minimal animations, and reusable components.
+EXECUTE THE FOLLOWING IN ORDER:
 
-Important: Do not blindly redesign everything. Inspect the current UI first, identify what is actually wrong, then improve it. Preserve useful existing components and functionality where appropriate. Do not remove working features, change API behavior, or modify the backend unless absolutely necessary for a UI issue.
+STEP 1 — AUDIT
+Read every file in core/templates/core/ and core/static/core/css/style.css in full. Produce a written inventory (as a comment block or markdown file, do not just proceed silently) listing every inline style="..." occurrence per template file and every one-off font-size/color/spacing value that isn't already a design token. Confirm you understand which Django template variables and form field names must not be touched.
 
-Make every page visually consistent with the others. Fix responsiveness and make sure there are no overlapping elements, broken layouts, excessive whitespace, horizontal scrolling, tiny text, inconsistent spacing, or unusable mobile screens.
+STEP 2 — EXTEND THE DESIGN SYSTEM (style.css)
+Add the following NEW tokens/rules to the existing :root block and CSS file, without deleting or renaming any existing variable (existing templates depend on current variable names):
+- A typographic scale: --text-display, --text-h1, --text-h2, --text-h3, --text-body, --text-caption (sizes/weights/line-heights per a Stripe/Linear-quality scale: display ~3rem/800, h1 ~2rem/800, h2 ~1.5rem/700, h3 ~1.125rem/700, body ~0.95rem/400, caption ~0.8rem/600 uppercase tracked). Create matching utility classes (.text-display, .text-h1, etc.) so templates can replace inline font-size declarations.
+- An 8px-based spacing scale as CSS custom properties (--space-1: 4px through --space-12: 96px) and utility classes for common margin/padding/gap patterns currently hardcoded inline.
+- Formalize radius into --radius-sm (8px), --radius-md (12px), --radius-lg (16px) and apply consistently.
+- Add a .card-elevated variant distinct from the existing .card (for interactive/browsable surfaces like talent cards and portfolio items — subtle shadow-based elevation) while leaving .card itself for flat/data contexts (dashboard, tables).
+- Add a .btn-ghost variant (transparent background, text-colored, no border) for tertiary actions.
+- Add reusable component classes: .section-header (eyebrow + heading + subtext pattern), .empty-state (icon + heading + subtext + action button, matching the visual quality of the existing home.html empty state), .skeleton (shimmer loading placeholder, respecting prefers-reduced-motion), .form-field (label + input + inline error message slot with a visible red-bordered error state).
+- Expand @media breakpoints to three tiers: 1024px, 768px, 480px. Ensure ALL layout classes (including any new ones you create for talent_detail's hiring sidebar) collapse correctly at each tier — sticky sidebars must become static full-width below 1024px.
+- Add a mobile card-view fallback pattern for data tables (bookings, invoices) that switches from <table> to a stacked card layout below 768px without altering the underlying <table> markup structure or {% for %} loop logic — use CSS only (e.g. display:block conversions with data-label attributes) OR, if JS is required, add it as a new small script that only handles presentation, never data.
+- Reserve --brand-gradient usage to exactly two contexts going forward: hero headline highlight text and primary CTA buttons. Do not apply it to icon backgrounds, avatars, or decorative fills elsewhere — replace those with flat --brand-primary or --brand-light.
 
-Final goal: When a new user opens FreelanceHub, it should immediately look like a serious commercial product built by a professional UI/UX team—not a student project or AI-generated website. Prioritize usability, trust, simplicity, visual hierarchy, performance, accessibility, and a premium feel.
+STEP 3 — COMPONENTIZE TEMPLATES (remove inline styles)
+For every template in core/templates/core/, replace inline style="..." attributes with the new/existing CSS classes from Step 2, preserving 100% of the existing Django template logic ({% if %}, {% for %}, {{ variable }}, {% url %}, form field names, csrf_token). Do this file by file, verifying after each file that no template variable, URL name, or form field name was altered, removed, or renamed. Priority order (highest visual impact first): talent_detail.html, dashboard.html, profile_edit.html, home.html, checkout.html, chat.html, admin_dashboard.html, inbox.html, notifications.html, booking_edit.html. Use login.html and signup.html's existing minimal-inline-style approach as your quality reference for what "done" looks like.
 
-Before finishing, test every major page and user flow, fix any UI regressions, and make sure the final design is consistent across the entire application.
+STEP 4 — FIX HOME.HTML AND LOGIN.HTML CONTENT
+Remove all fabricated statistics and testimonials from home.html and login.html. Replace the stats ribbon with real numbers computed from the database via the existing view context (if the current view (core/views.py home function) does not already pass these numbers into context, do NOT modify views.py to add them — instead, in the template, either use the freelancers queryset already provided (e.g. {{ freelancers|length }}) for a real count, or remove the metric entirely if no real data is available in the current template context). Rewrite all hero/marketing copy to remove "Top 3%", "Toptal-vetted", and any Upwork/Toptal-derived phrasing, replacing it with original FreelanceHub-specific value propositions centered on the platform's real features: structured bookings with date ranges, escrow-style invoice/payment flow, direct per-booking chat rooms, and a verified/rating system.
+
+STEP 5 — REDESIGN HIGHEST-IMPACT PAGES
+Using the new design system, redesign in this priority order: (1) home.html hero + talent directory + filters, (2) talent_detail.html full profile layout, (3) dashboard.html (both freelancer and client views, all three tabs), (4) profile_edit.html multi-section form. For each: apply the new typography/spacing scale, replace ad hoc card treatments with .card or .card-elevated as appropriate to content type, add empty states using the .empty-state component wherever a queryset can render zero results (bookings, invoices, portfolio items, reviews, favourites, notifications), and add .skeleton loading placeholders for the Chart.js earnings graph and any stat cards that render from database aggregates.
+
+STEP 6 — NAVIGATION & IDENTITY POLISH
+In base.html: visually separate the staff-only "Analytics" nav link from regular nav items (e.g., a vertical divider or distinct pill styling) so the permission boundary is visible. Keep the existing sticky blurred header, theme toggle, and mobile hamburger drawer mechanisms exactly as they function today — only restyle, do not re-architect the JS behavior in the inline <script> blocks in base.html unless a bug is found.
+
+STEP 7 — ACCESSIBILITY PASS
+Ensure all interactive elements (buttons, links, form inputs) have visible focus-visible states matching the existing --border-focus token. Verify color contrast of --text-tertiary against --bg-canvas and --bg-card meets WCAG AA in both dark and light themes — adjust the token value only if it fails, and if you do, re-verify light mode (§14 in style.css) does not break contrast.
+
+STEP 8 — VERIFICATION (do this for every route before considering the task complete)
+Test every URL pattern defined in core/urls.py: /, /signup/, /login/, /dashboard/ (as both freelancer and client role if test accounts allow), /freelancer/<id>/, /profile/edit/, /messages/, /messages/<username>/, /notifications/, /booking/edit/<id>/, /invoice/<id>/print/, /admin-dashboard/ (staff only). For each route, verify: (a) the page renders without template errors, (b) no Django template variable, URL name, or form field was broken, (c) the page is visually consistent with the new design system, (d) the page is checked at three viewport widths: 1440px (desktop), 834px (tablet), 390px (mobile), (e) any empty-data states (no bookings, no reviews, no portfolio items, no notifications) render the new .empty-state component correctly rather than erroring or showing blank space.
+
+STEP 9 — FINAL CLEANUP
+Search the entire core/templates/ and core/static/core/css/ directories for any remaining hardcoded hex colors, hardcoded px font-sizes outside the new type scale, and orphaned/unused CSS rules left over from the redesign. Remove dead CSS. Confirm style.css's existing §-numbered section comments are updated to reflect new sections added, keeping the same commenting convention already used in the file.
+
+Do not ask me clarifying questions about design taste — make premium, minimal, Stripe/Linear-quality decisions autonomously within the constraints above, and default to removing/simplifying visual elements when in doubt rather than adding new decorative ones. When finished, provide a summary of every file changed and confirm that no backend file (models.py, views.py, urls.py, serializers.py, admin.py, settings.py, migrations) was modified.

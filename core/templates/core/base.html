@@ -62,6 +62,7 @@
                 </a>
                 
                 {% if user.is_staff %}
+                    <span class="nav-separator"></span>
                     <a href="{% url 'admin_dashboard' %}" class="admin-link">
                         <i class="fa-solid fa-gauge-high"></i> Analytics
                     </a>
@@ -92,11 +93,11 @@
 
     <!-- Alert Notifications -->
     {% if messages %}
-        <div class="container" style="margin-top: 20px;">
+        <div class="container mt-4 animate-fade-in">
             {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-radius: 12px; margin-bottom: 12px; font-weight: 500;">
+                <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}">
                     <span><i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i> {{ message }}</span>
-                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer;">&times;</button>
+                    <button onclick="this.parentElement.remove()">&times;</button>
                 </div>
             {% endfor %}
         </div>

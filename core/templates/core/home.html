@@ -4,13 +4,15 @@
 {% block title %}FreelanceHub | Hire Top Freelance Developers & Designers{% endblock %}
 
 {% block content %}
+<div class="ambient-glow-blob blob-1"></div>
+<div class="ambient-glow-blob blob-2"></div>
 <!-- Commercial Hero Section -->
-<section class="commercial-hero">
+<section class="commercial-hero animate-fade-in">
     <div class="container">
         <div class="hero-badge-trust">
-            <i class="fa-solid fa-shield-halved"></i> Toptal-Vetted & Verified Talent Network
+            <i class="fa-solid fa-shield-halved"></i> Verified Experts & Global Talent Network
         </div>
-        <h1>Hire the Top 3% of <span>Freelance Talent</span></h1>
+        <h1>Hire Verified <span>Freelance Talent</span></h1>
         <p>Connect instantly with elite software engineers, UI/UX designers, and technology consultants ready to build your project.</p>
         
         <form method="GET" action="{% url 'home' %}" class="hero-search-box">
@@ -22,27 +24,23 @@
 
 <div class="container">
     <!-- Live Platform Statistics Ribbon -->
-    <div class="platform-stats-ribbon">
+    <div class="platform-stats-ribbon animate-slide-up">
         <div class="stat-item">
-            <h4>10,000+</h4>
-            <p>Vetted Experts</p>
+            <h4>{{ freelancers|length }}</h4>
+            <p>Available Experts</p>
         </div>
         <div class="stat-item">
-            <h4>98.4%</h4>
-            <p>Satisfaction Rate</p>
+            <h4>Escrow Secured</h4>
+            <p>Project Payments</p>
         </div>
         <div class="stat-item">
-            <h4>15,000+</h4>
-            <p>Projects Delivered</p>
-        </div>
-        <div class="stat-item">
-            <h4>$25M+</h4>
-            <p>Earned by Talent</p>
+            <h4>Verified Net</h4>
+            <p>Vetted Profiles Only</p>
         </div>
     </div>
 
     <!-- Skill Categories Grid -->
-    <section style="margin-bottom: 60px;">
+    <section class="mb-8">
         <div class="section-title-block">
             <h2>Explore Popular Talent Categories</h2>
             <p>Find specialized experts tailored for your industry and tech stack</p>
@@ -73,13 +71,13 @@
     </section>
 
     <!-- Search Directory & Filter Sidebar Section -->
-    <div class="search-directory-layout" id="directory">
+    <div class="search-directory-layout animate-slide-up" id="directory">
         <!-- Filters Sidebar -->
         <aside class="sidebar-filters">
             <form method="GET" action="{% url 'home' %}" class="filters-form" id="filterForm">
                 <h3><i class="fa-solid fa-filter"></i> Refine Search</h3>
                 
-                <div id="filterErrorMsg" class="alert alert-danger" style="display: none; margin-bottom: 15px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;"></div>
+                <div id="filterErrorMsg" class="alert alert-danger display-none text-caption mb-3 p-3 radius-md"></div>
 
                 <div class="filter-group">
                     <label for="q">Keyword</label>
@@ -93,7 +91,7 @@
                 
                 <div class="filter-group">
                     <label>Hourly Rate ($)</label>
-                    <div style="display: flex; gap: 8px;">
+                    <div class="grid-2">
                         <input type="number" step="0.01" name="min_rate" id="min_rate" value="{{ min_rate }}" placeholder="Min" min="0">
                         <input type="number" step="0.01" name="max_rate" id="max_rate" value="{{ max_rate }}" placeholder="Max" min="0">
                     </div>
@@ -120,17 +118,17 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; text-transform: none; margin-bottom: 8px; cursor: pointer;">
+                    <label class="filter-checkbox-label">
                         <input type="checkbox" name="availability" value="true" {% if availability == 'true' %}checked{% endif %}> Available Now Only
                     </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; text-transform: none; cursor: pointer;">
+                    <label class="filter-checkbox-label">
                         <input type="checkbox" name="verified" value="true" {% if verified == 'true' %}checked{% endif %}> Verified Talent Only
                     </label>
                 </div>
                 
                 <input type="hidden" name="sort_by" value="{{ sort_by }}">
                 
-                <button type="submit" class="btn-primary" id="applyFiltersBtn" style="margin-top: 10px;"><i class="fa-solid fa-check"></i> Apply Filters</button>
+                <button type="submit" class="btn-primary mt-2" id="applyFiltersBtn"><i class="fa-solid fa-check"></i> Apply Filters</button>
                 <a href="{% url 'home' %}" class="btn-secondary-link text-center">Reset All</a>
             </form>
         </aside>
@@ -140,9 +138,9 @@
             <div class="directory-control-bar">
                 <span class="results-count"><i class="fa-solid fa-users"></i> {{ freelancers.count }} Freelance{{ freelancers.count|pluralize:"r,rs" }} Available</span>
                 
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="sort_by_select" style="font-size: 0.8rem; font-weight: 700; color: var(--text-tertiary); margin: 0;">SORT BY:</label>
-                    <select id="sort_by_select" onchange="applySort(this.value)" style="width: auto; padding: 6px 30px 6px 12px; font-size: 0.88rem;">
+                <div class="align-center gap-2">
+                    <label for="sort_by_select" class="text-caption m-0">SORT BY:</label>
+                    <select id="sort_by_select" onchange="applySort(this.value)" class="w-auto py-1 px-3 text-body">
                         <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
                         <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
                         <option value="lowest_price" {% if sort_by == 'lowest_price' %}selected{% endif %}>Price: Low to High</option>
@@ -154,7 +152,7 @@
 
             <!-- Quick Suggestion Pills -->
             <div class="suggestion-pills-bar">
-                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-tertiary);"><i class="fa-solid fa-fire text-accent"></i> Trending Skills:</span>
+                <span class="text-caption text-secondary"><i class="fa-solid fa-fire text-accent"></i> Trending Skills:</span>
                 <button type="button" class="pill-btn" onclick="quickSearch('Django')">Django</button>
                 <button type="button" class="pill-btn" onclick="quickSearch('React')">React</button>
                 <button type="button" class="pill-btn" onclick="quickSearch('Python')">Python</button>
@@ -199,7 +197,7 @@
                                     <span class="star-rating"><i class="fa-solid fa-star"></i> {{ freelancer.get_average_rating }}</span>
                                     <span class="reviews-count">({{ freelancer.get_reviews_count }} review{{ freelancer.get_reviews_count|pluralize }})</span>
                                 {% else %}
-                                    <span class="muted-text" style="font-size: 0.82rem;"><i class="fa-regular fa-star"></i> No reviews yet</span>
+                                    <span class="muted-text text-caption"><i class="fa-regular fa-star"></i> No reviews yet</span>
                                 {% endif %}
                             </div>
                             
@@ -226,11 +224,11 @@
                         </div>
                     </article>
                 {% empty %}
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;">
-                        <i class="fa-solid fa-user-slash" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+                    <div class="empty-state grid-span-all py-8">
+                        <i class="fa-solid fa-user-slash text-accent"></i>
                         <h3>No freelancers found</h3>
                         <p>Try changing your search or filters.</p>
-                        <a href="{% url 'home' %}" class="btn-secondary-link" style="display: inline-block; width: auto; margin-top: 16px;">Clear Filters</a>
+                        <a href="/" class="btn-secondary-link mt-3"><i class="fa-solid fa-rotate-left"></i> Clear Filters</a>
                     </div>
                 {% endfor %}
             </div>
@@ -238,7 +236,7 @@
     </div>
 
     <!-- How It Works Section -->
-    <section style="margin: 80px 0 60px;">
+    <section class="my-8">
         <div class="section-title-block">
             <h2>How FreelanceHub Works</h2>
             <p>Simple 3-step workflow to connect, collaborate, and deliver world-class products</p>
@@ -303,9 +301,9 @@
     <section class="cta-banner">
         <h2>Ready to Hire Top Freelance Talent?</h2>
         <p>Join thousands of businesses scaling faster with verified software developers and designers.</p>
-        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-            <a href="{% url 'signup' %}" class="btn-primary" style="width: auto; padding: 14px 32px;"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
-            <a href="#directory" class="btn-secondary-link" style="margin: 0; padding: 14px 32px;">Browse Directory</a>
+        <div class="flex-center gap-4 flex-wrap">
+            <a href="{% url 'signup' %}" class="btn-primary w-auto btn-large"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
+            <a href="#directory" class="btn-secondary-link m-0 btn-large">Browse Directory</a>
         </div>
     </section>
 </div>

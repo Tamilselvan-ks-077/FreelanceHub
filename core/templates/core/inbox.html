@@ -3,35 +3,36 @@
 {% block title %}Messages Inbox | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 800px; padding-top: 40px;">
-    <div class="card" style="padding: 32px;">
-        <div style="margin-bottom: 24px;">
-            <h1 style="font-family: var(--font-outfit); font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-comments text-accent"></i> Messages & Inbox</h1>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">Select an active conversation to view message history and send direct proposals</p>
+<div class="container-md animate-fade-in">
+    <div class="card p-7">
+        <div class="mb-6">
+            <h1 class="text-h1 mb-1"><i class="fa-solid fa-comments text-accent"></i> Messages & Inbox</h1>
+            <p class="text-secondary text-body">Select an active conversation to view message history and send direct proposals</p>
         </div>
         
-        <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="flex-column gap-3">
             {% for partner in partners %}
-                <a href="{% url 'chat' partner.user.username %}" class="card" style="display: flex; align-items: center; gap: 16px; padding: 18px; text-decoration: none; color: inherit; background: var(--bg-surface);">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--brand-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-family: var(--font-outfit);">
+                <a href="{% url 'chat' partner.user.username %}" class="card inbox-item">
+                    <div class="inbox-avatar">
                         {{ partner.user.username|slice:":2"|upper }}
                     </div>
-                    <div style="flex: 1;">
-                        <h4 style="font-size: 1rem; margin-bottom: 2px; font-weight: 700;">
+                    <div class="flex-1">
+                        <h4 class="text-h3 mb-1">
                             {{ partner.user.username }}
                             {% if partner.is_verified %}
-                                <i class="fa-solid fa-circle-check" style="color: var(--success);" title="Verified Account"></i>
+                                <i class="fa-solid fa-circle-check text-success" title="Verified Account"></i>
                             {% endif %}
                         </h4>
-                        <p style="font-size: 0.85rem; color: var(--text-tertiary); margin: 0;">{{ partner.title|default:"Professional Consultant" }}</p>
+                        <p class="text-caption m-0">{{ partner.title|default:"Professional Consultant" }}</p>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: var(--text-tertiary);"></i>
+                    <i class="fa-solid fa-chevron-right text-caption"></i>
                 </a>
             {% empty %}
-                <div style="text-align: center; padding: 50px 20px; color: var(--text-tertiary);">
-                    <i class="fa-regular fa-comments" style="font-size: 3rem; margin-bottom: 12px;"></i>
-                    <p style="font-size: 0.95rem;">No active conversations. Explore the talent directory to message freelancers!</p>
-                    <a href="{% url 'home' %}" class="btn-primary" style="display: inline-block; width: auto; margin-top: 16px;">Browse Talent Directory</a>
+                <div class="empty-state">
+                    <i class="fa-regular fa-comments"></i>
+                    <h3>No Active Conversations</h3>
+                    <p>No active conversations. Explore the talent directory to message freelancers!</p>
+                    <a href="{% url 'home' %}" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Browse Talent Directory</a>
                 </div>
             {% endfor %}
         </div>

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <div class="chat-main-container">
+    <div class="chat-main-container animate-fade-in">
         <!-- Left Pane: Active Chat Partners -->
         <aside class="chat-sidebar">
             <div class="chat-sidebar-header">
@@ -13,16 +13,16 @@
             <div class="chat-sidebar-list">
                 {% for p in partners %}
                     <a href="{% url 'chat' p.user.username %}" class="chat-list-item {% if p.user == partner %}active{% endif %}">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                        <div class="chat-avatar">
                             {{ p.user.username|slice:":2"|upper }}
                         </div>
-                        <div style="flex: 1; min-width: 0;">
+                        <div class="flex-1">
                             <div class="chat-user-name">{{ p.user.username }}</div>
                             <div class="chat-last-msg">{{ p.title|default:"Freelance Professional" }}</div>
                         </div>
                     </a>
                 {% empty %}
-                    <p style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 0.85rem;">No other active conversations.</p>
+                    <p class="text-center text-secondary p-4 text-body">No other active conversations.</p>
                 {% endfor %}
             </div>
         </aside>
@@ -30,16 +30,16 @@
         <!-- Right Pane: Active Thread -->
         <section class="chat-window">
             <div class="chat-window-header">
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--brand-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                <div class="chat-avatar">
                     {{ partner.username|slice:":2"|upper }}
                 </div>
-                <div style="flex: 1;">
-                    <div style="font-weight: 700; color: var(--text-primary);">{{ partner.username }}</div>
-                    <span style="font-size: 0.78rem; color: var(--success);"><i class="fa-solid fa-circle" style="font-size: 0.6rem;"></i> Active Now</span>
+                <div class="flex-1">
+                    <div class="text-h3">{{ partner.username }}</div>
+                    <span class="text-caption text-success"><i class="fa-solid fa-circle text-success text-xxs"></i> Active Now</span>
                 </div>
                 
                 {% if partner.profile.role == 'freelancer' %}
-                    <a href="{% url 'talent_detail' partner.profile.id %}" class="btn-secondary-small" style="background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-secondary);"><i class="fa-solid fa-user"></i> View Profile</a>
+                    <a href="{% url 'talent_detail' partner.profile.id %}" class="btn-secondary-small"><i class="fa-solid fa-user"></i> View Profile</a>
                 {% endif %}
             </div>
 
@@ -49,23 +49,24 @@
                     <div class="message-row {% if msg.sender == user %}sent{% else %}received{% endif %}">
                         <div class="message-bubble">
                             {% if msg.body %}
-                                <p style="margin: 0; word-break: break-word;">{{ msg.body }}</p>
+                                <p class="m-0 word-break-word">{{ msg.body }}</p>
                             {% endif %}
                             
                             {% if msg.attachment %}
-                                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.82rem;">
+                                <div class="chat-attachment-box">
                                     <i class="fa-solid fa-paperclip"></i> 
-                                    <a href="{{ msg.attachment.url }}" target="_blank" download style="color: inherit; text-decoration: underline;">
+                                    <a href="{{ msg.attachment.url }}" target="_blank" download class="text-underline">
                                         {{ msg.attachment.name|default:"Attachment" }}
                                     </a>
                                 </div>
                             {% endif %}
-                            <span style="font-size: 0.7rem; opacity: 0.75; display: block; text-align: right; margin-top: 4px;">{{ msg.created_at|date:"H:i" }}</span>
+                            <span class="chat-msg-time">{{ msg.created_at|date:"H:i" }}</span>
                         </div>
                     </div>
                 {% empty %}
-                    <div style="text-align: center; color: var(--text-tertiary); margin: auto; padding: 40px;">
-                        <i class="fa-regular fa-comment-dots" style="font-size: 3rem; margin-bottom: 12px;"></i>
+                    <div class="empty-state">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <h3>No Messages</h3>
                         <p>No messages yet. Send a proposal or greeting to start chatting!</p>
                     </div>
                 {% endfor %}
@@ -74,16 +75,16 @@
             <!-- Input Form -->
             <form method="POST" action="{% url 'chat' partner.username %}" enctype="multipart/form-data" class="chat-input-form">
                 {% csrf_token %}
-                <label for="chat_attachment" style="cursor: pointer; padding: 10px; color: var(--text-tertiary);" title="Attach File">
-                    <i class="fa-solid fa-paperclip" style="font-size: 1.2rem;"></i>
-                    <input type="file" name="attachment" id="chat_attachment" style="display:none;" onchange="updateFileName(this)">
+                <label for="chat_attachment" class="chat-attachment-trigger" title="Attach File">
+                    <i class="fa-solid fa-paperclip text-h3"></i>
+                    <input type="file" name="attachment" id="chat_attachment" class="display-none" onchange="updateFileName(this)">
                 </label>
                 
                 <textarea name="body" placeholder="Write a message..." rows="1" id="chatTextarea" required></textarea>
                 
-                <button type="submit" class="btn-primary" style="width: auto; padding: 10px 18px;"><i class="fa-solid fa-paper-plane"></i></button>
+                <button type="submit" class="btn-primary w-auto p-3"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
-            <div id="file-selected-indicator" style="display:none; padding: 4px 16px; font-size: 0.78rem; color: var(--brand-primary); background: var(--bg-surface);"></div>
+            <div id="file-selected-indicator" class="file-indicator"></div>
         </section>
     </div>
 </div>
@@ -93,7 +94,7 @@
 <script>
     const chatLogs = document.getElementById('chatLogs');
     chatLogs.scrollTop = chatLogs.scrollHeight;
-
+ 
     function updateFileName(input) {
         const indicator = document.getElementById('file-selected-indicator');
         if (input.files && input.files.length > 0) {

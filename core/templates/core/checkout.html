@@ -3,34 +3,34 @@
 {% block title %}Escrow Payment Checkout | FreelanceHub{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 540px; padding-top: 40px;">
-    <div class="card" style="padding: 32px;">
-        <div style="text-align: center; margin-bottom: 24px;">
-            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--brand-light); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 12px; box-shadow: var(--shadow-sm);">
+<div class="container-sm animate-fade-in">
+    <div class="card p-7">
+        <div class="text-center mb-6 flex-column align-center">
+            <div class="auth-icon-ring">
                 <i class="fa-solid fa-lock"></i>
             </div>
-            <h1 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800; margin-bottom: 4px;">Escrow Payment Checkout</h1>
-            <p style="color: var(--text-secondary); font-size: 0.92rem;">Funds are held safely in escrow until project completion</p>
+            <h1 class="text-h1 mb-1">Escrow Payment Checkout</h1>
+            <p class="text-secondary text-body m-0">Funds are held safely in escrow until project completion</p>
         </div>
         
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-            <h4 style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 12px;">Invoice Summary</h4>
-            <ul style="list-style: none; margin: 0; padding: 0;">
-                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
-                    <span style="color: var(--text-tertiary);">Invoice ID</span>
+        <div class="bg-surface border-subtle radius-md p-5 mb-6">
+            <h4 class="text-caption mb-3">Invoice Summary</h4>
+            <ul class="invoice-summary-list">
+                <li>
+                    <span class="text-secondary">Invoice ID</span>
                     <strong>#INV-{{ invoice.id }}</strong>
                 </li>
-                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
-                    <span style="color: var(--text-tertiary);">Booking Ref</span>
+                <li>
+                    <span class="text-secondary">Booking Ref</span>
                     <strong>#{{ invoice.booking.id }}</strong>
                 </li>
-                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem;">
-                    <span style="color: var(--text-tertiary);">Freelancer</span>
+                <li>
+                    <span class="text-secondary">Freelancer</span>
                     <strong>{{ invoice.booking.freelancer.username }}</strong>
                 </li>
-                <li style="display: flex; justify-content: space-between; padding: 10px 0 0; font-size: 0.95rem;">
-                    <span style="font-weight: 700;">Total Amount Due</span>
-                    <strong style="color: var(--brand-primary); font-size: 1.25rem; font-family: var(--font-outfit);">${{ invoice.amount }}</strong>
+                <li class="align-center">
+                    <span class="text-h3">Total Amount Due</span>
+                    <strong class="text-accent text-h1">${{ invoice.amount }}</strong>
                 </li>
             </ul>
         </div>
@@ -38,7 +38,7 @@
         <form method="POST" action="{% url 'pay_invoice' invoice.id %}">
             {% csrf_token %}
             
-            <div class="form-group">
+            <div class="form-field">
                 <label for="payment_method">Payment Method</label>
                 <select name="payment_method" id="payment_method" required>
                     <option value="credit_card">Credit / Debit Card</option>
@@ -48,25 +48,25 @@
                 </select>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-                <div class="form-group" style="margin: 0;">
+            <div class="flex-column gap-3 mb-5">
+                <div class="form-field m-0">
                     <label>Card Number</label>
-                    <input type="text" placeholder="xxxx xxxx xxxx xxxx" disabled value="4111 2222 3333 4444" style="opacity: 0.65;">
+                    <input type="text" placeholder="xxxx xxxx xxxx xxxx" disabled value="4111 2222 3333 4444" class="opacity-75">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group" style="margin: 0;">
+                <div class="grid-2">
+                    <div class="form-field m-0">
                         <label>Expiry Date</label>
-                        <input type="text" placeholder="MM/YY" disabled value="12/28" style="opacity: 0.65;">
+                        <input type="text" placeholder="MM/YY" disabled value="12/28" class="opacity-75">
                     </div>
-                    <div class="form-group" style="margin: 0;">
+                    <div class="form-field m-0">
                         <label>CVV</label>
-                        <input type="password" placeholder="***" disabled value="123" style="opacity: 0.65;">
+                        <input type="password" placeholder="***" disabled value="123" class="opacity-75">
                     </div>
                 </div>
             </div>
             
-            <button type="submit" class="btn-primary" style="margin-bottom: 12px;"><i class="fa-solid fa-lock"></i> Authorize & Pay ${{ invoice.amount }}</button>
-            <a href="{% url 'dashboard' %}" class="btn-secondary-link" style="margin: 0;">Cancel Payment</a>
+            <button type="submit" class="btn-primary mb-3"><i class="fa-solid fa-lock"></i> Authorize & Pay ${{ invoice.amount }}</button>
+            <a href="{% url 'dashboard' %}" class="btn-secondary-link m-0">Cancel Payment</a>
         </form>
     </div>
 </div>

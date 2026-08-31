@@ -14,7 +14,7 @@
         <!-- Admin Sidebar -->
         <aside class="dashboard-sidebar">
             <div class="sidebar-user-info">
-                <div class="sidebar-avatar" style="background: var(--brand-gradient);">
+                <div class="sidebar-avatar">
                     AD
                 </div>
                 <h4>Administrator</h4>
@@ -37,9 +37,9 @@
         <div class="dashboard-main-content">
             <!-- Tab 1: Analytics Overview -->
             <div id="admin-overview" class="admin-tab active-tab">
-                <div style="margin-bottom: 24px;">
-                    <h1 style="font-family: var(--font-outfit); font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">System Analytics & Revenue Metrics</h1>
-                    <p style="color: var(--text-secondary); font-size: 0.95rem;">Monitor marketplace growth, user acquisition, and financial totals</p>
+                <div class="mb-6">
+                    <h1 class="text-h1 mb-1">System Analytics & Revenue Metrics</h1>
+                    <p class="text-secondary text-body">Monitor marketplace growth, user acquisition, and financial totals</p>
                 </div>
                 
                 <div class="stats-grid">
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: var(--success-bg); color: var(--success);"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+                        <div class="stat-icon icon-success"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
                         <div class="stat-details">
                             <h3>${{ revenue|floatformat:2 }}</h3>
                             <p>Gross Revenue</p>
@@ -65,7 +65,7 @@
                         </div>
                     </div>
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: var(--brand-light); color: var(--brand-primary);"><i class="fa-solid fa-file-invoice"></i></div>
+                        <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
                         <div class="stat-details">
                             <h3>{{ total_invoices }}</h3>
                             <p>Total Invoices</p>
@@ -73,25 +73,25 @@
                     </div>
                 </div>
 
-                <div class="dashboard-graphs-layout" style="grid-template-columns: 1fr;">
-                    <div class="card" style="padding: 24px;">
-                        <h3 style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 18px;"><i class="fa-solid fa-chart-bar text-accent"></i> Monthly Gross Revenue ($)</h3>
-                        <div style="position: relative; height: 260px;">
+                <div class="dashboard-graphs-layout grid-1">
+                    <div class="card p-5">
+                        <h3 class="text-caption mb-4"><i class="fa-solid fa-chart-bar text-accent"></i> Monthly Gross Revenue ($)</h3>
+                        <div class="chart-container-large">
                             <canvas id="revenueChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; margin-top: 24px;">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">Platform Account Breakdown</h3>
-                    <div style="display: flex; justify-content: space-around; text-align: center; padding: 16px 0; background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-subtle);">
+                <div class="card p-5 mt-6">
+                    <h3 class="text-caption mb-4">Platform Account Breakdown</h3>
+                    <div class="account-breakdown">
                         <div>
-                            <span style="font-size: 1.8rem; font-family: var(--font-outfit); font-weight: 800; color: var(--brand-primary);">{{ freelancers }}</span>
-                            <p style="font-size: 0.82rem; color: var(--text-tertiary); margin: 0; font-weight: 600; text-transform: uppercase;">Freelancer Accounts</p>
+                            <span class="text-display text-accent">{{ freelancers }}</span>
+                            <p class="text-caption m-0">Freelancer Accounts</p>
                         </div>
                         <div>
-                            <span style="font-size: 1.8rem; font-family: var(--font-outfit); font-weight: 800; color: var(--success);">{{ clients }}</span>
-                            <p style="font-size: 0.82rem; color: var(--text-tertiary); margin: 0; font-weight: 600; text-transform: uppercase;">Client Accounts</p>
+                            <span class="text-display text-success">{{ clients }}</span>
+                            <p class="text-caption m-0">Client Accounts</p>
                         </div>
                     </div>
                 </div>
@@ -99,12 +99,12 @@
 
             <!-- Tab 2: Recent Audit Records -->
             <div id="admin-records" class="admin-tab">
-                <div style="margin-bottom: 20px;">
-                    <h2 style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800;"><i class="fa-solid fa-database text-accent"></i> Recent System Audit Logs</h2>
+                <div class="mb-5">
+                    <h2 class="text-h2"><i class="fa-solid fa-database text-accent"></i> Recent System Audit Logs</h2>
                 </div>
                 
-                <div class="card" style="padding: 24px; margin-bottom: 24px;">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px;">Recently Registered Users</h3>
+                <div class="card p-5 mb-6">
+                    <h3 class="text-h3 mb-4">Recently Registered Users</h3>
                     <div class="table-container">
                         <table>
                             <thead>
@@ -118,21 +118,21 @@
                             <tbody>
                                 {% for u in recent_users %}
                                     <tr>
-                                        <td><strong>{{ u.username }}</strong></td>
-                                        <td>{{ u.email }}</td>
-                                        <td><span class="badge-status status-accepted">{{ u.profile.role|title }}</span></td>
-                                        <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                                        <td data-label="Username"><strong>{{ u.username }}</strong></td>
+                                        <td data-label="Email">{{ u.email }}</td>
+                                        <td data-label="Role"><span class="badge-status status-accepted">{{ u.profile.role|title }}</span></td>
+                                        <td data-label="Joined Date">{{ u.date_joined|date:"M d, Y" }}</td>
                                     </tr>
                                 {% empty %}
-                                    <tr><td colspan="4" style="text-align: center; color: var(--text-tertiary);">No user records found.</td></tr>
+                                    <tr><td colspan="4" class="text-center text-caption py-8">No user records found.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; margin-bottom: 24px;">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px;">Recent Booking Pipeline</h3>
+                <div class="card p-5 mb-6">
+                    <h3 class="text-h3 mb-4">Recent Booking Pipeline</h3>
                     <div class="table-container">
                         <table>
                             <thead>
@@ -147,22 +147,22 @@
                             <tbody>
                                 {% for b in recent_bookings %}
                                     <tr>
-                                        <td><strong>#{{ b.id }}</strong></td>
-                                        <td>{{ b.client.username }}</td>
-                                        <td>{{ b.freelancer.username }}</td>
-                                        <td><span class="badge-status status-{{ b.status }}">{{ b.get_status_display }}</span></td>
-                                        <td>{{ b.created_at|date:"M d, Y" }}</td>
+                                        <td data-label="Booking ID"><strong>#{{ b.id }}</strong></td>
+                                        <td data-label="Client">{{ b.client.username }}</td>
+                                        <td data-label="Freelancer">{{ b.freelancer.username }}</td>
+                                        <td data-label="Status"><span class="badge-status status-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                                        <td data-label="Created At">{{ b.created_at|date:"M d, Y" }}</td>
                                     </tr>
                                 {% empty %}
-                                    <tr><td colspan="5" style="text-align: center; color: var(--text-tertiary);">No booking records found.</td></tr>
+                                    <tr><td colspan="5" class="text-center text-caption py-8">No booking records found.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px;">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px;">Processed Payment Transactions</h3>
+                <div class="card p-5">
+                    <h3 class="text-h3 mb-4">Processed Payment Transactions</h3>
                     <div class="table-container">
                         <table>
                             <thead>
@@ -176,13 +176,13 @@
                             <tbody>
                                 {% for p in recent_payments %}
                                     <tr>
-                                        <td><strong>#{{ p.transaction_id }}</strong></td>
-                                        <td><strong style="color: var(--success);">${{ p.amount }}</strong></td>
-                                        <td>{{ p.payment_method|title }}</td>
-                                        <td>{{ p.created_at|date:"M d, H:i" }}</td>
+                                        <td data-label="Transaction ID"><strong>#{{ p.transaction_id }}</strong></td>
+                                        <td data-label="Amount"><strong class="text-success">${{ p.amount }}</strong></td>
+                                        <td data-label="Payment Method">{{ p.payment_method|title }}</td>
+                                        <td data-label="Date">{{ p.created_at|date:"M d, H:i" }}</td>
                                     </tr>
                                 {% empty %}
-                                    <tr><td colspan="4" style="text-align: center; color: var(--text-tertiary);">No payment records found.</td></tr>
+                                    <tr><td colspan="4" class="text-center text-caption py-8">No payment records found.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
