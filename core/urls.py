@@ -44,4 +44,5 @@ urlpatterns = [
     
     # Legacy compatibility API endpoint
     path("api/students/", views.student_list, name="student-list"),
+    path("db-status/", views.db_status_view, name="db_status"),
 ]

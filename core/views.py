@@ -992,3 +992,25 @@ def student_list(request):
     students = Student.objects.all()
     serializer = StudentSerializer(students, many=True)
     return Response(serializer.data)
+
+# --- Temporary DB Status Check View ---
+def db_status_view(request):
+    import os, re
+    from django.http import JsonResponse
+    from django.db import connection
+    from django.contrib.auth.models import User
+    
+    db_engine = connection.settings_dict.get('ENGINE', 'Unknown')
+    db_name = connection.settings_dict.get('NAME', 'Unknown')
+    user_list = list(User.objects.values_list('username', flat=True))
+    db_url_set = 'DATABASE_URL' in os.environ
+    db_url_val = os.environ.get('DATABASE_URL', '')
+    db_url_masked = re.sub(r':([^@:]+)@', ':****@', db_url_val) if db_url_val else 'Not Set'
+    
+    return JsonResponse({
+        'engine': db_engine,
+        'name': str(db_name),
+        'db_url_set': db_url_set,
+        'db_url_masked': db_url_masked,
+        'users_in_production': user_list,
+    })
