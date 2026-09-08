@@ -159,7 +159,7 @@ def api_me(request):
         profile = user.profile
         role = profile.role
         profile_id = profile.id
-        avatar = request.build_absolute_uri(profile.profile_picture.url) if profile.profile_picture else None
+        avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
     except Exception:
         role = 'client'
         profile_id = None
@@ -216,7 +216,7 @@ def api_profile(request):
             'hourly_rate': float(profile.hourly_rate) if profile.hourly_rate else None,
             'location': profile.location or '',
             'availability': profile.availability,
-            'profile_picture': request.build_absolute_uri(profile.profile_picture.url) if profile.profile_picture else None,
+            'avatar_url': request.build_absolute_uri(profile.avatar.url) if profile.avatar else None,
             'github_url': profile.github_url or '',
             'linkedin_url': profile.linkedin_url or '',
             'website_url': profile.website_url or '',
@@ -240,8 +240,8 @@ def api_profile(request):
         except (ValueError, TypeError):
             pass
 
-    if 'profile_picture' in request.FILES:
-        profile.profile_picture = request.FILES['profile_picture']
+    if 'avatar' in request.FILES:
+        profile.avatar = request.FILES['avatar']
 
     profile.save()
 
@@ -301,9 +301,18 @@ def api_freelancers(request):
     except ValueError:
         pass
 
-    avail = request.GET.get('availability', '').strip()
+    avail = request.GET.get('availability', '').strip().lower()
     if avail:
-        profiles = profiles.filter(availability=avail)
+        # Convert common string representations to boolean
+        if avail in ('true', 'available', '1'):
+            bool_val = True
+        elif avail in ('false', 'unavailable', 'busy', '0'):
+            bool_val = False
+        else:
+            # Invalid value; ignore the filter
+            bool_val = None
+        if bool_val is not None:
+            profiles = profiles.filter(availability=bool_val)
 
     page = max(int(request.GET.get('page', 1) or 1), 1)
     per_page = 12
@@ -322,12 +331,12 @@ def api_freelancers(request):
         data.append({
             'id': profile.id,
             'username': profile.user.username,
-            'full_name': profile.full_name or profile.user.get_full_name() or profile.user.username,
+            'full_name': profile.user.get_full_name() or profile.user.username,
             'bio': (profile.bio or '')[:160],
             'location': profile.location or '',
             'hourly_rate': float(profile.hourly_rate) if profile.hourly_rate else None,
             'availability': profile.availability,
-            'profile_picture': request.build_absolute_uri(profile.profile_picture.url) if profile.profile_picture else None,
+            'avatar_url': request.build_absolute_uri(profile.avatar.url) if profile.avatar else None,
             'skills': skills[:5],
             'avg_rating': round(float(avg), 1) if avg else None,
             'review_count': Review.objects.filter(reviewee=profile.user).count(),
@@ -395,7 +404,7 @@ def api_freelancer_detail(request, profile_id):
         'hourly_rate': float(profile.hourly_rate) if profile.hourly_rate else None,
         'location': profile.location or '',
         'availability': profile.availability,
-        'profile_picture': request.build_absolute_uri(profile.profile_picture.url) if profile.profile_picture else None,
+        'avatar_url': request.build_absolute_uri(profile.avatar.url) if profile.avatar else None,
         'github_url': profile.github_url or '',
         'linkedin_url': profile.linkedin_url or '',
         'website_url': profile.website_url or '',

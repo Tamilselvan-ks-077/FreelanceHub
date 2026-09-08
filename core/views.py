@@ -146,12 +146,6 @@ def home(request):
     elif sort_by == 'most_completed':
         freelancers = freelancers.order_by('-completed_count')
 
-    # Recently Viewed (Session-based) - only complete profiles
-    recently_viewed_ids = request.session.get('recently_viewed', [])
-    recently_viewed = []
-    if recently_viewed_ids:
-        recently_viewed = Profile.objects.public_freelancers().filter(id__in=recently_viewed_ids).select_related('user')
-
     return render(request, "core/home.html", {
         "freelancers": freelancers,
         "query": query,

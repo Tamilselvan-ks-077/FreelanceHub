@@ -10,15 +10,27 @@
 <section class="commercial-hero animate-fade-in">
     <div class="container">
         <div class="hero-badge-trust">
+            <span class="badge-pulse-dot"></span>
             <i class="fa-solid fa-shield-halved"></i> Verified Experts & Global Talent Network
         </div>
         <h1>Hire Verified <span>Freelance Talent</span></h1>
         <p>Connect instantly with elite software engineers, UI/UX designers, and technology consultants ready to build your project.</p>
         
         <form method="GET" action="{% url 'home' %}" class="hero-search-box">
-            <input type="text" name="q" value="{{ query }}" placeholder="Search by name, skill, or role (e.g. Django, React, Senior Architect)..." maxlength="100">
-            <button type="submit" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search Talent</button>
+            <i class="fa-solid fa-magnifying-glass search-box-icon"></i>
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by name, skill, or role (e.g. Django, React, Senior Architect)..." maxlength="100" autocomplete="off">
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-arrow-right"></i> Search Talent</button>
         </form>
+
+        <div class="hero-quick-tags">
+            <span class="quick-tag-label">Popular searches:</span>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('React')">React</button>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('Django')">Django</button>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('Python')">Python</button>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('UI/UX')">UI/UX Design</button>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('Next.js')">Next.js</button>
+            <button type="button" class="quick-tag-btn" onclick="quickSearch('DevOps')">DevOps</button>
+        </div>
     </div>
 </section>
 
@@ -26,16 +38,25 @@
     <!-- Live Platform Statistics Ribbon -->
     <div class="platform-stats-ribbon animate-slide-up">
         <div class="stat-item">
-            <h4>{{ freelancers|length }}</h4>
-            <p>Available Experts</p>
+            <div class="stat-icon"><i class="fa-solid fa-users-gear"></i></div>
+            <div class="stat-item-content">
+                <h4>{{ freelancers|length|default:"500+" }}</h4>
+                <p>Available Experts</p>
+            </div>
         </div>
         <div class="stat-item">
-            <h4>Escrow Secured</h4>
-            <p>Project Payments</p>
+            <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="stat-item-content">
+                <h4>Escrow Secured</h4>
+                <p>Project Payments</p>
+            </div>
         </div>
         <div class="stat-item">
-            <h4>Verified Net</h4>
-            <p>Vetted Profiles Only</p>
+            <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-item-content">
+                <h4>Verified Net</h4>
+                <p>Vetted Profiles Only</p>
+            </div>
         </div>
     </div>
 

@@ -1,101 +1,184 @@
 .talent-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  overflow: hidden;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  transition: all var(--transition-normal);
+  height: 100%;
 }
-.talent-card:hover { transform: var(--hover-lift); }
+
+.talent-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-100);
+}
+
+@media (prefers-color-scheme: dark) {
+  .talent-card:hover {
+    border-color: var(--brand-900);
+  }
+}
 
 .talent-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: var(--space-4);
 }
 
-.talent-avatar-link { text-decoration: none; }
+.talent-avatar-link {
+  text-decoration: none;
+}
 
 .fav-btn {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
   color: var(--text-tertiary);
-  transition: var(--transition-premium);
-  padding: var(--space-1);
+  transition: all var(--transition-fast);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
-.fav-btn:hover, .fav-btn.active { color: hsl(355, 78%, 56%); transform: scale(1.15); }
+
+.fav-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border-color: #fecaca;
+  transform: scale(1.05);
+}
+
+.fav-btn.active {
+  color: #ef4444;
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+.heart-filled {
+  fill: currentColor;
+}
 
 .talent-card-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   text-decoration: none;
   color: inherit;
+  flex: 1;
+}
+
+.talent-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .talent-name {
-  font-family: var(--font-outfit);
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
+}
+
+.talent-title {
+  font-size: 0.875rem;
+  color: var(--brand-600);
+  font-weight: 500;
+}
+
+.talent-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .talent-location {
-  font-size: var(--text-caption);
-  color: var(--text-tertiary);
-}
-
-.talent-bio {
-  font-size: var(--text-caption);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.5;
 }
 
 .stars-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
+
+.star-icon.filled {
+  color: #fbbf24;
+  fill: #fbbf24;
+}
+
 .rating-text {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
+
+.rating-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .no-rating {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-tertiary);
   font-style: italic;
+}
+
+.talent-bio {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .talent-card-footer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-top: auto;
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border-subtle);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
 }
 
 .talent-skills {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
-.talent-meta {
+.talent-meta-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.talent-rate-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
 .talent-rate {
-  font-family: var(--font-outfit);
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1rem;
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.talent-rate-suffix {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }

@@ -1,8 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { freelancerAPI, bookingAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import EmptyState from '../components/EmptyState';
+import Avatar from '../components/ui/Avatar';
+import Badge from '../components/ui/Badge';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import { MapPin, Star, Heart, Calendar, Briefcase, ExternalLink } from 'lucide-react';
 import './TalentDetailPage.css';
 
 export default function TalentDetailPage() {
@@ -52,168 +57,251 @@ export default function TalentDetailPage() {
 
   if (loading) {
     return (
-      <div className="container page-content">
-        <div className="skeleton skeleton-card" style={{ height: 400 }} />
+      <div className="container page-content mt-12">
+        <div className="talent-detail-grid">
+          <div className="main-col">
+            <div className="glass rounded-xl p-8 mb-6" style={{ height: '300px' }} />
+            <div className="glass rounded-xl p-8 mb-6" style={{ height: '200px' }} />
+          </div>
+          <div className="sidebar-col">
+            <div className="glass rounded-xl p-8" style={{ height: '400px' }} />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="container page-content">
+      <div className="container page-content mt-12">
         <EmptyState icon="😕" title="Freelancer not found" message="This profile might have been removed." />
       </div>
     );
   }
 
+  // Mock title if backend doesn't provide
+  const professionalTitle = profile.title || "Freelance Professional";
+
   return (
-    <div className="container page-content">
-      <div className="talent-detail-grid">
-        {/* Main Content */}
-        <div className="main-col">
-          <div className="card talent-header-card animate-in">
-            <div className="talent-header-info">
-              {profile.profile_picture ? (
-                <img src={profile.profile_picture} alt={profile.full_name} className="avatar avatar-xl" />
-              ) : (
-                <span className="avatar avatar-xl avatar-placeholder">{profile.full_name[0]}</span>
-              )}
-              <div className="talent-header-text">
-                <h1>{profile.full_name}</h1>
-                {profile.location && <p className="location">📍 {profile.location}</p>}
-                
-                <div className="talent-meta-tags">
-                  <span className={`badge badge-${profile.availability === 'available' ? 'success' : profile.availability === 'busy' ? 'warning' : 'danger'}`}>
-                    {profile.availability}
+    <div className="talent-detail-page">
+      {/* Profile Header Banner Area */}
+      <div className="profile-banner">
+        <div className="container">
+          <div className="profile-header-content">
+            <div className="profile-avatar-wrapper">
+              <Avatar 
+                src={profile.profile_picture} 
+                fallback={profile.full_name[0]} 
+                size="xl" 
+                className="profile-main-avatar"
+              />
+            </div>
+            
+            <div className="profile-header-info">
+              <div className="profile-name-row">
+                <h1 className="profile-name">{profile.full_name}</h1>
+                <Badge variant={
+                  profile.availability === 'available' ? 'success' : 
+                  profile.availability === 'busy' ? 'warning' : 'error'
+                } className="availability-badge">
+                  {profile.availability}
+                </Badge>
+              </div>
+              
+              <p className="profile-title">{professionalTitle}</p>
+              
+              <div className="profile-meta-row">
+                {profile.location && (
+                  <span className="profile-meta-item">
+                    <MapPin size={16} />
+                    {profile.location}
                   </span>
-                  {profile.hourly_rate && (
-                    <span className="rate-badge">₹{profile.hourly_rate}/hr</span>
-                  )}
-                </div>
+                )}
+                <span className="profile-meta-item">
+                  <Star className="star-icon filled" size={16} />
+                  <strong>{profile.avg_rating || 'New'}</strong> 
+                  {profile.review_count > 0 && ` (${profile.review_count} reviews)`}
+                </span>
+                {profile.hourly_rate && (
+                  <span className="profile-meta-item rate-highlight">
+                    ₹{profile.hourly_rate}/hr
+                  </span>
+                )}
               </div>
             </div>
-
-            <div className="talent-actions">
+            
+            <div className="profile-header-actions">
               {user && user.id !== profile.user_id && (
-                <button
-                  className={`btn btn-secondary ${profile.is_favourite ? 'fav-active' : ''}`}
+                <Button 
+                  variant={profile.is_favourite ? "secondary" : "outline"} 
                   onClick={handleToggleFav}
+                  icon={Heart}
+                  className={profile.is_favourite ? "text-red-500" : ""}
                 >
-                  {profile.is_favourite ? '♥ Saved' : '♡ Save'}
-                </button>
+                  {profile.is_favourite ? 'Saved' : 'Save'}
+                </Button>
               )}
             </div>
-          </div>
-
-          <div className="card animate-in" style={{ animationDelay: '0.1s' }}>
-            <h2 className="section-title">About</h2>
-            <p className="bio-text">{profile.bio || 'No bio provided.'}</p>
-
-            <h3 className="subsection-title">Skills</h3>
-            <div className="skills-wrap">
-              {profile.skills.map(s => <span key={s} className="badge badge-primary">{s}</span>)}
-            </div>
-          </div>
-
-          <div className="card animate-in" style={{ animationDelay: '0.15s' }}>
-            <h2 className="section-title">Portfolio</h2>
-            {profile.portfolio.length > 0 ? (
-              <div className="portfolio-grid">
-                {profile.portfolio.map(p => (
-                  <div key={p.id} className="portfolio-item">
-                    {p.image && <img src={p.image} alt={p.title} className="portfolio-img" />}
-                    <h4>{p.title}</h4>
-                    <p>{p.description}</p>
-                    {p.external_link && <a href={p.external_link} target="_blank" rel="noopener noreferrer">View Link</a>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted">No portfolio items added yet.</p>
-            )}
-          </div>
-
-          <div className="card animate-in" style={{ animationDelay: '0.2s' }}>
-            <h2 className="section-title">Reviews ({profile.review_count})</h2>
-            {profile.reviews.length > 0 ? (
-              <div className="reviews-list">
-                {profile.reviews.map(r => (
-                  <div key={r.id} className="review-item">
-                    <div className="review-header">
-                      <strong>{r.reviewer}</strong>
-                      <span className="stars">
-                        {[1,2,3,4,5].map(i => (
-                          <span key={i} className={`star ${i <= r.rating ? '' : 'empty'}`}>★</span>
-                        ))}
-                      </span>
-                    </div>
-                    <p>{r.comment}</p>
-                    <small className="text-muted">{new Date(r.created_at).toLocaleDateString()}</small>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted">No reviews yet.</p>
-            )}
           </div>
         </div>
+      </div>
 
-        {/* Sidebar */}
-        <div className="sidebar-col">
-          <div className="card sticky-card animate-in" style={{ animationDelay: '0.25s' }}>
-            <h3 className="section-title">Book this Talent</h3>
+      <div className="container page-content content-overlap">
+        <div className="talent-detail-grid">
+          {/* Main Content */}
+          <div className="main-col">
             
-            {user ? (
-              user.id === profile.user_id ? (
-                <p className="text-muted text-center">This is your profile.</p>
-              ) : (
-                <form onSubmit={handleBookingSubmit} className="booking-form">
-                  {bookingStatus && <div className="alert alert-success">{bookingStatus}</div>}
-                  {bookingError && <div className="alert alert-danger">{bookingError}</div>}
-
-                  <div className="form-group">
-                    <label>Start Date</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={bookingForm.start_date}
-                      onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>End Date</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={bookingForm.end_date}
-                      onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Project Details</label>
-                    <textarea
-                      className="form-control"
-                      value={bookingForm.description}
-                      onChange={e => setBookingForm({ ...bookingForm, description: e.target.value })}
-                      required
-                      placeholder="Describe the work..."
-                    ></textarea>
-                  </div>
-                  <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                    Send Request
-                  </button>
-                </form>
-              )
-            ) : (
-              <div className="text-center">
-                <p style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
-                  Log in to book {profile.full_name}.
-                </p>
-                <Link to="/login" className="btn btn-primary" style={{ width: '100%' }}>Log In</Link>
+            {/* About Section */}
+            <section className="profile-section glass animate-in">
+              <h2 className="section-title">About</h2>
+              <p className="bio-text">{profile.bio || 'No bio provided.'}</p>
+              
+              <h3 className="subsection-title">Skills & Expertise</h3>
+              <div className="skills-wrap">
+                {profile.skills.map(s => (
+                  <Badge key={s} variant="neutral" className="skill-badge">{s}</Badge>
+                ))}
               </div>
-            )}
+            </section>
+
+            {/* Portfolio Section */}
+            <section className="profile-section glass animate-in" style={{ animationDelay: '0.1s' }}>
+              <h2 className="section-title">Portfolio</h2>
+              {profile.portfolio.length > 0 ? (
+                <div className="portfolio-grid">
+                  {profile.portfolio.map(p => (
+                    <div key={p.id} className="portfolio-card">
+                      {p.image ? (
+                        <div className="portfolio-img-wrapper">
+                          <img src={p.image} alt={p.title} className="portfolio-img" />
+                        </div>
+                      ) : (
+                        <div className="portfolio-img-placeholder">
+                          <Briefcase size={32} />
+                        </div>
+                      )}
+                      <div className="portfolio-card-content">
+                        <h4 className="portfolio-title">{p.title}</h4>
+                        <p className="portfolio-desc">{p.description}</p>
+                        {p.external_link && (
+                          <a href={p.external_link} target="_blank" rel="noopener noreferrer" className="portfolio-link">
+                            <ExternalLink size={14} /> View Project
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState icon="🖼️" title="No portfolio" message="This professional hasn't added any portfolio items yet." />
+              )}
+            </section>
+
+            {/* Reviews Section */}
+            <section className="profile-section glass animate-in" style={{ animationDelay: '0.2s' }}>
+              <h2 className="section-title">Reviews <span className="text-tertiary font-normal">({profile.review_count})</span></h2>
+              {profile.reviews.length > 0 ? (
+                <div className="reviews-list">
+                  {profile.reviews.map(r => (
+                    <div key={r.id} className="review-card">
+                      <div className="review-header">
+                        <div className="reviewer-info">
+                          <Avatar fallback={r.reviewer[0]} size="sm" />
+                          <div>
+                            <strong>{r.reviewer}</strong>
+                            <div className="review-date">{new Date(r.created_at).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                        <div className="review-rating">
+                          {[1,2,3,4,5].map(i => (
+                            <Star key={i} size={14} className={`star-icon ${i <= r.rating ? 'filled' : 'empty'}`} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="review-comment">{r.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState icon="⭐" title="No reviews yet" message="Be the first to work with and review this professional." />
+              )}
+            </section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="sidebar-col">
+            <div className="booking-card glass sticky-card animate-in" style={{ animationDelay: '0.3s' }}>
+              <h3 className="booking-title">Book this Professional</h3>
+              
+              {user ? (
+                user.id === profile.user_id ? (
+                  <div className="self-profile-notice">
+                    <p>This is your profile view.</p>
+                    <Button variant="outline" className="w-full mt-4" onClick={() => window.location.href='/profile/edit'}>
+                      Edit Profile
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="booking-form">
+                    {bookingStatus && (
+                      <div className="status-message success">
+                        {bookingStatus}
+                      </div>
+                    )}
+                    {bookingError && (
+                      <div className="status-message error">
+                        {bookingError}
+                      </div>
+                    )}
+
+                    <div className="form-row">
+                      <div className="form-group flex-1">
+                        <Input
+                          label="Start Date"
+                          type="date"
+                          value={bookingForm.start_date}
+                          onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group flex-1">
+                        <Input
+                          label="End Date"
+                          type="date"
+                          value={bookingForm.end_date}
+                          onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="ui-input-label mb-1 block">Project Details</label>
+                      <textarea
+                        className="ui-input custom-textarea"
+                        value={bookingForm.description}
+                        onChange={e => setBookingForm({ ...bookingForm, description: e.target.value })}
+                        required
+                        placeholder="Describe the scope of work, deliverables, and any specific requirements..."
+                        rows={4}
+                      ></textarea>
+                    </div>
+                    
+                    <Button type="submit" variant="primary" size="lg" className="w-full mt-2" icon={Calendar}>
+                      Send Booking Request
+                    </Button>
+                    <p className="booking-help">You won't be charged yet. The professional needs to accept first.</p>
+                  </form>
+                )
+              ) : (
+                <div className="login-prompt">
+                  <p>Log in or sign up to send a booking request to {profile.full_name}.</p>
+                  <Link to="/login">
+                    <Button variant="primary" className="w-full">Log In to Book</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

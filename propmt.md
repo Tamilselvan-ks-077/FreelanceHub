@@ -1,57 +1,618 @@
-You are acting as a senior frontend architect and UI/UX engineer working on an EXISTING production Django project called FreelanceHub (repo: https://github.com/Tamilselvan-ks-077/FreelanceHub). This is a full-stack freelancer marketplace with real backend logic — Bookings, Invoices, Payments, Reviews, Portfolio items, Favourites, Notifications, and a chat system — all already implemented in core/models.py and core/views.py. 
+You are a senior full-stack engineer, UI/UX designer, security engineer, and code reviewer.
 
-CRITICAL CONSTRAINT: You must NOT modify core/models.py, core/views.py, core/urls.py, core/serializers.py, core/admin.py, myapp/settings.py, or any migration files. All backend logic, authentication (Django's built-in auth + custom login/signup/logout views), API endpoints, database queries, and URL routing must continue to work exactly as they do today. You are ONLY authorized to modify:
-- core/templates/**/*.html (structure and classes, NOT template context variables — do not rename or remove any Django template variable like {{ freelancer.hourly_rate }}, {% url 'name' %} tags, {% csrf_token %}, or form field names/names attributes, since these are wired to backend views and forms)
-- core/static/core/css/style.css
-- core/static/core/js/main.js (may add new JS files under core/static/core/js/ for new interactive behavior, e.g. skeleton loaders, mobile table fallback)
+I have an existing production-style full-stack project called **FreelanceHub**.
 
-GOAL: Transform FreelanceHub's frontend from an inconsistent, inline-style-heavy interface into a premium, production-ready marketplace UI — in the visual quality tier of Linear, Stripe, Contra, and Upwork — WITHOUT copying their layouts, copy, or specific visual patterns. Do not use Upwork/Toptal branding language ("Top 3%", "Toptal-vetted") anywhere in the copy you write.
+### PROJECT STACK
 
-CURRENT STATE (verified from codebase):
-- core/static/core/css/style.css already contains a legitimate design token system (§1 DESIGN TOKENS in the file) — HSL-based CSS variables for colors, a dark/light theme via [data-theme] attribute, a 4-tier shadow elevation system, and named sections for nav/cards/hero/forms/dashboard/chat/tables/footer/responsive. EXTEND this system, do not replace it wholesale.
-- The single biggest problem: templates use extensive inline style="..." attributes (talent_detail.html has ~78, dashboard.html ~48, profile_edit.html ~54, checkout.html ~28, chat.html/inbox.html/notifications.html ~20 each) that duplicate what should be CSS classes, causing inconsistency and breaking responsive behavior (inline width/position:sticky rules are not reachable by the existing @media queries in §15 of style.css).
-- home.html and login.html both contain fabricated platform statistics ("10,000+ Vetted Experts", "98.4% Satisfaction Rate", "$25M+ Earned", "Toptal-Vetted & Verified Talent Network") and two fake testimonials. These must be REMOVED and replaced with either (a) real dynamically-computed numbers using existing model methods/querysets already in core/models.py (e.g. Profile.objects.public_freelancers().count(), Profile.get_average_rating(), Profile.get_completed_projects_count()), or (b) removed entirely if no real equivalent exists — never fabricate numbers.
-- Only 2 responsive breakpoints exist (991px, 768px) covering a limited set of class names — inline-styled layouts (notably talent_detail.html's 320px-wide sticky hiring sidebar, built with inline styles not classes) are NOT covered and will likely break or overflow on mobile.
-- Only one well-designed empty state exists (home.html's "No freelancers found") — dashboard tables (bookings, invoices) currently show a bare text string in a table cell for empty states with no icon/action.
-- No skeleton/loading states exist anywhere (Chart.js earnings graph, stat cards) — they currently pop in blank/zero on first paint.
-- login.html and signup.html are the CLEANEST, most class-based templates in the codebase (minimal inline styles) — use their component discipline as the reference pattern for componentizing the rest of the site.
+Frontend:
 
-EXECUTE THE FOLLOWING IN ORDER:
+* React
+* Vite
+* React Router
+* JavaScript/JSX
+* CSS
+* Responsive design
+* Reusable UI components
+* Design tokens
 
-STEP 1 — AUDIT
-Read every file in core/templates/core/ and core/static/core/css/style.css in full. Produce a written inventory (as a comment block or markdown file, do not just proceed silently) listing every inline style="..." occurrence per template file and every one-off font-size/color/spacing value that isn't already a design token. Confirm you understand which Django template variables and form field names must not be touched.
+Backend:
 
-STEP 2 — EXTEND THE DESIGN SYSTEM (style.css)
-Add the following NEW tokens/rules to the existing :root block and CSS file, without deleting or renaming any existing variable (existing templates depend on current variable names):
-- A typographic scale: --text-display, --text-h1, --text-h2, --text-h3, --text-body, --text-caption (sizes/weights/line-heights per a Stripe/Linear-quality scale: display ~3rem/800, h1 ~2rem/800, h2 ~1.5rem/700, h3 ~1.125rem/700, body ~0.95rem/400, caption ~0.8rem/600 uppercase tracked). Create matching utility classes (.text-display, .text-h1, etc.) so templates can replace inline font-size declarations.
-- An 8px-based spacing scale as CSS custom properties (--space-1: 4px through --space-12: 96px) and utility classes for common margin/padding/gap patterns currently hardcoded inline.
-- Formalize radius into --radius-sm (8px), --radius-md (12px), --radius-lg (16px) and apply consistently.
-- Add a .card-elevated variant distinct from the existing .card (for interactive/browsable surfaces like talent cards and portfolio items — subtle shadow-based elevation) while leaving .card itself for flat/data contexts (dashboard, tables).
-- Add a .btn-ghost variant (transparent background, text-colored, no border) for tertiary actions.
-- Add reusable component classes: .section-header (eyebrow + heading + subtext pattern), .empty-state (icon + heading + subtext + action button, matching the visual quality of the existing home.html empty state), .skeleton (shimmer loading placeholder, respecting prefers-reduced-motion), .form-field (label + input + inline error message slot with a visible red-bordered error state).
-- Expand @media breakpoints to three tiers: 1024px, 768px, 480px. Ensure ALL layout classes (including any new ones you create for talent_detail's hiring sidebar) collapse correctly at each tier — sticky sidebars must become static full-width below 1024px.
-- Add a mobile card-view fallback pattern for data tables (bookings, invoices) that switches from <table> to a stacked card layout below 768px without altering the underlying <table> markup structure or {% for %} loop logic — use CSS only (e.g. display:block conversions with data-label attributes) OR, if JS is required, add it as a new small script that only handles presentation, never data.
-- Reserve --brand-gradient usage to exactly two contexts going forward: hero headline highlight text and primary CTA buttons. Do not apply it to icon backgrounds, avatars, or decorative fills elsewhere — replace those with flat --brand-primary or --brand-light.
+* Python
+* Django
+* Django REST Framework
+* JWT authentication
+* SQLite currently
+* REST APIs
 
-STEP 3 — COMPONENTIZE TEMPLATES (remove inline styles)
-For every template in core/templates/core/, replace inline style="..." attributes with the new/existing CSS classes from Step 2, preserving 100% of the existing Django template logic ({% if %}, {% for %}, {{ variable }}, {% url %}, form field names, csrf_token). Do this file by file, verifying after each file that no template variable, URL name, or form field name was altered, removed, or renamed. Priority order (highest visual impact first): talent_detail.html, dashboard.html, profile_edit.html, home.html, checkout.html, chat.html, admin_dashboard.html, inbox.html, notifications.html, booking_edit.html. Use login.html and signup.html's existing minimal-inline-style approach as your quality reference for what "done" looks like.
+Project structure:
 
-STEP 4 — FIX HOME.HTML AND LOGIN.HTML CONTENT
-Remove all fabricated statistics and testimonials from home.html and login.html. Replace the stats ribbon with real numbers computed from the database via the existing view context (if the current view (core/views.py home function) does not already pass these numbers into context, do NOT modify views.py to add them — instead, in the template, either use the freelancers queryset already provided (e.g. {{ freelancers|length }}) for a real count, or remove the metric entirely if no real data is available in the current template context). Rewrite all hero/marketing copy to remove "Top 3%", "Toptal-vetted", and any Upwork/Toptal-derived phrasing, replacing it with original FreelanceHub-specific value propositions centered on the platform's real features: structured bookings with date ranges, escrow-style invoice/payment flow, direct per-booking chat rooms, and a verified/rating system.
+FreelanceHub/
+├── backend/
+│   └── myapp/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── components/ui/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── styles/
+│   │   └── assets/
+├── manage.py
+├── requirements.txt
+└── README.md
 
-STEP 5 — REDESIGN HIGHEST-IMPACT PAGES
-Using the new design system, redesign in this priority order: (1) home.html hero + talent directory + filters, (2) talent_detail.html full profile layout, (3) dashboard.html (both freelancer and client views, all three tabs), (4) profile_edit.html multi-section form. For each: apply the new typography/spacing scale, replace ad hoc card treatments with .card or .card-elevated as appropriate to content type, add empty states using the .empty-state component wherever a queryset can render zero results (bookings, invoices, portfolio items, reviews, favourites, notifications), and add .skeleton loading placeholders for the Chart.js earnings graph and any stat cards that render from database aggregates.
+Important existing features include:
 
-STEP 6 — NAVIGATION & IDENTITY POLISH
-In base.html: visually separate the staff-only "Analytics" nav link from regular nav items (e.g., a vertical divider or distinct pill styling) so the permission boundary is visible. Keep the existing sticky blurred header, theme toggle, and mobile hamburger drawer mechanisms exactly as they function today — only restyle, do not re-architect the JS behavior in the inline <script> blocks in base.html unless a bug is found.
+* Authentication
+* Login / Signup
+* Protected routes
+* Freelancer listings
+* Search and filters
+* Freelancer detail pages
+* Favourite system
+* Dashboard
+* Profile editing
+* Messaging / Inbox
+* Chat
+* Notifications
+* Booking
+* Admin dashboard
+* REST API
+* Responsive navbar
+* Reusable UI components
+* Loading states / skeletons
+* Design system
 
-STEP 7 — ACCESSIBILITY PASS
-Ensure all interactive elements (buttons, links, form inputs) have visible focus-visible states matching the existing --border-focus token. Verify color contrast of --text-tertiary against --bg-canvas and --bg-card meets WCAG AA in both dark and light themes — adjust the token value only if it fails, and if you do, re-verify light mode (§14 in style.css) does not break contrast.
+---
 
-STEP 8 — VERIFICATION (do this for every route before considering the task complete)
-Test every URL pattern defined in core/urls.py: /, /signup/, /login/, /dashboard/ (as both freelancer and client role if test accounts allow), /freelancer/<id>/, /profile/edit/, /messages/, /messages/<username>/, /notifications/, /booking/edit/<id>/, /invoice/<id>/print/, /admin-dashboard/ (staff only). For each route, verify: (a) the page renders without template errors, (b) no Django template variable, URL name, or form field was broken, (c) the page is visually consistent with the new design system, (d) the page is checked at three viewport widths: 1440px (desktop), 834px (tablet), 390px (mobile), (e) any empty-data states (no bookings, no reviews, no portfolio items, no notifications) render the new .empty-state component correctly rather than erroring or showing blank space.
+# YOUR TASK
 
-STEP 9 — FINAL CLEANUP
-Search the entire core/templates/ and core/static/core/css/ directories for any remaining hardcoded hex colors, hardcoded px font-sizes outside the new type scale, and orphaned/unused CSS rules left over from the redesign. Remove dead CSS. Confirm style.css's existing §-numbered section comments are updated to reflect new sections added, keeping the same commenting convention already used in the file.
+Do NOT immediately start rewriting the project.
 
-Do not ask me clarifying questions about design taste — make premium, minimal, Stripe/Linear-quality decisions autonomously within the constraints above, and default to removing/simplifying visual elements when in doubt rather than adding new decorative ones. When finished, provide a summary of every file changed and confirm that no backend file (models.py, views.py, urls.py, serializers.py, admin.py, settings.py, migrations) was modified.
+First, perform a **complete audit of the existing codebase**.
+
+Understand the actual implementation rather than assuming the architecture from this description.
+
+Inspect:
+
+* Frontend
+* Backend
+* API endpoints
+* Authentication
+* Database/models
+* Routing
+* State management
+* API service layer
+* Components
+* Pages
+* CSS
+* Design tokens
+* Assets
+* Environment configuration
+* Error handling
+* Security
+* Performance
+* Responsive behavior
+* Production/deployment configuration
+
+---
+
+# PHASE 1 — CODEBASE AUDIT
+
+Analyze the entire project and identify:
+
+### Frontend
+
+* Broken components
+* Runtime errors
+* Console errors
+* Incorrect imports
+* Unused imports
+* Dead code
+* Duplicate code
+* Bad component structure
+* Poor state management
+* API handling problems
+* Race conditions
+* Missing loading states
+* Missing error states
+* Poor empty states
+* Broken navigation
+* Broken responsive layouts
+* Accessibility problems
+* Bad UX
+* Inconsistent styling
+* Hardcoded values
+* Poor typography
+* Layout issues
+* Unnecessary re-renders
+* Performance problems
+
+### Backend
+
+* Broken APIs
+* Incorrect serializers
+* Incorrect views/viewsets
+* Incorrect URL routing
+* Authentication problems
+* Authorization problems
+* Missing validation
+* Poor exception handling
+* N+1 database queries
+* Inefficient queries
+* Incorrect model relationships
+* Missing indexes where appropriate
+* Security vulnerabilities
+* Poor API structure
+* Incorrect status codes
+* Duplicate logic
+* Bad Django practices
+
+### Database
+
+Check:
+
+* Models
+* Relationships
+* Foreign keys
+* Constraints
+* Indexes
+* Migrations
+* Query efficiency
+* Data validation
+* Potential data integrity issues
+
+### Authentication & Security
+
+Perform a security review including:
+
+* JWT handling
+* Token storage
+* Authentication flow
+* Authorization
+* IDOR vulnerabilities
+* Broken access control
+* CORS
+* CSRF
+* XSS
+* SQL injection
+* Input validation
+* File upload security
+* Rate limiting
+* Sensitive information exposure
+* Debug mode
+* Secret management
+* Security headers
+* Password handling
+* API endpoint protection
+* Admin protection
+
+Use the **OWASP Top 10** as a security-review framework.
+
+Do not introduce unnecessary security complexity.
+
+---
+
+# PHASE 2 — UI/UX AUDIT
+
+Treat FreelanceHub as a real professional product, not a student demo.
+
+Review every important page:
+
+* Home
+* Login
+* Signup
+* Freelancer listing
+* Freelancer detail
+* Dashboard
+* Profile
+* Inbox
+* Chat
+* Notifications
+* Booking
+* Admin dashboard
+* Any other existing page
+
+Improve:
+
+* Visual hierarchy
+* Typography
+* Spacing
+* Alignment
+* Cards
+* Buttons
+* Forms
+* Inputs
+* Navigation
+* Search/filter experience
+* Empty states
+* Loading states
+* Error states
+* Responsive design
+* Mobile experience
+* Accessibility
+* Micro-interactions
+* Hover/focus states
+* Consistency
+
+The UI should feel like a **real SaaS/freelance marketplace product**.
+
+Aim for:
+
+* Clean
+* Premium
+* Modern
+* Professional
+* Minimal
+* Consistent
+* Fast
+* Responsive
+
+Do NOT overuse gradients, glassmorphism, huge animations, excessive shadows, or unnecessary decorative elements.
+
+Do not make it look obviously AI-generated.
+
+---
+
+# PHASE 3 — FUNCTIONAL TESTING
+
+Trace the complete user flows.
+
+Test logically:
+
+1. New user opens website
+2. Signup
+3. Login
+4. Logout
+5. Browse freelancers
+6. Search freelancers
+7. Apply filters
+8. Open freelancer profile
+9. Favourite/unfavourite freelancer
+10. Open dashboard
+11. Edit profile
+12. Send message
+13. Receive/view messages
+14. Open chat
+15. Create booking
+16. Edit booking
+17. Notifications
+18. Admin functionality
+19. Protected routes
+20. Invalid routes
+21. API failures
+22. Expired/invalid authentication
+23. Refresh browser while authenticated
+24. Mobile navigation
+
+For every flow, identify what can fail.
+
+---
+
+# PHASE 4 — API + FRONTEND INTEGRATION
+
+Verify that every frontend API call correctly matches the Django backend.
+
+Check:
+
+* HTTP method
+* URL
+* Request body
+* Headers
+* Authentication
+* Response structure
+* Error handling
+* Status codes
+* Loading states
+
+Find mismatches such as:
+
+Frontend expects:
+{
+"user": {...}
+}
+
+while backend actually returns:
+{
+"data": {...}
+}
+
+Fix integration issues instead of adding hacks to hide them.
+
+Create a clean API service architecture if the existing one needs improvement.
+
+---
+
+# PHASE 5 — PERFORMANCE
+
+Optimize only where there is a real benefit.
+
+Check:
+
+Frontend:
+
+* Unnecessary renders
+* Large components
+* Expensive calculations
+* Image loading
+* Bundle size
+* Lazy loading
+* API requests
+* Duplicate requests
+
+Backend:
+
+* N+1 queries
+* select_related
+* prefetch_related
+* pagination
+* unnecessary database queries
+* inefficient filtering
+
+Do not prematurely optimize.
+
+---
+
+# PHASE 6 — CODE QUALITY
+
+Improve the codebase while preserving existing behavior.
+
+Follow:
+
+* DRY
+* SOLID where appropriate
+* Clear naming
+* Small reusable components
+* Separation of concerns
+* Clean API service layer
+* Maintainable Django architecture
+* Maintainable React architecture
+
+Remove:
+
+* Dead code
+* Duplicate logic
+* Unused files
+* Unused imports
+* Temporary debugging code
+* Hardcoded development-only hacks
+
+Do not rewrite everything just for the sake of rewriting.
+
+---
+
+# PHASE 7 — PRODUCTION READINESS
+
+Check the project as if it is going to be shown to:
+
+* Recruiters
+* Interviewers
+* Developers
+* Real users
+
+Review:
+
+* Environment variables
+* Secrets
+* DEBUG
+* CORS
+* Allowed hosts
+* Static files
+* Media files
+* API configuration
+* Production database readiness
+* Error handling
+* Logging
+* Security settings
+* Build configuration
+* Deployment configuration
+
+Clearly separate development configuration from production configuration.
+
+---
+
+# VERY IMPORTANT RULES
+
+### 1. DO NOT BREAK WORKING FEATURES
+
+Before modifying anything, understand how it currently works.
+
+Prefer small, targeted changes.
+
+### 2. DO NOT REWRITE THE ENTIRE PROJECT
+
+Keep the existing architecture when it is good.
+
+Only refactor when there is a clear reason.
+
+### 3. VERIFY BEFORE CLAIMING
+
+Do not say something is fixed unless you actually inspect/test the relevant code.
+
+### 4. PRESERVE EXISTING FUNCTIONALITY
+
+Every existing feature should continue working after improvements.
+
+### 5. DO NOT CREATE FAKE FEATURES
+
+Do not add fake API responses, fake authentication, fake data, or placeholder functionality just to make the UI appear complete.
+
+### 6. NO RANDOM DEPENDENCIES
+
+Do not install libraries unless they provide a clear benefit.
+
+Prefer the existing stack.
+
+### 7. NO HARDCODED SECRETS
+
+Never put API keys, passwords, tokens, or secrets directly into source code.
+
+### 8. KEEP THE DESIGN SYSTEM
+
+Use the existing design tokens where possible.
+
+Do not create random colors, spacing, radii, or typography values throughout the project.
+
+### 9. RESPONSIVE FIRST
+
+Every UI improvement must work on:
+
+* Desktop
+* Tablet
+* Mobile
+
+### 10. ACCESSIBILITY
+
+Use:
+
+* Semantic HTML
+* Keyboard navigation
+* Proper labels
+* Focus states
+* Accessible buttons
+* Alt text
+* Appropriate ARIA only when necessary
+
+---
+
+# EXECUTION STRATEGY
+
+Work in this exact order:
+
+### STEP 1
+
+Inspect the complete repository.
+
+### STEP 2
+
+Create an internal understanding of:
+
+* Architecture
+* Data flow
+* Authentication flow
+* API flow
+* Main user flows
+* Component relationships
+
+### STEP 3
+
+Identify problems and classify them:
+
+🔴 Critical
+
+* Security vulnerabilities
+* Broken core functionality
+* Data loss/integrity problems
+* Authentication/authorization problems
+
+🟠 High
+
+* Major bugs
+* Broken user flows
+* API integration problems
+* Serious responsive/UI issues
+
+🟡 Medium
+
+* UX problems
+* Performance issues
+* Code quality problems
+
+🟢 Low
+
+* Minor visual improvements
+* Refactoring
+* Small polish improvements
+
+### STEP 4
+
+Fix critical and high-priority issues first.
+
+### STEP 5
+
+Improve UX/UI.
+
+### STEP 6
+
+Improve performance and code quality.
+
+### STEP 7
+
+Run/build/test the project.
+
+### STEP 8
+
+Check for regressions.
+
+### STEP 9
+
+Give me a final report.
+
+---
+
+# FINAL REPORT
+
+After completing the work, provide:
+
+## 1. Audit Summary
+
+What was wrong?
+
+## 2. Changes Made
+
+List the files changed and what was changed.
+
+## 3. Bugs Fixed
+
+Explain each important bug.
+
+## 4. Security Improvements
+
+List security issues found and fixed.
+
+## 5. UI/UX Improvements
+
+Explain the major visual/UX changes.
+
+## 6. Performance Improvements
+
+Explain meaningful optimizations.
+
+## 7. Testing
+
+Tell me exactly what you tested.
+
+Example:
+
+* npm run build → PASS
+* Django checks → PASS
+* API authentication → PASS
+* Login flow → PASS
+* Freelancer search → PASS
+* Favourite → PASS
+* Messaging → PASS
+* Booking → PASS
+* Mobile layout → PASS
+
+Do not claim PASS unless actually verified.
+
+## 8. Remaining Issues
+
+Clearly list anything you could not verify or fix.
+
+## 9. Recommended Next Steps
+
+Give me the top 5 improvements that would provide the most value.
+
+---
+
+# MOST IMPORTANT
+
+Think like a **senior engineer taking ownership of an existing production application**.
+
+Do not blindly modify files.
+
+**Inspect → Understand → Identify → Prioritize → Fix → Test → Verify → Report.**
+
+Make FreelanceHub feel like a polished, professional, production-ready freelance marketplace while preserving the existing architecture and functionality.
