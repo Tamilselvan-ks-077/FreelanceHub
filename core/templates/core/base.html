@@ -1,36 +1,42 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FreelanceHub | Premium Marketplace{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Premium next-generation marketplace connecting expert freelancers and forward-thinking clients worldwide.{% endblock %}">
+    <title>{% block title %}FreelanceHub | Botanical Artisanal Marketplace{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Artisanal marketplace connecting verified expert craftsmen and forward-thinking clients worldwide.{% endblock %}">
     
-    <!-- Fonts -->
+    <!-- Botanical Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=5.4">
     
     <!-- Theme Initializer -->
     <script>
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
     </script>
     
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Commercial Navigation Header -->
+    <!-- Botanical Paper Grain Texture Overlay -->
+    <div class="botanical-paper-overlay" aria-hidden="true"></div>
+
+    <!-- Navigation Header -->
     <nav class="nav-header">
         <a href="{% url 'home' %}" class="nav-brand">
-            <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
+            <svg class="brand-logo-icon" viewBox="0 0 24 24" fill="currentColor" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.2 2.2C13.6 2.2 13.9 2.5 13.8 2.9L12.2 8.5H18.2C18.7 8.5 19 9 18.7 9.4L9.8 21.4C9.4 21.9 8.7 21.7 8.9 21.1L10.6 14.5H4.8C4.3 14.5 4 14 4.3 13.6L12.3 2.6C12.5 2.3 12.8 2.2 13.2 2.2Z"/>
+            </svg>
+            <span class="brand-logo-text">FreelanceHub</span>
         </a>
         
         <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation menu">
@@ -114,7 +120,10 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="{% url 'home' %}" class="footer-brand-logo">
-                        <i class="fa-solid fa-bolt brand-icon"></i> FreelanceHub
+                        <svg class="brand-logo-icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.2 2.2C13.6 2.2 13.9 2.5 13.8 2.9L12.2 8.5H18.2C18.7 8.5 19 9 18.7 9.4L9.8 21.4C9.4 21.9 8.7 21.7 8.9 21.1L10.6 14.5H4.8C4.3 14.5 4 14 4.3 13.6L12.3 2.6C12.5 2.3 12.8 2.2 13.2 2.2Z"/>
+                        </svg>
+                        <span class="brand-logo-text">FreelanceHub</span>
                     </a>
                     <p>Connecting world-class freelance engineers, designers, and consultants with ambitious technology leaders worldwide.</p>
                 </div>

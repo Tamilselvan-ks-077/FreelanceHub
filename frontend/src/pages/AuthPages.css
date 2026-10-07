@@ -1,13 +1,170 @@
-/* Additional responsive adjustments for authentication pages */
+/* ============================================================
+   Botanical / Organic Serif — Auth Pages Styling
+   ============================================================ */
+
+.auth-page {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-4);
+  background: var(--bg-app);
+  position: relative;
+}
+
+.auth-page::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(140, 154, 132, 0.15) 0%, rgba(194, 123, 102, 0.08) 50%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-3xl);
+  padding: 3.25rem 2.75rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.auth-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--forest-green);
+  color: var(--sage-light);
+  font-size: 1.2rem;
+  margin-bottom: var(--space-3);
+  box-shadow: var(--shadow-xs);
+}
+
+.auth-header h1 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.auth-header p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.role-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: 6px;
+}
+
+.role-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4) var(--space-3);
+  background: var(--bg-app-alt);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.role-option:hover {
+  border-color: var(--sage-green);
+  background: var(--bg-clay-light);
+}
+
+.role-option.active {
+  background: var(--bg-surface);
+  border-color: var(--forest-green);
+  box-shadow: 0 0 0 3px var(--sage-soft);
+}
+
+.role-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.role-option span:nth-child(2) {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--forest-green);
+}
+
+.role-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: var(--space-5);
+  background: var(--forest-green);
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  border: 1px solid var(--forest-green);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  padding: 0.95rem 1.5rem;
+  font-size: 0.88rem;
+  transition: all var(--transition-base);
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-terra);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-6);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  font-weight: 600;
+  color: var(--forest-green);
+  text-decoration: underline;
+}
+
+.auth-footer a:hover {
+  color: var(--terracotta);
+}
+
 @media (max-width: 480px) {
   .auth-card {
     padding: var(--space-6) var(--space-4);
-    max-width: 100%;
-  }
-  .auth-header h1 {
-    font-size: var(--text-h3);
-  }
-  .auth-submit {
-    font-size: 0.9rem;
+    border-radius: var(--radius-2xl);
   }
 }

@@ -26,7 +26,7 @@ export default function InboxPage() {
   useEffect(() => { fetchThreads(); }, [fetchThreads]);
 
   const filteredThreads = threads.filter(t => 
-    t.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    (t.full_name || t.username || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -59,10 +59,10 @@ export default function InboxPage() {
           ) : filteredThreads.length > 0 ? (
             filteredThreads.map(t => (
               <Link key={t.username} to={`/messages/${t.username}`} className={`thread-item ${t.unread_count > 0 ? 'unread' : ''}`}>
-                <Avatar fallback={t.full_name[0]} size="md" />
+                <Avatar fallback={(t.full_name || t.username || '?')[0].toUpperCase()} size="md" />
                 <div className="thread-info">
                   <div className="thread-meta">
-                    <span className="thread-name">{t.full_name}</span>
+                    <span className="thread-name">{t.full_name || t.username}</span>
                     <span className="thread-date">
                       {t.last_message_at ? new Date(t.last_message_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''}
                     </span>

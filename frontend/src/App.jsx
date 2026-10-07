@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import PaperGrainOverlay from './components/PaperGrainOverlay';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -31,6 +33,7 @@ function GuestRoute({ children }) {
 function AppRoutes() {
   return (
     <>
+      <PaperGrainOverlay />
       <Navbar />
       <main className="page-content">
         <Routes>
@@ -51,7 +54,7 @@ function AppRoutes() {
           <Route path="/admin-dashboard" element={<ProtectedRoute staffOnly><AdminDashboardPage /></ProtectedRoute>} />
 
           <Route path="*" element={
-            <div className="container empty-state">
+            <div className="container empty-state mt-12">
               <span className="empty-state-icon">🔍</span>
               <h3>Page Not Found</h3>
               <p>The page you're looking for doesn't exist.</p>
@@ -59,6 +62,7 @@ function AppRoutes() {
           } />
         </Routes>
       </main>
+      <Footer />
     </>
   );
 }

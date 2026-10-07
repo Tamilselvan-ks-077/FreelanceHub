@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { adminAPI } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
 import BookingStatusBadge from '../components/BookingStatusBadge';
+import Badge from '../components/ui/Badge';
+import { Users, Briefcase, DollarSign, Calendar, ShieldCheck, Activity } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState(null);
@@ -18,41 +20,100 @@ export default function AdminDashboardPage() {
     }
   }, []);
 
-  useEffect(() => { fetchAdminStats(); }, [fetchAdminStats]);
+  useEffect(() => {
+    fetchAdminStats();
+  }, [fetchAdminStats]);
 
-  if (loading) return <div className="container page-content"><SkeletonCard count={4} /></div>;
+  if (loading) {
+    return (
+      <div className="container page-content mt-8">
+        <SkeletonCard count={4} />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="container page-content mt-8">
+        <div className="alert alert-danger">Failed to load admin analytics.</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container page-content">
-      <div className="section-header">
-        <h1>Admin Analytics</h1>
-        <p>Platform overview and statistics.</p>
+    <div className="container page-content mt-8">
+      <div className="section-header mb-8">
+        <div className="flex items-center gap-3">
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              background: '#151521',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--neon-lime)',
+            }}
+          >
+            <ShieldCheck size={24} />
+          </div>
+          <div>
+            <h1>Admin Control & Analytics</h1>
+            <p>Platform telemetry, user overview, and system volume.</p>
+          </div>
+        </div>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-label">Total Users</div>
-          <div className="stat-value">{data.stats.users}</div>
+      {/* Metrics Row */}
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-icon-wrapper bg-brand-light">
+            <Users size={24} />
+          </div>
+          <div className="metric-content">
+            <p className="metric-label">Total Users</p>
+            <h3 className="metric-value">{data.stats.users}</h3>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Freelancers</div>
-          <div className="stat-value">{data.stats.freelancers}</div>
+
+        <div className="metric-card">
+          <div className="metric-icon-wrapper bg-blue-light">
+            <Briefcase size={24} />
+          </div>
+          <div className="metric-content">
+            <p className="metric-label">Freelancers</p>
+            <h3 className="metric-value">{data.stats.freelancers}</h3>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Total Bookings</div>
-          <div className="stat-value">{data.stats.bookings}</div>
+
+        <div className="metric-card">
+          <div className="metric-icon-wrapper bg-amber-light">
+            <Calendar size={24} />
+          </div>
+          <div className="metric-content">
+            <p className="metric-label">Total Bookings</p>
+            <h3 className="metric-value">{data.stats.bookings}</h3>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Total Revenue Volume</div>
-          <div className="stat-value">₹{data.stats.revenue}</div>
+
+        <div className="metric-card">
+          <div className="metric-icon-wrapper bg-green-light">
+            <DollarSign size={24} />
+          </div>
+          <div className="metric-content">
+            <p className="metric-label">Revenue Volume</p>
+            <h3 className="metric-value">${data.stats.revenue}</h3>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-2" style={{ marginTop: 32 }}>
+        {/* Recent Bookings */}
         <div className="card">
-          <h2 className="section-title">Recent Bookings</h2>
+          <h3 className="panel-title mb-4">Recent Platform Contracts</h3>
           <div className="table-wrapper">
-            <table className="data-table">
+            <table className="invoices-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -62,12 +123,12 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.recent_bookings.slice(0, 10).map(b => (
+                {data.recent_bookings.slice(0, 10).map((b) => (
                   <tr key={b.id}>
-                    <td data-label="ID">#{b.id}</td>
-                    <td data-label="Client">{b.client.username}</td>
-                    <td data-label="Freelancer">{b.freelancer.username}</td>
-                    <td data-label="Status"><BookingStatusBadge status={b.status} /></td>
+                    <td><strong>#{b.id}</strong></td>
+                    <td>{b.client.username}</td>
+                    <td>{b.freelancer.username}</td>
+                    <td><BookingStatusBadge status={b.status} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -75,10 +136,11 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
+        {/* Recent Users */}
         <div className="card">
-          <h2 className="section-title">Recent Users</h2>
+          <h3 className="panel-title mb-4">Recent User Registrations</h3>
           <div className="table-wrapper">
-            <table className="data-table">
+            <table className="invoices-table">
               <thead>
                 <tr>
                   <th>Username</th>
@@ -88,12 +150,24 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.users.slice(0, 10).map(u => (
+                {data.users.slice(0, 10).map((u) => (
                   <tr key={u.id}>
-                    <td data-label="Username">{u.username}</td>
-                    <td data-label="Role"><span className={`badge badge-${u.role === 'freelancer' ? 'primary' : 'secondary'}`}>{u.role}</span></td>
-                    <td data-label="Joined">{new Date(u.date_joined).toLocaleDateString()}</td>
-                    <td data-label="Staff">{u.is_staff ? 'Yes' : 'No'}</td>
+                    <td><strong>{u.username}</strong></td>
+                    <td>
+                      <Badge variant={u.role === 'freelancer' ? 'purple' : 'lime'}>
+                        {u.role}
+                      </Badge>
+                    </td>
+                    <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                      {new Date(u.date_joined).toLocaleDateString()}
+                    </td>
+                    <td>
+                      {u.is_staff ? (
+                        <span style={{ color: '#059669', fontWeight: 700 }}>Admin</span>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>User</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

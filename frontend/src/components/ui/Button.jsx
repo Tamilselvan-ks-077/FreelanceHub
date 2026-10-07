@@ -4,11 +4,12 @@ import { Loader2 } from 'lucide-react';
 
 export default function Button({
   children,
-  variant = 'primary', // primary, secondary, outline, ghost, danger
-  size = 'md', // sm, md, lg
+  variant = 'primary', // primary, lime, purple, secondary, outline, ghost, dark, glass, danger
+  size = 'md', // sm, md, lg, xl
   className = '',
   isLoading = false,
   icon: Icon,
+  iconRight: IconRight,
   disabled,
   ...props
 }) {
@@ -26,9 +27,12 @@ export default function Button({
       {isLoading ? (
         <Loader2 className="spinner" size={16} />
       ) : Icon ? (
-        <Icon className="btn-icon" size={18} />
+        <Icon className="btn-icon" size={size === 'lg' || size === 'xl' ? 20 : 16} />
       ) : null}
-      <span className="btn-text">{children}</span>
+      {children && <span className="btn-text">{children}</span>}
+      {IconRight && !isLoading && (
+        <IconRight className="btn-icon-right" size={size === 'lg' || size === 'xl' ? 20 : 16} />
+      )}
     </button>
   );
 }

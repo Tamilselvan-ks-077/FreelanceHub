@@ -428,9 +428,11 @@ class BookingFlowViaViewsTest(TestCase):
 
     def test_create_booking_via_view(self):
         self.c.login(username="viewclient", password="pass1234")
+        start = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+        end = (datetime.date.today() + datetime.timedelta(days=10)).isoformat()
         resp = self.c.post(reverse("create_booking", args=[self.fl_user.profile.id]), {
-            "start_date": "2026-09-01",
-            "end_date": "2026-09-10",
+            "start_date": start,
+            "end_date": end,
             "description": "Test project via view",
         })
         self.assertEqual(resp.status_code, 302)
@@ -441,9 +443,11 @@ class BookingFlowViaViewsTest(TestCase):
 
     def test_accept_booking_changes_status(self):
         self.c.login(username="viewclient", password="pass1234")
+        start = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+        end = (datetime.date.today() + datetime.timedelta(days=10)).isoformat()
         self.c.post(reverse("create_booking", args=[self.fl_user.profile.id]), {
-            "start_date": "2026-09-01",
-            "end_date": "2026-09-10",
+            "start_date": start,
+            "end_date": end,
             "description": "Accept test",
         })
         booking = Booking.objects.first()
@@ -458,9 +462,11 @@ class BookingFlowViaViewsTest(TestCase):
 
     def test_reject_booking_changes_status(self):
         self.c.login(username="viewclient", password="pass1234")
+        start = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+        end = (datetime.date.today() + datetime.timedelta(days=10)).isoformat()
         self.c.post(reverse("create_booking", args=[self.fl_user.profile.id]), {
-            "start_date": "2026-09-01",
-            "end_date": "2026-09-05",
+            "start_date": start,
+            "end_date": end,
             "description": "Reject test",
         })
         booking = Booking.objects.first()
@@ -472,9 +478,11 @@ class BookingFlowViaViewsTest(TestCase):
 
     def test_cancel_booking_deletes_record(self):
         self.c.login(username="viewclient", password="pass1234")
+        start = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+        end = (datetime.date.today() + datetime.timedelta(days=10)).isoformat()
         self.c.post(reverse("create_booking", args=[self.fl_user.profile.id]), {
-            "start_date": "2026-09-01",
-            "end_date": "2026-09-05",
+            "start_date": start,
+            "end_date": end,
             "description": "Cancel test",
         })
         booking = Booking.objects.first()
@@ -484,20 +492,24 @@ class BookingFlowViaViewsTest(TestCase):
 
     def test_edit_booking_updates_db(self):
         self.c.login(username="viewclient", password="pass1234")
+        start = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+        end = (datetime.date.today() + datetime.timedelta(days=10)).isoformat()
         self.c.post(reverse("create_booking", args=[self.fl_user.profile.id]), {
-            "start_date": "2026-09-01",
-            "end_date": "2026-09-05",
+            "start_date": start,
+            "end_date": end,
             "description": "Original desc",
         })
         booking = Booking.objects.first()
 
+        new_start = (datetime.date.today() + datetime.timedelta(days=5)).isoformat()
+        new_end = (datetime.date.today() + datetime.timedelta(days=15)).isoformat()
         self.c.post(reverse("booking_edit", args=[booking.id]), {
-            "start_date": "2026-10-01",
-            "end_date": "2026-10-15",
+            "start_date": new_start,
+            "end_date": new_end,
             "description": "Updated description",
         })
         booking.refresh_from_db()
-        self.assertEqual(str(booking.start_date), "2026-10-01")
+        self.assertEqual(str(booking.start_date), new_start)
         self.assertEqual(booking.description, "Updated description")
 
 

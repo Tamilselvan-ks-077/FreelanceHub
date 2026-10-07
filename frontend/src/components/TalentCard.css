@@ -1,184 +1,240 @@
-.talent-card {
+/* ============================================================
+   Botanical / Organic Serif — Talent Card Styling
+   ============================================================ */
+
+.botanical-talent-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
   display: flex;
   flex-direction: column;
-  padding: var(--space-5);
-  border-radius: var(--radius-xl);
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  position: relative;
   height: 100%;
 }
 
-.talent-card:hover {
-  transform: translateY(-4px);
+.botanical-talent-card:hover {
+  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--brand-100);
-}
-
-@media (prefers-color-scheme: dark) {
-  .talent-card:hover {
-    border-color: var(--brand-900);
-  }
+  border-color: var(--sage-green);
 }
 
 .talent-card-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   margin-bottom: var(--space-4);
 }
 
-.talent-avatar-link {
-  text-decoration: none;
+.talent-avatar-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
-.fav-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+.talent-card-avatar {
+  width: 62px;
+  height: 62px;
   border-radius: var(--radius-full);
-  color: var(--text-tertiary);
-  transition: all var(--transition-fast);
-  padding: var(--space-2);
+  border: 2px solid var(--border-default);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast);
+}
+
+.botanical-talent-card:hover .talent-card-avatar {
+  transform: scale(1.05);
+}
+
+.avatar-verified-badge {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--forest-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(45, 58, 49, 0.15);
+}
+
+.talent-fav-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.fav-btn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
-  border-color: #fecaca;
-  transform: scale(1.05);
+.talent-fav-btn:hover {
+  border-color: var(--terracotta);
+  background: var(--terracotta-soft);
+  transform: scale(1.08);
 }
 
-.fav-btn.active {
-  color: #ef4444;
-  background-color: #fee2e2;
-  border-color: #fecaca;
+.talent-fav-btn.is-fav {
+  background: var(--terracotta-soft);
+  border-color: var(--terracotta);
 }
 
-.heart-filled {
-  fill: currentColor;
-}
-
+/* Card Body */
 .talent-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  text-decoration: none;
-  color: inherit;
   flex: 1;
-}
-
-.talent-name-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.talent-name {
-  font-size: 1.25rem;
+.talent-meta-top {
+  margin-bottom: var(--space-2);
+}
+
+.talent-name-link {
+  text-decoration: none;
+}
+
+.talent-card-name {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
+  color: var(--forest-green);
+  letter-spacing: -0.015em;
+  transition: color var(--transition-fast);
 }
 
-.talent-title {
-  font-size: 0.875rem;
-  color: var(--brand-600);
+.talent-card-name:hover {
+  color: var(--terracotta);
+}
+
+.talent-role-tag {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
   font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
-.talent-meta-row {
+.talent-location-rating-row {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  font-size: 0.82rem;
 }
 
 .talent-location {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.stars-row {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 4px;
+  color: var(--text-muted);
 }
 
-.star-icon.filled {
-  color: #fbbf24;
-  fill: #fbbf24;
+.location-icon {
+  color: var(--sage-green);
 }
 
-.rating-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+.stars-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-clay-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--forest-green);
 }
 
-.rating-text strong {
-  color: var(--text-primary);
+.no-rating-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-sage-subtle);
+  color: var(--forest-green);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.no-rating {
-  font-size: 0.875rem;
-  color: var(--text-tertiary);
-  font-style: italic;
-}
-
-.talent-bio {
-  font-size: 0.875rem;
+.talent-card-bio {
+  font-size: 0.92rem;
   color: var(--text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   line-height: 1.6;
-  margin: 0;
+  margin-bottom: var(--space-5);
 }
 
-.talent-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-default);
-}
-
-.talent-skills {
+/* Skills Badges */
+.talent-skills-container {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 6px;
+  margin-top: auto;
+  margin-bottom: var(--space-5);
 }
 
-.talent-meta-footer {
+.talent-skill-badge {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--forest-green);
+  background: var(--bg-sage-subtle);
+  border: 1px solid var(--border-sage);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.talent-skill-badge:hover {
+  background: var(--bg-clay-light);
+  border-color: var(--sage-green);
+}
+
+.talent-skill-more {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 0 4px;
 }
 
-.talent-rate-wrapper {
+/* Footer: Rate & CTA */
+.talent-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
+  margin-top: auto;
+}
+
+.talent-rate-block {
   display: flex;
   align-items: baseline;
   gap: 2px;
 }
 
-.talent-rate {
-  font-family: var(--font-display);
+.rate-amount {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
   font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--text-primary);
+  color: var(--forest-green);
 }
 
-.talent-rate-suffix {
-  font-size: 0.875rem;
-  color: var(--text-tertiary);
-  font-weight: 500;
+.rate-unit {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.talent-view-btn {
+  padding: 0.45rem 1.15rem !important;
+  font-size: 0.75rem !important;
 }

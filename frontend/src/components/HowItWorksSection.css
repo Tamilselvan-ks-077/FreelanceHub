@@ -1,0 +1,134 @@
+/* ============================================================
+   Botanical / Organic Serif — How It Works Styling
+   ============================================================ */
+
+.botanical-how-it-works-section {
+  padding: var(--space-24) 0;
+  background-color: var(--bg-app);
+  position: relative;
+}
+
+.how-it-works-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto var(--space-16) auto;
+}
+
+.hiw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--forest-green);
+  box-shadow: var(--shadow-xs);
+  margin-bottom: var(--space-5);
+}
+
+.hiw-feather-icon {
+  color: var(--sage-green);
+}
+
+.hiw-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  font-weight: 700;
+  color: var(--forest-green);
+  line-height: 1.18;
+  margin-bottom: var(--space-4);
+}
+
+.hiw-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.hiw-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  position: relative;
+}
+
+.hiw-step-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-6);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.hiw-step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--sage-green);
+}
+
+.hiw-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.hiw-step-num {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.hiw-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sage-subtle);
+  border: 1px solid var(--border-sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--forest-green);
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.hiw-step-card:hover .hiw-icon-box {
+  transform: scale(1.08);
+  background: var(--sage-green);
+  color: #FFFFFF;
+}
+
+.hiw-step-heading {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.015em;
+}
+
+.hiw-step-desc {
+  font-family: var(--font-body);
+  font-size: 0.96rem;
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.hiw-arrow-indicator {
+  display: none; /* keep clean botanical look */
+}
+
+@media (max-width: 900px) {
+  .hiw-steps-grid {
+    grid-template-columns: 1fr;
+  }
+}

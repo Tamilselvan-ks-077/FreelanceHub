@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { profileAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import SkeletonCard from '../components/SkeletonCard';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import { User, Camera, ArrowLeft, Save, CheckCircle2 } from 'lucide-react';
 
 export default function ProfileEditPage() {
   const { user, refetch } = useAuth();
@@ -16,9 +19,15 @@ export default function ProfileEditPage() {
   const [previewImage, setPreviewImage] = useState(null);
 
   const [form, setForm] = useState({
-    full_name: '', bio: '', location: '', hourly_rate: '',
-    availability: 'available', github_url: '', linkedin_url: '',
-    website_url: '', skills: ''
+    full_name: '',
+    bio: '',
+    location: '',
+    hourly_rate: '',
+    availability: 'available',
+    github_url: '',
+    linkedin_url: '',
+    website_url: '',
+    skills: '',
   });
 
   const fetchProfile = useCallback(async () => {
@@ -36,7 +45,9 @@ export default function ProfileEditPage() {
         website_url: p.website_url || '',
         skills: p.skills ? p.skills.join(', ') : '',
       });
-      if (p.profile_picture) setPreviewImage(p.profile_picture);
+      if (p.avatar_url || p.profile_picture) {
+        setPreviewImage(p.avatar_url || p.profile_picture);
+      }
     } catch (err) {
       setError('Failed to load profile.');
     } finally {
@@ -44,7 +55,9 @@ export default function ProfileEditPage() {
     }
   }, []);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -63,16 +76,16 @@ export default function ProfileEditPage() {
     setSuccess('');
     try {
       const formData = new FormData();
-      Object.keys(form).forEach(key => {
+      Object.keys(form).forEach((key) => {
         if (form[key] !== null && form[key] !== undefined) {
           formData.append(key, form[key]);
         }
       });
-      
+
       await profileAPI.update(formData);
       await refetch();
       setSuccess('Profile updated successfully.');
-      setTimeout(() => navigate('/dashboard'), 1500);
+      setTimeout(() => navigate('/dashboard'), 1200);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to update profile.');
     } finally {
@@ -80,58 +93,124 @@ export default function ProfileEditPage() {
     }
   };
 
-  if (loading) return <div className="container page-content"><SkeletonCard count={1} /></div>;
+  if (loading) {
+    return (
+      <div className="container page-content mt-8">
+        <SkeletonCard count={1} />
+      </div>
+    );
+  }
 
   return (
-    <div className="container page-content" style={{ maxWidth: 700 }}>
-      <div className="section-header">
-        <h1>Edit Profile</h1>
+    <div className="container page-content mt-8" style={{ maxWidth: 780 }}>
+      <div className="section-header flex items-center justify-between mb-6">
+        <div>
+          <h1>Edit Profile</h1>
+          <p>Update your public details, rate, and technical skills</p>
+        </div>
+        <Button variant="outline" size="sm" icon={ArrowLeft} onClick={() => navigate(-1)}>
+          Back
+        </Button>
       </div>
 
       <div className="card">
         {error && <div className="alert alert-danger">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+        {success && (
+          <div className="alert alert-success">
+            <CheckCircle2 size={16} /> {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group" style={{ alignItems: 'center', marginBottom: 32 }}>
-            <div 
-              style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', background: 'var(--bg-surface-hover)', cursor: 'pointer', border: '2px dashed var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
+          {/* Avatar Upload */}
+          <div className="form-group flex flex-col items-center mb-8">
+            <div
+              style={{
+                width: 108,
+                height: 108,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                background: '#F3F2FA',
+                cursor: 'pointer',
+                border: '3px solid var(--purple-light)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 10,
+                boxShadow: 'var(--shadow-card)',
+              }}
               onClick={() => fileInputRef.current?.click()}
             >
               {previewImage ? (
-                <img src={previewImage} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={previewImage} alt="Avatar Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontSize: '2rem' }}>📷</span>
+                <Camera size={32} color="var(--purple-primary)" />
               )}
             </div>
-            <label style={{ cursor: 'pointer', color: 'var(--brand-primary)' }} onClick={() => fileInputRef.current?.click()}>
-              Change Avatar
-            </label>
+            <button
+              type="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--purple-primary)',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Change Photo
+            </button>
             <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" style={{ display: 'none' }} />
           </div>
 
           <div className="grid grid-2">
             <div className="form-group">
               <label>Full Name</label>
-              <input name="full_name" className="form-control" value={form.full_name} onChange={handleChange} />
+              <input
+                name="full_name"
+                className="form-control"
+                value={form.full_name}
+                onChange={handleChange}
+                placeholder="Alex Rivera"
+                required
+              />
             </div>
             <div className="form-group">
               <label>Location</label>
-              <input name="location" className="form-control" value={form.location} onChange={handleChange} />
+              <input
+                name="location"
+                className="form-control"
+                value={form.location}
+                onChange={handleChange}
+                placeholder="San Francisco, CA or Remote"
+              />
             </div>
           </div>
 
           {user?.role === 'freelancer' && (
             <div className="grid grid-2">
               <div className="form-group">
-                <label>Hourly Rate (₹)</label>
-                <input type="number" name="hourly_rate" className="form-control" value={form.hourly_rate} onChange={handleChange} />
+                <label>Hourly Rate ($/hr)</label>
+                <input
+                  type="number"
+                  name="hourly_rate"
+                  className="form-control"
+                  value={form.hourly_rate}
+                  onChange={handleChange}
+                  placeholder="85"
+                />
               </div>
               <div className="form-group">
-                <label>Availability</label>
-                <select name="availability" className="form-control" value={form.availability} onChange={handleChange}>
-                  <option value="available">Available</option>
-                  <option value="busy">Busy</option>
+                <label>Availability Status</label>
+                <select
+                  name="availability"
+                  className="form-control"
+                  value={form.availability}
+                  onChange={handleChange}
+                >
+                  <option value="available">Available Now</option>
+                  <option value="busy">Currently Busy</option>
                   <option value="unavailable">Unavailable</option>
                 </select>
               </div>
@@ -139,39 +218,73 @@ export default function ProfileEditPage() {
           )}
 
           <div className="form-group">
-            <label>Bio</label>
-            <textarea name="bio" className="form-control" value={form.bio} onChange={handleChange} rows={4}></textarea>
+            <label>Bio / Professional Summary</label>
+            <textarea
+              name="bio"
+              className="form-control"
+              value={form.bio}
+              onChange={handleChange}
+              rows={4}
+              placeholder="Tell clients about your background, specializations, and years of experience..."
+            />
           </div>
 
           {user?.role === 'freelancer' && (
             <div className="form-group">
-              <label>Skills (comma separated)</label>
-              <input name="skills" className="form-control" value={form.skills} onChange={handleChange} placeholder="e.g. React, Django, UI/UX" />
+              <label>Skills & Frameworks (comma separated)</label>
+              <input
+                name="skills"
+                className="form-control"
+                value={form.skills}
+                onChange={handleChange}
+                placeholder="e.g. React, Django, PostgreSQL, Next.js, Cloud Architecture"
+              />
             </div>
           )}
 
-          <div className="grid grid-2" style={{ marginTop: 24 }}>
+          <div className="grid grid-3" style={{ marginTop: 20 }}>
             <div className="form-group">
               <label>GitHub URL</label>
-              <input type="url" name="github_url" className="form-control" value={form.github_url} onChange={handleChange} />
+              <input
+                type="url"
+                name="github_url"
+                className="form-control"
+                value={form.github_url}
+                onChange={handleChange}
+                placeholder="https://github.com/username"
+              />
             </div>
             <div className="form-group">
               <label>LinkedIn URL</label>
-              <input type="url" name="linkedin_url" className="form-control" value={form.linkedin_url} onChange={handleChange} />
+              <input
+                type="url"
+                name="linkedin_url"
+                className="form-control"
+                value={form.linkedin_url}
+                onChange={handleChange}
+                placeholder="https://linkedin.com/in/username"
+              />
             </div>
             <div className="form-group">
-              <label>Website URL</label>
-              <input type="url" name="website_url" className="form-control" value={form.website_url} onChange={handleChange} />
+              <label>Personal Website</label>
+              <input
+                type="url"
+                name="website_url"
+                className="form-control"
+                value={form.website_url}
+                onChange={handleChange}
+                placeholder="https://yourportfolio.io"
+              />
             </div>
           </div>
 
           <div style={{ marginTop: 32, display: 'flex', gap: 16 }}>
-            <button type="submit" className="btn btn-primary btn-lg" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Profile'}
-            </button>
-            <button type="button" className="btn btn-secondary btn-lg" onClick={() => navigate(-1)}>
+            <Button type="submit" variant="lime" size="lg" isLoading={saving} icon={Save}>
+              Save Profile
+            </Button>
+            <Button type="button" variant="secondary" size="lg" onClick={() => navigate(-1)}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

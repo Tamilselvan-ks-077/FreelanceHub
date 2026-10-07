@@ -96,7 +96,7 @@ export default function ChatPage() {
   };
 
   const filteredThreads = threads.filter(t => 
-    t.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    (t.full_name || t.username || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -132,10 +132,10 @@ export default function ChatPage() {
                 to={`/messages/${t.username}`} 
                 className={`thread-item ${t.unread_count > 0 ? 'unread' : ''} ${t.username === username ? 'active' : ''}`}
               >
-                <Avatar fallback={t.full_name[0]} size="md" />
+                <Avatar fallback={(t.full_name || t.username || '?')[0].toUpperCase()} size="md" />
                 <div className="thread-info">
                   <div className="thread-meta">
-                    <span className="thread-name">{t.full_name}</span>
+                    <span className="thread-name">{t.full_name || t.username}</span>
                     <span className="thread-date">
                       {t.last_message_at ? new Date(t.last_message_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''}
                     </span>
@@ -171,9 +171,9 @@ export default function ChatPage() {
                 <ArrowLeft size={20} />
               </button>
               <div className="chat-recipient">
-                <Avatar fallback={otherUser?.full_name[0]} size="sm" />
+                <Avatar fallback={(otherUser?.full_name || otherUser?.username || '?')[0].toUpperCase()} size="sm" />
                 <div className="recipient-info">
-                  <h3 className="recipient-name">{otherUser?.full_name}</h3>
+                  <h3 className="recipient-name">{otherUser?.full_name || otherUser?.username}</h3>
                   <span className="recipient-status">
                     <span className="status-dot online"></span> Online
                   </span>
@@ -195,7 +195,7 @@ export default function ChatPage() {
                     <div key={m.id} className={`message-wrapper ${isMine ? 'mine' : 'theirs'}`}>
                       {!isMine && showAvatar ? (
                         <div className="message-avatar">
-                          <Avatar fallback={otherUser?.full_name[0]} size="sm" />
+                          <Avatar fallback={(otherUser?.full_name || otherUser?.username || '?')[0].toUpperCase()} size="sm" />
                         </div>
                       ) : (
                         <div className="message-avatar-placeholder"></div>
@@ -222,7 +222,7 @@ export default function ChatPage() {
                 })
               ) : (
                 <div className="empty-chat-state">
-                  <p>Say hi to {otherUser?.full_name}!</p>
+                  <p>Say hi to {otherUser?.full_name || otherUser?.username}!</p>
                 </div>
               )}
               <div ref={chatEndRef} />

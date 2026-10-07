@@ -1,0 +1,17 @@
+{
+  "name": "freelancehub",
+  "version": "1.0.0",
+  "description": "A premium, glassmorphic dark-themed services marketplace and freelancer classifieds platform designed to connect clients and freelancers. Featuring real-time filters, instant messaging, invoice printouts, billing gateways, staff analytics, and responsive dark/light themes.",
+  "main": "index.js",
+  "dependencies": {
+    "ogl": "^1.0.11"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

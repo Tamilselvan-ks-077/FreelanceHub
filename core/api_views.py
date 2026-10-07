@@ -159,7 +159,7 @@ def api_me(request):
         profile = user.profile
         role = profile.role
         profile_id = profile.id
-        avatar_url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+        avatar = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
     except Exception:
         role = 'client'
         profile_id = None

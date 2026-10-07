@@ -1,97 +1,198 @@
+/* ============================================================
+   Botanical / Organic Serif — UI Button Component
+   ============================================================ */
+
 .ui-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  border-radius: var(--radius-full);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
   white-space: nowrap;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .ui-button:focus-visible {
-  outline: 2px solid var(--brand-500);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(140, 154, 132, 0.4);
 }
 
 .ui-button-disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
-/* Sizes */
+/* Sizes with comfortable touch heights */
 .ui-button-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.78rem;
+  min-height: 38px;
 }
 
 .ui-button-md {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.84rem;
+  min-height: 46px;
 }
 
 .ui-button-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  padding: 0.95rem 2.25rem;
+  font-size: 0.92rem;
+  min-height: 52px;
 }
 
-/* Variants */
-.ui-button-primary {
-  background-color: var(--brand-600);
-  color: white;
-  border-color: var(--brand-600);
+.ui-button-xl {
+  padding: 1.15rem 2.85rem;
+  font-size: 1rem;
+  min-height: 60px;
+}
+
+/* 1. Primary — Deep Forest Green */
+.ui-button-primary,
+.ui-button-dark {
+  background-color: var(--forest-green);
+  color: var(--text-white);
+  border-color: var(--forest-green);
   box-shadow: var(--shadow-sm);
 }
 
-.ui-button-primary:hover:not(.ui-button-disabled) {
-  background-color: var(--brand-700);
-  border-color: var(--brand-700);
+.ui-button-primary:hover:not(.ui-button-disabled),
+.ui-button-dark:hover:not(.ui-button-disabled) {
+  background-color: var(--terracotta);
+  border-color: var(--terracotta);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-terra);
 }
 
+/* 2. Terracotta Pop (Interactive / Lime alias) */
+.ui-button-lime,
+.ui-button-terracotta {
+  background-color: var(--terracotta);
+  color: #FFFFFF;
+  border-color: var(--terracotta);
+  box-shadow: var(--shadow-terra);
+}
+
+.ui-button-lime:hover:not(.ui-button-disabled),
+.ui-button-terracotta:hover:not(.ui-button-disabled) {
+  background-color: var(--terracotta-hover);
+  border-color: var(--terracotta-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(194, 123, 102, 0.4);
+}
+
+/* 3. Sage Green (Purple alias) */
+.ui-button-purple,
+.ui-button-sage {
+  background-color: var(--sage-green);
+  color: #FFFFFF;
+  border-color: var(--sage-green);
+  box-shadow: var(--shadow-sage);
+}
+
+.ui-button-purple:hover:not(.ui-button-disabled),
+.ui-button-sage:hover:not(.ui-button-disabled) {
+  background-color: var(--sage-hover);
+  border-color: var(--sage-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(140, 154, 132, 0.35);
+}
+
+/* 4. Secondary — Soft Clay / Rice Paper */
 .ui-button-secondary {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  color: var(--forest-green);
   border-color: var(--border-default);
+  box-shadow: var(--shadow-subtle);
 }
 
 .ui-button-secondary:hover:not(.ui-button-disabled) {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-clay-light);
+  border-color: var(--sage-green);
+  color: var(--forest-green);
+  transform: translateY(-1px);
 }
 
+/* 5. Outline / Sage Border */
 .ui-button-outline {
   background-color: transparent;
-  color: var(--text-primary);
-  border-color: var(--border-default);
+  color: var(--forest-green);
+  border-color: var(--sage-green);
 }
 
 .ui-button-outline:hover:not(.ui-button-disabled) {
-  background-color: var(--bg-secondary);
-  border-color: var(--border-strong);
+  background-color: var(--sage-soft);
+  border-color: var(--forest-green);
+  transform: translateY(-1px);
 }
 
+.ui-button-outline-light {
+  background-color: transparent;
+  color: var(--text-white);
+  border-color: rgba(250, 249, 246, 0.4);
+}
+
+.ui-button-outline-light:hover:not(.ui-button-disabled) {
+  background-color: rgba(250, 249, 246, 0.15);
+  border-color: var(--text-white);
+  transform: translateY(-1px);
+}
+
+/* 6. Glassmorphic Warm Alabaster */
+.ui-button-glass {
+  background: rgba(249, 248, 244, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--forest-green);
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-subtle);
+}
+
+.ui-button-glass:hover:not(.ui-button-disabled) {
+  background: var(--bg-surface);
+  border-color: var(--sage-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 7. Ghost */
 .ui-button-ghost {
   background-color: transparent;
-  color: var(--text-secondary);
+  color: var(--forest-green);
+  border-color: transparent;
 }
 
 .ui-button-ghost:hover:not(.ui-button-disabled) {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--forest-soft);
+  color: var(--terracotta);
 }
 
+/* 8. Danger (Muted Earth Red) */
 .ui-button-danger {
   background-color: var(--error-bg);
-  color: var(--error-text);
+  color: var(--error);
+  border-color: rgba(184, 74, 57, 0.25);
 }
 
 .ui-button-danger:hover:not(.ui-button-disabled) {
-  background-color: #fecaca;
+  background-color: #F8DBD6;
+  border-color: var(--error);
+  transform: translateY(-1px);
 }
 
-/* Icons */
+/* Spinner animation */
 .spinner {
   animation: spin 1s linear infinite;
 }

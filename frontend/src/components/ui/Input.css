@@ -1,87 +1,92 @@
+/* ============================================================
+   Botanical / Organic Serif — UI Input Component
+   ============================================================ */
+
 .ui-input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   width: 100%;
 }
 
 .ui-input-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--forest-green);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .ui-input-container {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .ui-input-icon {
   position: absolute;
-  left: var(--space-3);
-  color: var(--text-tertiary);
+  left: 1.25rem;
+  color: var(--sage-green);
   pointer-events: none;
+  transition: color var(--transition-fast);
 }
 
 .ui-input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--forest-green);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-base);
+  outline: none;
+  box-shadow: var(--shadow-xs);
 }
 
 .ui-input.with-icon {
-  padding-left: 2.25rem;
+  padding-left: 3rem;
+}
+
+.ui-input:focus ~ .ui-input-icon,
+.ui-input-container:focus-within .ui-input-icon {
+  color: var(--terracotta);
 }
 
 .ui-input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-light);
 }
 
 .ui-input:focus {
-  outline: none;
-  border-color: var(--brand-500);
-  box-shadow: 0 0 0 3px var(--brand-100);
-}
-
-@media (prefers-color-scheme: dark) {
-  .ui-input:focus {
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  }
+  border-color: var(--sage-green);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 4px var(--sage-soft);
 }
 
 .ui-input.has-error {
-  border-color: #ef4444;
+  border-color: var(--error);
 }
 
 .ui-input.has-error:focus {
-  box-shadow: 0 0 0 3px #fee2e2;
-}
-
-@media (prefers-color-scheme: dark) {
-  .ui-input.has-error:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
-  }
+  box-shadow: 0 0 0 4px var(--error-bg);
 }
 
 .ui-input:disabled {
-  background-color: var(--bg-secondary);
-  color: var(--text-tertiary);
+  background-color: var(--bg-app-alt);
+  color: var(--text-muted);
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .ui-input-helper {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 3px;
 }
 
 .ui-input-helper.error-text {
-  color: #ef4444;
+  color: var(--error);
+  font-weight: 500;
 }
