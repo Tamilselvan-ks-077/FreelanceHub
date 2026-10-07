@@ -72,6 +72,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .talent-fav-btn:hover {
@@ -107,6 +108,7 @@
   color: var(--forest-green);
   letter-spacing: -0.015em;
   transition: color var(--transition-fast);
+  word-break: break-word;
 }
 
 .talent-card-name:hover {
@@ -120,6 +122,7 @@
   font-weight: 500;
   color: var(--text-muted);
   margin-top: 2px;
+  word-break: break-word;
 }
 
 .talent-location-rating-row {
@@ -128,6 +131,8 @@
   justify-content: space-between;
   margin-bottom: var(--space-4);
   font-size: 0.82rem;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .talent-location {
@@ -139,6 +144,7 @@
 
 .location-icon {
   color: var(--sage-green);
+  flex-shrink: 0;
 }
 
 .stars-pill {
@@ -169,6 +175,7 @@
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: var(--space-5);
+  word-break: break-word;
 }
 
 /* Skills Badges */
@@ -214,6 +221,8 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--border-default);
   margin-top: auto;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .talent-rate-block {
@@ -237,4 +246,26 @@
 .talent-view-btn {
   padding: 0.45rem 1.15rem !important;
   font-size: 0.75rem !important;
+  min-height: 36px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .botanical-talent-card {
+    padding: var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+
+  .talent-card-avatar {
+    width: 52px;
+    height: 52px;
+  }
+
+  .talent-card-name {
+    font-size: 1.18rem;
+  }
+
+  .talent-card-bio {
+    font-size: 0.88rem;
+  }
 }

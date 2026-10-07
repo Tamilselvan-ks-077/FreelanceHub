@@ -11,7 +11,7 @@
 .profile-hero-dark {
   background: var(--forest-green);
   border-bottom: 1px solid rgba(250, 249, 246, 0.1);
-  padding: 3rem 0 4rem 0;
+  padding: 3rem 0 3.5rem 0;
   color: var(--text-white);
   position: relative;
   overflow: hidden;
@@ -56,6 +56,10 @@
   z-index: 1;
 }
 
+.profile-avatar-block {
+  flex-shrink: 0;
+}
+
 .detail-avatar-ring {
   position: relative;
   width: 110px;
@@ -76,8 +80,8 @@
   position: absolute;
   bottom: 0px;
   right: 0px;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--terracotta);
   display: flex;
@@ -89,93 +93,207 @@
 
 .profile-info-block {
   flex: 1;
+  min-width: 0;
 }
 
 .profile-title-line {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .profile-fullname {
   color: #FFFFFF;
   font-family: var(--font-serif);
-  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-size: clamp(1.85rem, 3.5vw, 2.8rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
+  word-break: break-word;
 }
 
-.profile-headline-tag {
+.detail-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-status-chip.available {
+  background: rgba(77, 124, 93, 0.25);
+  color: #A8E5BA;
+  border: 1px solid rgba(77, 124, 93, 0.5);
+}
+
+.detail-status-chip.busy {
+  background: rgba(199, 133, 57, 0.2);
+  color: #F8D39E;
+  border: 1px solid rgba(199, 133, 57, 0.4);
+}
+
+.dot-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.profile-role-sub {
   font-family: var(--font-body);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   color: var(--sage-light);
   font-weight: 500;
   margin-top: 4px;
+  margin-bottom: var(--space-3);
+  word-break: break-word;
 }
 
-.profile-quick-stats-row {
+.profile-badges-strip {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  margin-top: var(--space-4);
-  font-size: 0.92rem;
+  gap: var(--space-4);
+  font-size: 0.88rem;
   color: rgba(250, 249, 246, 0.85);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.detail-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rate-tag {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.rate-tag .unit {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: normal;
+  color: rgba(250, 249, 246, 0.7);
+}
+
+.profile-social-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
-.profile-stat-item {
+.profile-ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(250, 249, 246, 0.8);
+  font-size: 0.82rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(250, 249, 246, 0.1);
+  border: 1px solid rgba(250, 249, 246, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.profile-ext-link:hover {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: #FFFFFF;
+}
+
+.profile-actions-block {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 /* Two-Column Detail Grid */
-.detail-content-grid {
+.detail-content-body {
+  padding: var(--space-12) var(--space-8);
+}
+
+.talent-detail-grid {
   display: grid;
   grid-template-columns: 1.8fr 1.2fr;
   gap: var(--space-10);
-  padding: var(--space-12) 0;
+  align-items: start;
 }
 
-/* Left Content Cards */
-.profile-card-block {
+.main-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.sidebar-col {
+  min-width: 0;
+}
+
+/* Content Cards */
+.detail-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-2xl);
   padding: var(--space-8);
   box-shadow: var(--shadow-sm);
-  margin-bottom: var(--space-8);
 }
 
-.profile-block-title {
+.detail-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.detail-card-head h3 {
   font-family: var(--font-serif);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--forest-green);
-  margin-bottom: var(--space-4);
-  letter-spacing: -0.015em;
+  margin: 0;
 }
 
-.profile-bio-text {
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.8;
+.bio-paragraph {
+  font-size: 1.02rem;
+  line-height: 1.78;
   color: var(--text-secondary);
   white-space: pre-line;
+  margin-bottom: var(--space-6);
 }
 
-/* Skills Cloud */
-.profile-skills-grid {
+.detail-subhead {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  margin-bottom: var(--space-3);
+}
+
+.detail-skills-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.profile-skill-chip {
+.skill-pill-large {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-body);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--forest-green);
   background: var(--bg-sage-subtle);
@@ -184,10 +302,136 @@
   border-radius: var(--radius-full);
 }
 
-/* Right Sticky Booking Box */
-.booking-sticky-card {
-  position: sticky;
-  top: 100px;
+/* Portfolio Gallery */
+.portfolio-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+}
+
+.portfolio-showcase-item {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-app-alt);
+  display: flex;
+  flex-direction: column;
+}
+
+.port-thumb-box {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+}
+
+.port-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-base);
+}
+
+.portfolio-showcase-item:hover .port-thumb-img {
+  transform: scale(1.04);
+}
+
+.port-thumb-placeholder {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-sage-subtle);
+}
+
+.port-item-info {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.port-item-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  margin-bottom: 4px;
+}
+
+.port-item-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-3);
+  flex: 1;
+}
+
+.port-item-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  text-decoration: underline;
+}
+
+/* Reviews Stack */
+.reviews-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.client-review-item {
+  padding: var(--space-5);
+  background: var(--bg-app-alt);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+}
+
+.review-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reviewer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reviewer-name {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  color: var(--forest-green);
+}
+
+.review-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.review-star-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.review-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--forest-green);
+}
+
+/* Booking Widget Card */
+.booking-widget-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-2xl);
@@ -195,109 +439,138 @@
   box-shadow: var(--shadow-lg);
 }
 
-.booking-rate-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--border-default);
-  margin-bottom: var(--space-6);
+.sticky-sidebar {
+  position: sticky;
+  top: 100px;
 }
 
-.booking-rate-big {
+.booking-header {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.booking-widget-title {
   font-family: var(--font-serif);
-  font-size: 2.2rem;
+  font-size: 1.45rem;
   font-weight: 700;
-  color: var(--forest-green);
-}
-
-.booking-rate-unit {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-}
-
-.booking-form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
-}
-
-.booking-field-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--forest-green);
   margin-bottom: 4px;
 }
 
-.booking-input {
-  width: 100%;
-  padding: 0.8rem 1.15rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-default);
-  background: var(--bg-app-alt);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  color: var(--forest-green);
-  outline: none;
-  transition: all var(--transition-fast);
+.booking-widget-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
-.booking-input:focus {
+.date-fields-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.booking-form-wrap textarea {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--bg-app-alt);
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--forest-green);
+  outline: none;
+  resize: vertical;
+}
+
+.booking-form-wrap textarea:focus {
   background: #FFFFFF;
   border-color: var(--sage-green);
   box-shadow: 0 0 0 3px var(--sage-soft);
 }
 
-.booking-submit-btn {
-  width: 100%;
-  margin-top: var(--space-2);
-}
-
-/* Reviews List */
-.reviews-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.review-card-item {
-  padding: var(--space-6);
-  background: var(--bg-app-alt);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
-}
-
-.review-author-line {
+.booking-guarantee-note {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-3);
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: var(--space-4);
+  text-align: center;
 }
 
-.review-author-name {
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--forest-green);
+.guest-booking-prompt {
+  text-align: center;
 }
 
-.review-comment {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--forest-green);
+.guest-booking-prompt p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
 }
 
-@media (max-width: 960px) {
-  .detail-content-grid {
+/* Responsive */
+@media (max-width: 1024px) {
+  .talent-detail-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-8);
   }
+
+  .sticky-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-hero-dark {
+    padding: 2rem 0 2.5rem 0;
+  }
+
   .profile-header-layout {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--space-5);
+  }
+
+  .detail-avatar-ring {
+    width: 84px;
+    height: 84px;
+  }
+
+  .profile-actions-block {
+    width: 100%;
+  }
+
+  .profile-actions-block a,
+  .profile-actions-block .ui-button {
+    flex: 1;
+  }
+
+  .detail-content-body {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .detail-card,
+  .booking-widget-card {
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+
+  .portfolio-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-fullname {
+    font-size: 1.65rem;
+  }
+
+  .date-fields-row {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .profile-badges-strip {
+    gap: var(--space-2);
   }
 }

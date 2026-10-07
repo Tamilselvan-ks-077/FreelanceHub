@@ -278,7 +278,7 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          <div style={{ marginTop: 32, display: 'flex', gap: 16 }}>
+          <div className="profile-form-actions">
             <Button type="submit" variant="lime" size="lg" isLoading={saving} icon={Save}>
               Save Profile
             </Button>

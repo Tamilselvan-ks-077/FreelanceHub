@@ -68,11 +68,19 @@
   .stats-panel-bar {
     grid-template-columns: repeat(2, 1fr);
     padding: var(--space-6);
+    gap: var(--space-6);
   }
 }
 
 @media (max-width: 560px) {
   .stats-panel-bar {
     grid-template-columns: 1fr;
+    padding: var(--space-5) var(--space-4);
+    gap: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+
+  .stat-metric-val {
+    font-size: 1.55rem;
   }
 }

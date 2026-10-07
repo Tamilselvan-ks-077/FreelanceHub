@@ -53,15 +53,17 @@
   letter-spacing: 0.12em;
   color: var(--text-white);
   margin-bottom: var(--space-6);
+  max-width: 100%;
 }
 
 .text-sage-light {
   color: var(--sage-light);
+  flex-shrink: 0;
 }
 
 .cta-headline {
   font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
   font-weight: 700;
   color: #FFFFFF;
   line-height: 1.15;
@@ -110,8 +112,52 @@
   color: var(--sage-light);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .botanical-cta-section {
+    padding: var(--space-12) 0;
+  }
+
   .botanical-cta-card {
-    padding: var(--space-10) var(--space-4);
+    padding: var(--space-12) var(--space-6);
+    border-radius: var(--radius-2xl);
+  }
+
+  .cta-headline {
+    font-size: 2rem;
+  }
+
+  .cta-description {
+    font-size: 1rem;
+    margin-bottom: var(--space-8);
+  }
+}
+
+@media (max-width: 580px) {
+  .botanical-cta-card {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .cta-headline {
+    font-size: 1.75rem;
+  }
+
+  .cta-button-group {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+  }
+
+  .cta-button-group .ui-button {
+    width: 100%;
+  }
+
+  .cta-features-badges {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .cta-pill-dot {
+    display: none;
   }
 }

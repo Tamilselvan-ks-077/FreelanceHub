@@ -32,16 +32,18 @@
   letter-spacing: 0.12em;
   margin-bottom: var(--space-4);
   box-shadow: var(--shadow-xs);
+  max-width: 100%;
 }
 
 .directory-badge-leaf {
   color: var(--sage-green);
+  flex-shrink: 0;
 }
 
 .directory-title {
   color: var(--forest-green);
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+  font-size: clamp(2rem, 3.8vw, 3.4rem);
   font-weight: 700;
   line-height: 1.15;
   margin-bottom: var(--space-3);
@@ -71,6 +73,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .filter-select-box {
@@ -85,10 +88,12 @@
   left: 1.25rem;
   color: var(--sage-green);
   pointer-events: none;
+  z-index: 1;
 }
 
 .filter-native-select {
   width: 100%;
+  min-height: 48px;
   padding: 0.85rem 1.25rem 0.85rem 2.8rem;
   font-family: var(--font-body);
   font-size: 0.92rem;
@@ -132,12 +137,15 @@
 
 .quick-tag-pill {
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--forest-green);
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  padding: 5px 14px;
+  padding: 6px 14px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -158,12 +166,13 @@
 .quick-clear-btn {
   background: none;
   border: none;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--terracotta);
   cursor: pointer;
   margin-left: auto;
   text-decoration: underline;
+  padding: 4px 8px;
 }
 
 .quick-clear-btn:hover {
@@ -178,6 +187,8 @@
   margin-bottom: var(--space-6);
   font-size: 0.9rem;
   color: var(--text-secondary);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .talent-results-grid {
@@ -191,6 +202,7 @@
   justify-content: center;
   gap: var(--space-4);
   margin-top: var(--space-12);
+  flex-wrap: wrap;
 }
 
 .pagination-info {
@@ -199,9 +211,45 @@
   color: var(--forest-green);
 }
 
+/* Responsive */
 @media (max-width: 900px) {
+  .directory-main-section {
+    padding: var(--space-16) 0;
+  }
+
+  .directory-section-header {
+    margin-bottom: var(--space-8);
+  }
+
   .directory-filter-bar {
     grid-template-columns: 1fr;
     border-radius: var(--radius-2xl);
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .quick-clear-btn {
+    margin-left: 0;
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .directory-main-section {
+    padding: var(--space-12) 0;
+  }
+
+  .directory-title {
+    font-size: 1.85rem;
+  }
+
+  .directory-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .quick-tags-bar {
+    margin-bottom: var(--space-6);
   }
 }

@@ -4,6 +4,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import BookingStatusBadge from '../components/BookingStatusBadge';
 import Badge from '../components/ui/Badge';
 import { Users, Briefcase, DollarSign, Calendar, ShieldCheck, Activity } from 'lucide-react';
+import './DashboardPage.css';
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState(null);

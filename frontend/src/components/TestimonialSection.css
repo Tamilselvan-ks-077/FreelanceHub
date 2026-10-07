@@ -28,15 +28,17 @@
   color: var(--forest-green);
   box-shadow: var(--shadow-xs);
   margin-bottom: var(--space-5);
+  max-width: 100%;
 }
 
 .testimonial-flower-icon {
   color: var(--terracotta);
+  flex-shrink: 0;
 }
 
 .testimonial-title {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
   font-weight: 700;
   color: var(--forest-green);
   line-height: 1.18;
@@ -77,6 +79,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .stars-row {
@@ -135,6 +139,7 @@
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .author-info {
@@ -162,7 +167,40 @@
 }
 
 @media (max-width: 900px) {
+  .botanical-testimonial-section {
+    padding: var(--space-16) 0;
+  }
+
+  .testimonial-header {
+    margin-bottom: var(--space-10);
+  }
+
   .testimonial-cards-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .botanical-testimonial-section {
+    padding: var(--space-12) 0;
+  }
+
+  .testimonial-title {
+    font-size: 1.85rem;
+  }
+
+  .testimonial-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .testimonial-card {
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+
+  .quote-text {
+    font-size: 1rem;
+    line-height: 1.65;
   }
 }

@@ -29,15 +29,17 @@
   color: var(--forest-green);
   box-shadow: var(--shadow-xs);
   margin-bottom: var(--space-5);
+  max-width: 100%;
 }
 
 .hiw-feather-icon {
   color: var(--sage-green);
+  flex-shrink: 0;
 }
 
 .hiw-title {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
   font-weight: 700;
   color: var(--forest-green);
   line-height: 1.18;
@@ -99,6 +101,7 @@
   justify-content: center;
   color: var(--forest-green);
   transition: transform var(--transition-fast), background-color var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .hiw-step-card:hover .hiw-icon-box {
@@ -124,11 +127,43 @@
 }
 
 .hiw-arrow-indicator {
-  display: none; /* keep clean botanical look */
+  display: none;
 }
 
 @media (max-width: 900px) {
+  .botanical-how-it-works-section {
+    padding: var(--space-16) 0;
+  }
+
+  .how-it-works-header {
+    margin-bottom: var(--space-10);
+  }
+
   .hiw-steps-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .botanical-how-it-works-section {
+    padding: var(--space-12) 0;
+  }
+
+  .hiw-title {
+    font-size: 1.85rem;
+  }
+
+  .hiw-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .hiw-step-card {
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+
+  .hiw-step-heading {
+    font-size: 1.2rem;
   }
 }

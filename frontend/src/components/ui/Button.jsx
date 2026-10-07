@@ -10,6 +10,7 @@ export default function Button({
   isLoading = false,
   icon: Icon,
   iconRight: IconRight,
+  iconPosition,
   disabled,
   ...props
 }) {
@@ -17,6 +18,9 @@ export default function Button({
   const variantClass = `ui-button-${variant}`;
   const sizeClass = `ui-button-${size}`;
   const disabledClass = disabled || isLoading ? 'ui-button-disabled' : '';
+
+  const LeftIcon = iconPosition === 'right' ? null : Icon;
+  const RightIcon = IconRight || (iconPosition === 'right' ? Icon : null);
 
   return (
     <button
@@ -26,12 +30,12 @@ export default function Button({
     >
       {isLoading ? (
         <Loader2 className="spinner" size={16} />
-      ) : Icon ? (
-        <Icon className="btn-icon" size={size === 'lg' || size === 'xl' ? 20 : 16} />
+      ) : LeftIcon ? (
+        <LeftIcon className="btn-icon" size={size === 'lg' || size === 'xl' ? 20 : 16} />
       ) : null}
       {children && <span className="btn-text">{children}</span>}
-      {IconRight && !isLoading && (
-        <IconRight className="btn-icon-right" size={size === 'lg' || size === 'xl' ? 20 : 16} />
+      {RightIcon && !isLoading && (
+        <RightIcon className="btn-icon-right" size={size === 'lg' || size === 'xl' ? 20 : 16} />
       )}
     </button>
   );

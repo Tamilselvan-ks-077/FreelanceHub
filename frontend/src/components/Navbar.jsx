@@ -59,29 +59,31 @@ export default function Navbar() {
           <Link to="/" className={`nav-link ${isActive('/')}`} onClick={closeMenu}>
             Explore Talent
           </Link>
-          <button 
-            type="button" 
-            className="nav-link nav-link-btn" 
-            onClick={() => scrollToSection('features')}
-          >
-            Features
-          </button>
-          <button 
-            type="button" 
-            className="nav-link nav-link-btn" 
-            onClick={() => scrollToSection('how-it-works')}
-          >
-            How It Works
-          </button>
-          <button 
-            type="button" 
-            className="nav-link nav-link-btn" 
-            onClick={() => scrollToSection('testimonials')}
-          >
-            Testimonials
-          </button>
-
-          {user && (
+          {!user ? (
+            <>
+              <button 
+                type="button" 
+                className="nav-link nav-link-btn" 
+                onClick={() => scrollToSection('features')}
+              >
+                Features
+              </button>
+              <button 
+                type="button" 
+                className="nav-link nav-link-btn" 
+                onClick={() => scrollToSection('how-it-works')}
+              >
+                How It Works
+              </button>
+              <button 
+                type="button" 
+                className="nav-link nav-link-btn" 
+                onClick={() => scrollToSection('testimonials')}
+              >
+                Testimonials
+              </button>
+            </>
+          ) : (
             <>
               <div className="nav-link-separator" />
               <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`} onClick={closeMenu}>
@@ -166,29 +168,38 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile Drawer Overlay */}
+      {menuOpen && (
+        <div 
+          className="mobile-drawer-backdrop" 
+          onClick={closeMenu}
+          aria-label="Close navigation menu"
+        />
+      )}
+
       {/* Mobile Drawer */}
-      <div className={`mobile-nav-drawer ${menuOpen ? 'is-open' : ''}`}>
+      <div className={`mobile-nav-drawer ${menuOpen ? 'is-open' : ''}`} aria-hidden={!menuOpen}>
         <div className="mobile-drawer-inner">
           <Link to="/" className={`mobile-nav-link ${isActive('/')}`} onClick={closeMenu}>
             Explore Talent
           </Link>
           <button 
             type="button" 
-            className="mobile-nav-link" 
+            className="mobile-nav-link mobile-nav-btn-link" 
             onClick={() => scrollToSection('features')}
           >
             Features & USP
           </button>
           <button 
             type="button" 
-            className="mobile-nav-link" 
+            className="mobile-nav-link mobile-nav-btn-link" 
             onClick={() => scrollToSection('how-it-works')}
           >
             How It Works
           </button>
           <button 
             type="button" 
-            className="mobile-nav-link" 
+            className="mobile-nav-link mobile-nav-btn-link" 
             onClick={() => scrollToSection('testimonials')}
           >
             Testimonials
@@ -197,23 +208,26 @@ export default function Navbar() {
           {user ? (
             <>
               <div className="mobile-drawer-divider" />
-              <Link to="/dashboard" className="mobile-nav-link" onClick={closeMenu}>
+              <Link to="/dashboard" className={`mobile-nav-link ${isActive('/dashboard')}`} onClick={closeMenu}>
                 <LayoutDashboard size={18} /> Dashboard
               </Link>
-              <Link to="/messages" className="mobile-nav-link" onClick={closeMenu}>
+              <Link to="/messages" className={`mobile-nav-link ${isActive('/messages')}`} onClick={closeMenu}>
                 <MessageSquare size={18} /> Messages
                 {user.unread_messages > 0 && (
                   <Badge variant="purple" className="ml-2">{user.unread_messages}</Badge>
                 )}
               </Link>
-              <Link to="/notifications" className="mobile-nav-link" onClick={closeMenu}>
+              <Link to="/notifications" className={`mobile-nav-link ${isActive('/notifications')}`} onClick={closeMenu}>
                 <Bell size={18} /> Notifications
+                {user.unread_notifications > 0 && (
+                  <span className="mobile-drawer-badge">●</span>
+                )}
               </Link>
-              <Link to="/profile/edit" className="mobile-nav-link" onClick={closeMenu}>
+              <Link to="/profile/edit" className={`mobile-nav-link ${isActive('/profile/edit')}`} onClick={closeMenu}>
                 <User size={18} /> Edit Profile
               </Link>
               {user.is_staff && (
-                <Link to="/admin-dashboard" className="mobile-nav-link" onClick={closeMenu}>
+                <Link to="/admin-dashboard" className={`mobile-nav-link ${isActive('/admin-dashboard')}`} onClick={closeMenu}>
                   <ShieldCheck size={18} /> Admin Dashboard
                 </Link>
               )}
