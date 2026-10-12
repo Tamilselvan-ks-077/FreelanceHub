@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import ErrorBoundary from './components/ErrorBoundary';
+import CookieConsentBanner from './components/CookieConsentBanner';
 import PaperGrainOverlay from './components/PaperGrainOverlay';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,6 +16,11 @@ import ChatPage from './pages/ChatPage';
 import NotificationsPage from './pages/NotificationsPage';
 import BookingEditPage from './pages/BookingEditPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsConditionsPage from './pages/TermsConditionsPage';
+import CookiesPolicyPage from './pages/CookiesPolicyPage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function ProtectedRoute({ children, staffOnly = false }) {
   const { user, loading } = useAuth();
@@ -35,7 +42,7 @@ function AppRoutes() {
     <>
       <PaperGrainOverlay />
       <Navbar />
-      <main className="page-content">
+      <main className="page-content" id="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
 
@@ -53,26 +60,30 @@ function AppRoutes() {
 
           <Route path="/admin-dashboard" element={<ProtectedRoute staffOnly><AdminDashboardPage /></ProtectedRoute>} />
 
-          <Route path="*" element={
-            <div className="container empty-state mt-12">
-              <span className="empty-state-icon">🔍</span>
-              <h3>Page Not Found</h3>
-              <p>The page you're looking for doesn't exist.</p>
-            </div>
-          } />
+          {/* Legal and Compliance Routes */}
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsConditionsPage />} />
+          <Route path="/cookies" element={<CookiesPolicyPage />} />
+          <Route path="/refund" element={<RefundPolicyPage />} />
+
+          {/* 404 Route */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
       <Footer />
+      <CookieConsentBanner />
     </>
   );
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

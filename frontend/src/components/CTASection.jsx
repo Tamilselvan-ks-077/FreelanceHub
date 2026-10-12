@@ -25,29 +25,18 @@ export default function CTASection() {
             </h2>
 
             <p className="cta-description">
-              Collaborate with top 1% verified software engineers, AI architects, and editorial designers. Elevate your project with milestone escrow and effortless harmony.
+              Start commissioning verified software engineers, full-stack architects, and UI/UX designers with complete milestone escrow protection.
             </p>
 
             <div className="cta-button-group">
               <Button
-                variant="lime" /* Terracotta styling in tokens */
+                variant="lime"
                 size="xl"
                 iconRight={ArrowRight}
                 onClick={() => navigate('/signup')}
                 className="cta-primary-btn"
               >
-                Begin Collaboration
-              </Button>
-              <Button
-                variant="outline-light"
-                size="xl"
-                onClick={() => {
-                  const el = document.getElementById('how-it-works');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="cta-secondary-btn"
-              >
-                Explore The Process
+                Join FreelanceHub Today
               </Button>
             </div>
 

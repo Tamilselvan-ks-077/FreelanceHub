@@ -46,6 +46,9 @@ export default function ChatPage() {
     try {
       const res = await messageAPI.chat(username);
       setOtherUser(res.data.other_user);
+      if (res.data.other_user) {
+        document.title = `Chat with ${res.data.other_user.full_name || res.data.other_user.username} | FreelanceHub`;
+      }
       setMessages(res.data.messages);
     } catch (err) {
       console.error(err);
@@ -232,7 +235,9 @@ export default function ChatPage() {
             <div className="chat-input-container">
               {file && (
                 <div className="attachment-preview">
-                  <span className="attachment-name">📎 {file.name}</span>
+                  <span className="attachment-name inline-flex items-center gap-1">
+                    <Paperclip size={14} /> {file.name}
+                  </span>
                   <button type="button" className="remove-btn" onClick={() => setFile(null)}>×</button>
                 </div>
               )}

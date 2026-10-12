@@ -20,57 +20,47 @@ export default function HeroSection({ onExploreClick }) {
         <div className="hero-copy-col animate-in">
           <div className="hero-badge-pill">
             <span className="botanical-pill-dot" />
-            <span className="hero-badge-text">CURATED ARTISANAL TALENT NETWORK</span>
+            <span className="hero-badge-text">CURATED TALENT MARKETPLACE</span>
             <Leaf size={14} strokeWidth={1.5} className="hero-badge-leaf" />
           </div>
 
           <h1 className="hero-main-title">
-            Cultivate your <br />
-            <span className="serif-italic">next breakthrough</span> <br />
-            with master minds.
+            Hire verified <br />
+            <span className="serif-italic">software craftsmen</span> <br />
+            and product designers.
           </h1>
 
           <p className="hero-lead-text">
-            Connect directly with the top 1% of vetted software craftsmen, AI architects, and editorial UI/UX designers—empowering high-growth ventures to flourish without friction.
+            Directly connect with vetted software engineers, systems architects, and UI/UX designers. Collaborate with clear milestone escrow protection and zero agency markup.
           </p>
 
           <div className="hero-actions-row">
             <Button
-              variant="lime" /* styled as terracotta in botanical tokens */
+              variant="lime"
               size="lg"
               iconRight={ArrowRight}
               onClick={onExploreClick}
               className="hero-primary-cta"
             >
-              Explore Artisans
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              icon={Compass}
-              onClick={onExploreClick}
-              className="hero-secondary-cta"
-            >
-              Browse Directory
+              Explore Directory
             </Button>
           </div>
 
-          {/* Social Proof Botanical Trust Bar */}
+          {/* Core Verified Guarantees */}
           <div className="hero-trust-bar">
-            <div className="trust-avatars-stack">
-              <div className="mini-avatar av-1">AR</div>
-              <div className="mini-avatar av-2">SL</div>
-              <div className="mini-avatar av-3">EM</div>
-              <div className="mini-avatar av-4">VK</div>
-            </div>
-            <div className="trust-meta">
-              <div className="trust-stars-row">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={14} strokeWidth={1.5} fill="#C78539" color="#C78539" />
-                ))}
-                <span className="trust-score">4.98 / 5.0</span>
+            <div className="flex flex-wrap items-center gap-4 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck size={16} strokeWidth={1.5} style={{ color: 'var(--success)' }} />
+                <span>Milestone Escrow Protection</span>
               </div>
-              <p className="trust-sub">Trusted by 2,500+ founders, design studios & venture leaders</p>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} strokeWidth={1.5} style={{ color: 'var(--sage-green)' }} />
+                <span>Verified Technical Experience</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Zap size={16} strokeWidth={1.5} style={{ color: 'var(--terracotta)' }} />
+                <span>Direct Invoicing & Chat</span>
+              </div>
             </div>
           </div>
         </div>
@@ -81,7 +71,7 @@ export default function HeroSection({ onExploreClick }) {
             {/* Architectural Arch Frame */}
             <div className="showcase-arch-frame">
               <div className="arch-image-wrap">
-                <img src={heroImg} alt="Master Craftsman" className="arch-hero-img" />
+                <img src={heroImg} alt="Alex Rivera - Principal Full-Stack and AI Architect Profile" className="arch-hero-img" />
                 <div className="arch-image-overlay" />
               </div>
 

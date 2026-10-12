@@ -1,37 +1,37 @@
 import React from 'react';
-import { Users, CheckCircle, Star, Clock, Sparkles } from 'lucide-react';
+import { Users, CheckCircle, MessageSquare, ShieldCheck } from 'lucide-react';
 import './StatsSection.css';
 
-export default function StatsSection({ totalFreelancers = 140 }) {
+export default function StatsSection() {
   const stats = [
     {
-      value: `${totalFreelancers || 140}+`,
-      label: 'Vetted Craftsmen',
-      subtext: 'Rigorous technical appraisal',
+      value: 'Verified',
+      label: 'Technical Expertise',
+      subtext: 'Portfolio & code appraisal',
       icon: Users,
-    },
-    {
-      value: '99.4%',
-      label: 'Delight Rate',
-      subtext: 'Across completed milestones',
-      icon: Star,
-    },
-    {
-      value: '< 24h',
-      label: 'Harmonious Match',
-      subtext: 'From inquiry to kickoff',
-      icon: Clock,
     },
     {
       value: '100%',
       label: 'Milestone Escrow',
-      subtext: 'Protected financial disbursements',
+      subtext: 'Secured financial releases',
+      icon: ShieldCheck,
+    },
+    {
+      value: 'Direct',
+      label: 'Studio Messaging',
+      subtext: 'End-to-end project chat',
+      icon: MessageSquare,
+    },
+    {
+      value: '0%',
+      label: 'Hidden Platform Fees',
+      subtext: 'Transparent project invoicing',
       icon: CheckCircle,
     },
   ];
 
   return (
-    <section className="botanical-stats-section">
+    <section className="botanical-stats-section" aria-label="Platform guarantees">
       <div className="container">
         <div className="stats-panel-bar">
           {stats.map((stat, idx) => {

@@ -19,8 +19,11 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
+from core.api_views import api_health
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', api_health, name='root_health'),
     path('api/v1/', include('core.api_urls')),
     path('', include("core.urls")),
 ]

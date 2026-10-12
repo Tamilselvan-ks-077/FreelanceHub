@@ -16,7 +16,7 @@ import {
 import { 
   TrendingUp, Users, Calendar, DollarSign, 
   Clock, CheckCircle, AlertCircle, ChevronRight,
-  CreditCard, ArrowRight
+  CreditCard, ArrowRight, FileText
 } from 'lucide-react';
 import './DashboardPage.css';
 
@@ -39,7 +39,10 @@ export default function DashboardPage() {
     }
   }, []);
 
-  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+  useEffect(() => {
+    document.title = 'Dashboard | FreelanceHub';
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const handlePay = async (invoiceId) => {
     setPaying(invoiceId);
@@ -135,7 +138,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="dashboard-header animate-in">
           <div>
-            <h1 className="dashboard-title">Welcome back, {user.full_name} 👋</h1>
+            <h1 className="dashboard-title">Welcome back, {user.full_name}</h1>
             <p className="dashboard-subtitle">Here's what's happening with your {isFreelancer ? 'freelance business' : 'hiring activity'} today.</p>
           </div>
           <div className="dashboard-actions">
@@ -289,7 +292,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="py-8">
-                  <EmptyState icon="📝" title="No recent activity" message="When you get new bookings or requests, they'll appear here." />
+                  <EmptyState icon={FileText} title="No recent activity" message="When you get new bookings or requests, they'll appear here." />
                 </div>
               )}
             </div>

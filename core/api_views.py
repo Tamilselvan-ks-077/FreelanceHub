@@ -5,12 +5,15 @@ Django REST Framework API views for the FreelanceHub React SPA.
 All endpoints use session-based authentication — no JWT needed.
 """
 
+import logging
 import uuid
+from datetime import date
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Q, Avg, Sum
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 
@@ -19,6 +22,10 @@ from .models import (
     Review, Portfolio, Notification, Message, Favourite, Payment,
     ActivityLog, ChatRoom, ChatMessage,
 )
+from .throttling import AuthRateThrottle, ActionRateThrottle, DirectoryRateThrottle
+from .security_utils import validate_uploaded_file
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -88,6 +95,7 @@ def notification_to_dict(n):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def api_login(request):
     username = request.data.get('username', '').strip()
     password = request.data.get('password', '')
@@ -123,14 +131,20 @@ def api_logout(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def api_signup(request):
     username = request.data.get('username', '').strip()
     email = request.data.get('email', '').strip()
     password = request.data.get('password', '')
     role = request.data.get('role', 'client')
+    terms_agreed = request.data.get('terms_agreed', True)
 
     if not username or not password:
         return Response({'error': 'Username and password are required.'}, status=400)
+    if len(password) < 8:
+        return Response({'error': 'Password must be at least 8 characters long.'}, status=400)
+    if not terms_agreed:
+        return Response({'error': 'You must agree to the Terms of Service and Privacy Policy.'}, status=400)
     if User.objects.filter(username=username).exists():
         return Response({'error': 'Username already taken.'}, status=400)
 
@@ -241,6 +255,7 @@ def api_profile(request):
             pass
 
     if 'avatar' in request.FILES:
+        validate_uploaded_file(request.FILES['avatar'], allowed_types='image')
         profile.avatar = request.FILES['avatar']
 
     profile.save()
@@ -264,6 +279,7 @@ def api_profile(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@throttle_classes([DirectoryRateThrottle])
 def api_freelancers(request):
     profiles = Profile.objects.filter(
         role='freelancer'
@@ -529,6 +545,7 @@ def api_dashboard(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([ActionRateThrottle])
 def api_create_booking(request, freelancer_id):
     try:
         freelancer_profile = Profile.objects.get(id=freelancer_id)
@@ -540,16 +557,40 @@ def api_create_booking(request, freelancer_id):
         return Response({'error': 'You cannot book yourself.'}, status=400)
 
     data = request.data
+    start_date_str = data.get('start_date')
+    end_date_str = data.get('end_date')
+    if not start_date_str or not end_date_str:
+        return Response({'error': 'start_date and end_date are required.'}, status=400)
+
     try:
-        booking = Booking.objects.create(
-            client=request.user,
-            freelancer=freelancer_user,
-            start_date=data['start_date'],
-            end_date=data['end_date'],
-            description=data.get('description', ''),
-        )
-    except KeyError as e:
-        return Response({'error': f'Missing field: {e}'}, status=400)
+        start_date = date.fromisoformat(str(start_date_str))
+        end_date = date.fromisoformat(str(end_date_str))
+    except (ValueError, TypeError):
+        return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+
+    if start_date > end_date:
+        return Response({'error': 'End date must be on or after start date.'}, status=400)
+
+    # Prevent duplicate active bookings between same client & freelancer for overlapping dates
+    overlapping = Booking.objects.filter(
+        client=request.user,
+        freelancer=freelancer_user,
+        status__in=['pending', 'accepted'],
+        start_date__lte=end_date,
+        end_date__gte=start_date,
+    ).exists()
+    if overlapping:
+        return Response({
+            'error': 'An active or pending booking already exists with this freelancer for overlapping dates.'
+        }, status=400)
+
+    booking = Booking.objects.create(
+        client=request.user,
+        freelancer=freelancer_user,
+        start_date=start_date,
+        end_date=end_date,
+        description=data.get('description', ''),
+    )
 
     Notification.objects.create(
         user=freelancer_user,
@@ -657,32 +698,59 @@ def api_cancel_booking(request, booking_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([ActionRateThrottle])
 def api_pay_invoice(request, invoice_id):
-    try:
-        invoice = Invoice.objects.select_related('booking__freelancer').get(id=invoice_id)
-    except Invoice.DoesNotExist:
-        return Response({'error': 'Invoice not found.'}, status=404)
+    idempotency_key = (
+        request.headers.get('Idempotency-Key') or
+        request.headers.get('X-Idempotency-Key') or
+        request.data.get('idempotency_key') or
+        ''
+    ).strip()
 
-    if request.user != invoice.booking.client:
-        return Response({'error': 'Only the client can pay this invoice.'}, status=403)
-    if invoice.status == 'paid':
-        return Response({'error': 'Already paid.'}, status=400)
+    # If an idempotency key was sent and already processed, return previous success safely
+    if idempotency_key:
+        existing_payment = Payment.objects.filter(idempotency_key=idempotency_key).select_related('invoice').first()
+        if existing_payment:
+            return Response({
+                'message': 'Payment already processed (idempotent request).',
+                'invoice_id': existing_payment.invoice_id,
+                'transaction_id': existing_payment.transaction_id,
+                'idempotent': True,
+            })
 
-    invoice.status = 'paid'
-    invoice.save()
+    with transaction.atomic():
+        try:
+            invoice = Invoice.objects.select_for_update().select_related('booking__freelancer', 'booking__client').get(id=invoice_id)
+        except Invoice.DoesNotExist:
+            return Response({'error': 'Invoice not found.'}, status=404)
 
-    Payment.objects.create(
-        invoice=invoice,
-        transaction_id=str(uuid.uuid4()),
-        amount=invoice.amount,
-        payment_method=request.data.get('payment_method', 'credit_card'),
-    )
-    Notification.objects.create(
-        user=invoice.booking.freelancer,
-        verb=f'Payment received for Booking #{invoice.booking.id}',
-        notification_type='payment',
-    )
-    return Response({'message': 'Payment successful.', 'invoice_id': invoice.id})
+        if request.user != invoice.booking.client:
+            return Response({'error': 'Only the client can pay this invoice.'}, status=403)
+        if invoice.status == 'paid':
+            return Response({'error': 'Invoice has already been paid.'}, status=400)
+
+        invoice.status = 'paid'
+        invoice.save(update_fields=['status'])
+
+        payment_key = idempotency_key if idempotency_key else None
+        payment = Payment.objects.create(
+            invoice=invoice,
+            transaction_id=str(uuid.uuid4()),
+            idempotency_key=payment_key,
+            amount=invoice.amount,
+            payment_method=request.data.get('payment_method', 'credit_card'),
+        )
+        Notification.objects.create(
+            user=invoice.booking.freelancer,
+            verb=f'Payment received for Booking #{invoice.booking.id}',
+            notification_type='payment',
+        )
+
+    return Response({
+        'message': 'Payment successful.',
+        'invoice_id': invoice.id,
+        'transaction_id': payment.transaction_id,
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -740,14 +808,18 @@ def api_chat(request, username):
         })
 
     body = request.data.get('body', '').strip()
-    if not body and 'attachment' not in request.FILES:
+    attachment = request.FILES.get('attachment')
+    if not body and not attachment:
         return Response({'error': 'Message body or attachment required.'}, status=400)
+
+    if attachment:
+        validate_uploaded_file(attachment, allowed_types='all')
 
     msg = Message.objects.create(
         sender=user,
         recipient=other_user,
         body=body,
-        attachment=request.FILES.get('attachment'),
+        attachment=attachment,
     )
     Notification.objects.create(
         user=other_user,
@@ -815,3 +887,36 @@ def api_admin_stats(request):
             for u in all_users
         ],
     })
+
+
+# ---------------------------------------------------------------------------
+# SYSTEM MONITORING & HEALTH CHECK
+# ---------------------------------------------------------------------------
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_health(request):
+    """Production uptime & monitoring health check endpoint."""
+    import time
+    from django.db import connection
+    start_time = time.time()
+    db_ok = False
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        db_ok = True
+    except Exception as e:
+        logger.error(f"Health check DB ping failed: {e}")
+
+    latency_ms = round((time.time() - start_time) * 1000, 2)
+    status_str = 'healthy' if db_ok else 'degraded'
+    code = 200 if db_ok else 503
+
+    return Response({
+        'status': status_str,
+        'database': 'connected' if db_ok else 'unreachable',
+        'latency_ms': latency_ms,
+        'uptime_monitoring': 'active',
+        'version': '1.0.0',
+    }, status=code)

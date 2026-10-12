@@ -36,6 +36,7 @@ export default function HomePage() {
   }, [filters]);
 
   useEffect(() => {
+    document.title = 'FreelanceHub | Curated Marketplace for Verified Craftsmen & Engineers';
     fetchFreelancers();
   }, [fetchFreelancers]);
 

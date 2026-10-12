@@ -28,6 +28,7 @@ export default function NotificationsPage() {
   }, [refetch]);
 
   useEffect(() => {
+    document.title = 'Notifications | FreelanceHub';
     fetchNotifications();
   }, [fetchNotifications]);
 
@@ -42,13 +43,13 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'booking':
-        return <Calendar size={18} className="text-purple" />;
+        return <Calendar size={18} className="text-forest" />;
       case 'payment':
-        return <DollarSign size={18} className="text-lime" />;
+        return <DollarSign size={18} className="text-terracotta" />;
       case 'message':
-        return <MessageSquare size={18} className="text-purple" />;
+        return <MessageSquare size={18} className="text-forest" />;
       default:
-        return <Bell size={18} className="text-purple" />;
+        return <Bell size={18} className="text-forest" />;
     }
   };
 
@@ -61,11 +62,11 @@ export default function NotificationsPage() {
               width: 42,
               height: 42,
               borderRadius: 12,
-              background: '#151521',
+              background: 'var(--forest-dark)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--neon-lime)',
+              color: 'var(--terracotta)',
             }}
           >
             <Bell size={20} />
@@ -86,7 +87,7 @@ export default function NotificationsPage() {
                 style={{
                   padding: '1.25rem 1.5rem',
                   borderBottom: '1px solid var(--border-subtle)',
-                  background: n.is_read ? '#FFFFFF' : 'var(--purple-soft)',
+                  background: n.is_read ? '#FFFFFF' : 'var(--bg-sage-subtle)',
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '14px',
@@ -131,7 +132,7 @@ export default function NotificationsPage() {
         ) : (
           <div style={{ padding: '3rem 1.5rem' }}>
             <EmptyState
-              icon="🔔"
+              icon={Bell}
               title="All Caught Up"
               message="You have no notifications at the moment."
             />

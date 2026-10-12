@@ -8,7 +8,7 @@ export default function Avatar({ src, alt, fallback, size = 'md', className = ''
   return (
     <div className={`ui-avatar ${sizeClass} ${className}`}>
       {src ? (
-        <img src={src} alt={alt || ''} className="ui-avatar-img" />
+        <img src={src} alt={alt || 'Profile photo'} className="ui-avatar-img" />
       ) : fallback ? (
         <span className="ui-avatar-fallback">{fallback}</span>
       ) : (

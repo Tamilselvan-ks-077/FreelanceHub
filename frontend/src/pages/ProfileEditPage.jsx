@@ -4,8 +4,7 @@ import { profileAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import SkeletonCard from '../components/SkeletonCard';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { User, Camera, ArrowLeft, Save, CheckCircle2 } from 'lucide-react';
+import { Camera, ArrowLeft, Save, CheckCircle2 } from 'lucide-react';
 
 export default function ProfileEditPage() {
   const { user, refetch } = useAuth();
@@ -56,6 +55,7 @@ export default function ProfileEditPage() {
   }, []);
 
   useEffect(() => {
+    document.title = 'Edit Profile | FreelanceHub';
     fetchProfile();
   }, [fetchProfile]);
 
@@ -64,6 +64,10 @@ export default function ProfileEditPage() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image file exceeds the 5MB limit. Please choose a smaller file.');
+        return;
+      }
       setForm({ ...form, profile_picture: file });
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -130,9 +134,9 @@ export default function ProfileEditPage() {
                 height: 108,
                 borderRadius: '50%',
                 overflow: 'hidden',
-                background: '#F3F2FA',
+                background: 'var(--bg-sage-subtle)',
                 cursor: 'pointer',
-                border: '3px solid var(--purple-light)',
+                border: '3px solid var(--sage-green)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -142,9 +146,9 @@ export default function ProfileEditPage() {
               onClick={() => fileInputRef.current?.click()}
             >
               {previewImage ? (
-                <img src={previewImage} alt="Avatar Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={previewImage} alt="Profile photo preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <Camera size={32} color="var(--purple-primary)" />
+                <Camera size={32} color="var(--forest-green)" />
               )}
             </div>
             <button
@@ -153,7 +157,7 @@ export default function ProfileEditPage() {
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                color: 'var(--purple-primary)',
+                color: 'var(--forest-green)',
                 fontWeight: 700,
                 fontSize: '0.9rem',
               }}

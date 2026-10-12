@@ -37,8 +37,9 @@ export default function BookingEditPage() {
   }, [id]);
 
   useEffect(() => {
+    document.title = `Manage Booking #${id} | FreelanceHub`;
     fetchBooking();
-  }, [fetchBooking]);
+  }, [fetchBooking, id]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -195,7 +196,7 @@ export default function BookingEditPage() {
             )}
 
             {isFreelancer && booking.status === 'accepted' && (
-              <Button variant="purple" size="md" icon={Check} onClick={() => handleAction('complete')} isLoading={saving}>
+              <Button variant="primary" size="md" icon={Check} onClick={() => handleAction('complete')} isLoading={saving}>
                 Mark as Completed
               </Button>
             )}

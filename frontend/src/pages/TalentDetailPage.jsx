@@ -4,12 +4,11 @@ import { freelancerAPI, bookingAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import EmptyState from '../components/EmptyState';
 import Avatar from '../components/ui/Avatar';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { 
   MapPin, Star, Heart, Calendar, Briefcase, ExternalLink, 
-  ShieldCheck, MessageSquare, ArrowLeft, CheckCircle2, Globe, Code, Sparkles 
+  ShieldCheck, MessageSquare, ArrowLeft, CheckCircle2, Globe, Code, Sparkles, Zap 
 } from 'lucide-react';
 import './TalentDetailPage.css';
 
@@ -27,6 +26,9 @@ export default function TalentDetailPage() {
     try {
       const res = await freelancerAPI.detail(id);
       setProfile(res.data);
+      if (res.data) {
+        document.title = `${res.data.full_name || res.data.username} - Profile | FreelanceHub`;
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -84,7 +86,7 @@ export default function TalentDetailPage() {
     return (
       <div className="container page-content mt-12">
         <EmptyState
-          icon="⚡"
+          icon={Zap}
           title="Talent Profile Not Found"
           message="This professional profile is either unavailable or has been deactivated."
           action={
@@ -119,6 +121,7 @@ export default function TalentDetailPage() {
               <div className="detail-avatar-ring">
                 <Avatar
                   src={displayAvatar}
+                  alt={`${profile.full_name || profile.username}'s profile photo`}
                   fallback={(profile.full_name || profile.username || 'U')[0].toUpperCase()}
                   size="xl"
                   className="detail-main-avatar"
@@ -209,7 +212,7 @@ export default function TalentDetailPage() {
             {/* About Card */}
             <div className="detail-card">
               <div className="detail-card-head">
-                <Sparkles size={18} className="text-purple" />
+                <Sparkles size={18} className="text-terracotta" />
                 <h3>About & Background</h3>
               </div>
               <p className="bio-paragraph">
@@ -229,7 +232,7 @@ export default function TalentDetailPage() {
             {/* Portfolio Card */}
             <div className="detail-card">
               <div className="detail-card-head">
-                <Briefcase size={18} className="text-purple" />
+                <Briefcase size={18} className="text-forest" />
                 <h3>Verified Portfolio Projects ({profile.portfolio?.length || 0})</h3>
               </div>
 
@@ -243,7 +246,7 @@ export default function TalentDetailPage() {
                         </div>
                       ) : (
                         <div className="port-thumb-placeholder">
-                          <Briefcase size={28} className="text-purple" />
+                          <Briefcase size={28} className="text-forest" />
                         </div>
                       )}
                       <div className="port-item-info">
@@ -273,7 +276,7 @@ export default function TalentDetailPage() {
             {/* Reviews Card */}
             <div className="detail-card">
               <div className="detail-card-head">
-                <Star size={18} className="text-purple" />
+                <Star size={18} className="text-terracotta" />
                 <h3>Client Reviews ({profile.review_count || 0})</h3>
               </div>
 
@@ -325,7 +328,7 @@ export default function TalentDetailPage() {
                   <div className="self-booking-notice">
                     <p>You are viewing your own public profile.</p>
                     <Link to="/profile/edit">
-                      <Button variant="purple" size="md" className="w-full mt-4">
+                      <Button variant="primary" size="md" className="w-full mt-4">
                         Edit My Profile
                       </Button>
                     </Link>

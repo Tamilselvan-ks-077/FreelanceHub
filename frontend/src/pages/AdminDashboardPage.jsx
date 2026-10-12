@@ -3,7 +3,7 @@ import { adminAPI } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
 import BookingStatusBadge from '../components/BookingStatusBadge';
 import Badge from '../components/ui/Badge';
-import { Users, Briefcase, DollarSign, Calendar, ShieldCheck, Activity } from 'lucide-react';
+import { Users, Briefcase, DollarSign, Calendar, ShieldCheck } from 'lucide-react';
 import './DashboardPage.css';
 
 export default function AdminDashboardPage() {
@@ -22,6 +22,7 @@ export default function AdminDashboardPage() {
   }, []);
 
   useEffect(() => {
+    document.title = 'Admin Analytics | FreelanceHub';
     fetchAdminStats();
   }, [fetchAdminStats]);
 
@@ -155,7 +156,7 @@ export default function AdminDashboardPage() {
                   <tr key={u.id}>
                     <td><strong>{u.username}</strong></td>
                     <td>
-                      <Badge variant={u.role === 'freelancer' ? 'purple' : 'lime'}>
+                      <Badge variant={u.role === 'freelancer' ? 'sage' : 'lime'}>
                         {u.role}
                       </Badge>
                     </td>

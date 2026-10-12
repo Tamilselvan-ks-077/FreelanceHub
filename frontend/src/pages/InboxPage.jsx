@@ -23,7 +23,10 @@ export default function InboxPage() {
     }
   }, []);
 
-  useEffect(() => { fetchThreads(); }, [fetchThreads]);
+  useEffect(() => {
+    document.title = 'Studio Messages | FreelanceHub';
+    fetchThreads();
+  }, [fetchThreads]);
 
   const filteredThreads = threads.filter(t => 
     (t.full_name || t.username || '').toLowerCase().includes(searchQuery.toLowerCase())

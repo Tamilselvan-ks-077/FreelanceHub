@@ -8,7 +8,11 @@ import './TalentCard.css';
 
 function Stars({ rating, count }) {
   if (!rating) {
-    return <span className="no-rating-pill">★ New Artisan</span>;
+    return (
+      <span className="no-rating-pill inline-flex items-center gap-1">
+        <Star size={11} strokeWidth={1.5} /> New Profile
+      </span>
+    );
   }
   return (
     <span className="stars-pill">
@@ -50,6 +54,7 @@ export default function TalentCard({ freelancer, onToggleFav }) {
           <div className="talent-avatar-wrapper">
             <Avatar
               src={displayAvatar}
+              alt={`${displayName}'s profile photo`}
               fallback={displayName[0].toUpperCase()}
               size="lg"
               className="talent-card-avatar"

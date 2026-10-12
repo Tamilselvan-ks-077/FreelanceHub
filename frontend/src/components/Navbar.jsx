@@ -78,9 +78,9 @@ export default function Navbar() {
               <button 
                 type="button" 
                 className="nav-link nav-link-btn" 
-                onClick={() => scrollToSection('testimonials')}
+                onClick={() => scrollToSection('standards')}
               >
-                Testimonials
+                Standards
               </button>
             </>
           ) : (
@@ -200,9 +200,9 @@ export default function Navbar() {
           <button 
             type="button" 
             className="mobile-nav-link mobile-nav-btn-link" 
-            onClick={() => scrollToSection('testimonials')}
+            onClick={() => scrollToSection('standards')}
           >
-            Testimonials
+            Standards
           </button>
 
           {user ? (
@@ -214,7 +214,7 @@ export default function Navbar() {
               <Link to="/messages" className={`mobile-nav-link ${isActive('/messages')}`} onClick={closeMenu}>
                 <MessageSquare size={18} /> Messages
                 {user.unread_messages > 0 && (
-                  <Badge variant="purple" className="ml-2">{user.unread_messages}</Badge>
+                  <Badge variant="lime" className="ml-2">{user.unread_messages}</Badge>
                 )}
               </Link>
               <Link to="/notifications" className={`mobile-nav-link ${isActive('/notifications')}`} onClick={closeMenu}>

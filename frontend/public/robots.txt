@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /booking/*/edit
+Disallow: /profile/edit
+
+Sitemap: https://freelancehub.io/sitemap.xml

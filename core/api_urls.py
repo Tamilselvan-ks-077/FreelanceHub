@@ -45,4 +45,7 @@ urlpatterns = [
 
     # Admin
     path('admin/stats/',                         api_views.api_admin_stats,     name='api_admin_stats'),
+
+    # Health & Monitoring
+    path('health/',                              api_views.api_health,          name='api_health'),
 ]

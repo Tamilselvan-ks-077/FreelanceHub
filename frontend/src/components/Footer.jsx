@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Mail, ShieldCheck, Globe, Code, Share2, Leaf } from 'lucide-react';
+import { Mail, ShieldCheck, Globe, Code, Share2, MapPin, Building } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="botanical-footer">
+    <footer className="botanical-footer" aria-label="Site footer">
       <div className="container">
         <div className="footer-top-grid">
-          {/* Brand Info */}
+          {/* Brand & Business Info */}
           <div className="footer-brand-block">
             <Link to="/" className="footer-logo">
               <svg className="footer-brand-icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
@@ -20,56 +20,73 @@ export default function Footer() {
             </Link>
 
             <p className="footer-brand-desc">
-              An intentional, artisanal marketplace for verified engineering craftsmen, AI researchers, and editorial designers.
+              Curated marketplace connecting founders and enterprises directly with verified software engineers, AI architects, and editorial designers.
             </p>
 
-            <div className="footer-social-row">
+            <div className="text-xs space-y-1.5 pt-2" style={{ color: 'var(--text-muted)' }}>
+              <div className="flex items-center gap-1.5">
+                <Building size={14} />
+                <span>FreelanceHub Technologies Private Limited</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MapPin size={14} />
+                <span>108 Botanical Garden Road, Bengaluru, KA 560004</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Mail size={14} />
+                <span>support@freelancehub.io | grievance@freelancehub.io</span>
+              </div>
+            </div>
+
+            <div className="footer-social-row mt-4">
               <a href="https://github.com" target="_blank" rel="noreferrer" className="social-icon-btn" aria-label="GitHub">
                 <Code size={18} strokeWidth={1.5} />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon-btn" aria-label="Social">
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon-btn" aria-label="Twitter">
                 <Share2 size={18} strokeWidth={1.5} />
               </a>
               <a href="https://freelancehub.io" target="_blank" rel="noreferrer" className="social-icon-btn" aria-label="Website">
                 <Globe size={18} strokeWidth={1.5} />
               </a>
-              <a href="mailto:support@freelancehub.io" className="social-icon-btn" aria-label="Email">
+              <a href="mailto:support@freelancehub.io" className="social-icon-btn" aria-label="Email Support">
                 <Mail size={18} strokeWidth={1.5} />
               </a>
             </div>
           </div>
 
-          {/* Nav Columns */}
+          {/* Nav Column: Marketplace */}
           <div className="footer-links-column">
-            <h4 className="footer-column-heading">Ecosystem</h4>
+            <h4 className="footer-column-heading">Marketplace</h4>
             <ul className="footer-links-list">
-              <li><Link to="/">Artisan Directory</Link></li>
-              <li><a href="#features">The Standard</a></li>
-              <li><a href="#how-it-works">The Process</a></li>
-              <li><a href="#testimonials">Testimonials</a></li>
-              <li><Link to="/signup">Join Sanctuary</Link></li>
+              <li><Link to="/#talent-directory">Find Talent</Link></li>
+              <li><Link to="/signup">Apply as Freelancer</Link></li>
+              <li><Link to="/#how-it-works">How It Works</Link></li>
+              <li><Link to="/signup">Hire Engineers</Link></li>
+              <li><Link to="/dashboard">Client Portal</Link></li>
             </ul>
           </div>
 
+          {/* Nav Column: Workspace */}
           <div className="footer-links-column">
-            <h4 className="footer-column-heading">For Ventures</h4>
+            <h4 className="footer-column-heading">Workspace</h4>
             <ul className="footer-links-list">
-              <li><Link to="/signup">Commission Project</Link></li>
-              <li><Link to="/">Search Craftsmen</Link></li>
-              <li><Link to="/signup">Milestone Escrow</Link></li>
-              <li><Link to="/dashboard">Ventures Portal</Link></li>
-              <li><Link to="/login">Direct Invoicing</Link></li>
-            </ul>
-          </div>
-
-          <div className="footer-links-column">
-            <h4 className="footer-column-heading">For Artisans</h4>
-            <ul className="footer-links-list">
-              <li><Link to="/signup">Apply as Master</Link></li>
-              <li><Link to="/profile/edit">Portfolio Showcase</Link></li>
+              <li><Link to="/dashboard">Dashboard</Link></li>
               <li><Link to="/messages">Studio Messages</Link></li>
-              <li><Link to="/dashboard">Earnings Ledger</Link></li>
-              <li><Link to="/dashboard">Milestones</Link></li>
+              <li><Link to="/profile/edit">Edit Profile</Link></li>
+              <li><Link to="/notifications">Notifications</Link></li>
+              <li><Link to="/login">Sign In</Link></li>
+            </ul>
+          </div>
+
+          {/* Nav Column: Legal & Compliance */}
+          <div className="footer-links-column">
+            <h4 className="footer-column-heading">Trust & Legal</h4>
+            <ul className="footer-links-list">
+              <li><Link to="/privacy">Privacy Policy (DPDP & GDPR)</Link></li>
+              <li><Link to="/terms">Terms & Conditions</Link></li>
+              <li><Link to="/cookies">Cookies & Tracking</Link></li>
+              <li><Link to="/refund">Refund & Escrow Policy</Link></li>
+              <li><a href="mailto:grievance@freelancehub.io">Grievance Officer</a></li>
             </ul>
           </div>
         </div>
@@ -77,11 +94,19 @@ export default function Footer() {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom-bar">
           <div className="footer-copyright">
-            © {currentYear} FreelanceHub Inc. Crafted with organic elegance and intentionality.
+            © {currentYear} FreelanceHub Technologies Private Limited. All rights reserved.
           </div>
-          <div className="footer-legal-links">
-            <span className="footer-secure-tag">
-              <ShieldCheck size={14} strokeWidth={1.5} color="#8C9A84" /> 256-bit Encrypted Escrow
+          <div className="footer-legal-links flex items-center gap-4 text-xs">
+            <Link to="/privacy" className="hover:underline">Privacy</Link>
+            <span style={{ color: 'var(--border-strong)' }}>•</span>
+            <Link to="/terms" className="hover:underline">Terms</Link>
+            <span style={{ color: 'var(--border-strong)' }}>•</span>
+            <Link to="/cookies" className="hover:underline">Cookies</Link>
+            <span style={{ color: 'var(--border-strong)' }}>•</span>
+            <Link to="/refund" className="hover:underline">Refunds</Link>
+            <span style={{ color: 'var(--border-strong)' }}>•</span>
+            <span className="footer-secure-tag inline-flex items-center gap-1">
+              <ShieldCheck size={14} strokeWidth={1.5} color="#8C9A84" /> 256-bit Escrow Security
             </span>
           </div>
         </div>

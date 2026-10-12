@@ -12,7 +12,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.10em;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
   transition: all var(--transition-base);

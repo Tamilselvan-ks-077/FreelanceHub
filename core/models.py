@@ -399,6 +399,7 @@ class Favourite(models.Model):
 class Payment(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='payments')
     transaction_id = models.CharField(max_length=100, unique=True)
+    idempotency_key = models.CharField(max_length=255, unique=True, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50, default='credit_card')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -406,6 +407,8 @@ class Payment(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['-created_at']),
+            models.Index(fields=['idempotency_key']),
+            models.Index(fields=['invoice', '-created_at']),
         ]
 
     def __str__(self):
