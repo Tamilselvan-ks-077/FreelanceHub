@@ -1208,7 +1208,9 @@ body.nav-open { overflow: hidden; }
     font-size: clamp(2.5rem, 5.5vw, 4.2rem);
     font-weight: 800;
     line-height: 1.12;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.012em;
+    font-variant-ligatures: normal;
+    font-feature-settings: "liga" 1;
     margin-bottom: 20px;
     color: var(--text-primary);
 }

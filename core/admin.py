@@ -4,8 +4,12 @@ from .models import (
     Review, Portfolio, Notification, Message, Favourite, Payment, ActivityLog
 )
 
-admin.site.register(Student)
-admin.site.register(Profile)
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'is_verified', 'hourly_rate', 'location', 'availability')
+    list_filter = ('role', 'is_verified', 'availability')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'title')
+    list_editable = ('is_verified',)
 admin.site.register(Skill)
 admin.site.register(FreelancerSkill)
 admin.site.register(Booking)
